@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dieta Renal — Semáforo Nutricional</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>🍽️ Dieta Renal</h1>
+    <p class="subtitle">Semáforo de potasio, fósforo y sodio por foto</p>
+  </header>
+
+  <main class="container">
+    <section class="card capture-card">
+      <div id="preview-wrap" class="preview-wrap">
+        <img id="preview" alt="Vista previa del alimento" hidden>
+        <div id="preview-placeholder" class="preview-placeholder">
+          <span>📷</span>
+          <p>Toma o sube una foto de tu comida</p>
+        </div>
+      </div>
+
+      <div class="capture-actions">
+        <label class="btn btn-primary">
+          📸 Tomar foto
+          <input id="camera-input" type="file" accept="image/*" capture="environment" hidden>
+        </label>
+        <label class="btn btn-secondary">
+          🖼️ Subir imagen
+          <input id="file-input" type="file" accept="image/*" hidden>
+        </label>
+      </div>
+
+      <button id="analyze-btn" class="btn btn-analyze" disabled>Analizar alimento</button>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="results" class="card results-card" hidden>
+      <h2>Resultado del análisis</h2>
+      <div id="results-list"></div>
+    </section>
+
+    <section class="card history-card">
+      <div class="history-header">
+        <h2>Historial de hoy</h2>
+        <button id="clear-history" class="btn btn-ghost">Borrar historial</button>
+      </div>
+      <div id="daily-summary" class="daily-summary"></div>
+      <div id="history-list" class="history-list"></div>
+    </section>
+
+    <p class="disclaimer">
+      ⚠️ Esta app es una herramienta educativa de apoyo y usa valores nutricionales
+      de referencia general (por 100&nbsp;g). No sustituye la indicación de tu
+      nefrólogo(a) o nutricionista, quienes deben personalizar tus límites diarios
+      de potasio, fósforo y sodio. El reconocimiento por IA puede cometer errores:
+      verifica siempre el alimento identificado.
+    </p>
+  </main>
+
+  <div id="manual-select-modal" class="modal" hidden>
+    <div class="modal-content">
+      <h3>Confirmar o corregir alimento</h3>
+      <input id="manual-search" type="text" placeholder="Buscar alimento..." list="food-datalist" autocomplete="off">
+      <datalist id="food-datalist"></datalist>
+      <div class="modal-actions">
+        <button id="manual-cancel" class="btn btn-ghost">Cancelar</button>
+        <button id="manual-confirm" class="btn btn-primary">Usar este alimento</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
