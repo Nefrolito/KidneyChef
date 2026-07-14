@@ -4,12 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dieta Renal — Semáforo Nutricional</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e7490'/%3E%3Cpath d='M16 6c-4.5 0-7 3.6-7 8.2 0 5.4 3.4 9.6 5.6 11.4 1 .8 2.4-.1 2.1-1.4-.5-2-1-4.4.4-6 1.6-1.8 4.4-1 4.9 1.4.3 1.5 2.5 1.3 2.5-.3 0-7.1-3.7-13.3-8.5-13.3z' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="topbar">
-    <h1>🍽️ Dieta Renal</h1>
-    <p class="subtitle">Semáforo de potasio, fósforo y sodio por foto</p>
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="30" height="30">
+          <rect width="32" height="32" rx="9" fill="url(#g)"/>
+          <path d="M16 6c-4.5 0-7 3.6-7 8.2 0 5.4 3.4 9.6 5.6 11.4 1 .8 2.4-.1 2.1-1.4-.5-2-1-4.4.4-6 1.6-1.8 4.4-1 4.9 1.4.3 1.5 2.5 1.3 2.5-.3 0-7.1-3.7-13.3-8.5-13.3z" fill="white"/>
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="32" y2="32">
+              <stop offset="0" stop-color="#14b8c4"/>
+              <stop offset="1" stop-color="#0e7490"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <h1>Dieta Renal</h1>
+        <p class="subtitle">Semáforo nutricional por foto</p>
+      </div>
+    </div>
   </header>
 
   <main class="container">
@@ -17,18 +37,25 @@
       <div id="preview-wrap" class="preview-wrap">
         <img id="preview" alt="Vista previa del alimento" hidden>
         <div id="preview-placeholder" class="preview-placeholder">
-          <span>📷</span>
+          <span class="placeholder-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 8h2.5l1.2-2h8.6l1.2 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/>
+              <circle cx="12" cy="13.5" r="3.6"/>
+            </svg>
+          </span>
           <p>Toma o sube una foto de tu comida</p>
         </div>
       </div>
 
       <div class="capture-actions">
         <label class="btn btn-primary">
-          📸 Tomar foto
+          <svg class="btn-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h2.5l1.2-2h8.6l1.2 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.6"/></svg>
+          Tomar foto
           <input id="camera-input" type="file" accept="image/*" capture="environment" hidden>
         </label>
         <label class="btn btn-secondary">
-          🖼️ Subir imagen
+          <svg class="btn-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 15.5 8 11l3 3 4-4.5 5.5 6"/><circle cx="8" cy="8.5" r="1.4"/></svg>
+          Subir imagen
           <input id="file-input" type="file" accept="image/*" hidden>
         </label>
       </div>
@@ -51,13 +78,16 @@
       <div id="history-list" class="history-list"></div>
     </section>
 
-    <p class="disclaimer">
-      ⚠️ Esta app es una herramienta educativa de apoyo y usa valores nutricionales
-      de referencia general (por 100&nbsp;g). No sustituye la indicación de tu
-      nefrólogo(a) o nutricionista, quienes deben personalizar tus límites diarios
-      de potasio, fósforo y sodio. El reconocimiento por IA puede cometer errores:
-      verifica siempre el alimento identificado.
-    </p>
+    <div class="disclaimer">
+      <svg class="disclaimer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><path d="M12 8v5"/><circle cx="12" cy="16.2" r="0.4" fill="currentColor"/></svg>
+      <p>
+        Esta app es una herramienta educativa de apoyo y usa valores nutricionales
+        de referencia general (por 100&nbsp;g). No sustituye la indicación de tu
+        nefrólogo(a) o nutricionista, quienes deben personalizar tus límites diarios
+        de potasio, fósforo y sodio. El reconocimiento por IA puede cometer errores:
+        verifica siempre el alimento identificado.
+      </p>
+    </div>
   </main>
 
   <div id="manual-select-modal" class="modal" hidden>
