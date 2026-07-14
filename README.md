@@ -54,7 +54,7 @@ cámara).
 
 ## Créditos
 
-- Foto decorativa de la pantalla de captura: "Healthy Vegetable Bowl" por
+- Foto decorativa de la pantalla de captura: "Healthy Gnocchi Buddha Bowl" por
   Jonas Zeschke (FitTasteTic), Wikimedia Commons, licencia
   [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/deed.es).
-  https://commons.wikimedia.org/wiki/File:Healthy_Vegetable_Bowl.jpg
+  https://commons.wikimedia.org/wiki/File:Healthy_Gnocchi_Buddha_Bowl_-_49859053553.jpg
