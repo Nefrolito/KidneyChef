@@ -12,6 +12,22 @@ const NUTRIENTE_LABEL = {
   sodio_mg: "Sodio",
 };
 
+const NUTRIENTE_ICON = {
+  potasio_mg: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4C10 4 4 10 4 20c10 0 16-6 16-16Z"/><path d="M8.5 15.5 15.5 8.5"/></svg>`,
+  fosforo_mg: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><circle cx="6" cy="18" r="2.3"/><circle cx="18" cy="6" r="2.3"/></svg>`,
+  sodio_mg: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l1 3H8Z"/><path d="M8 6h8l1.2 12.5A2 2 0 0 1 15.2 21H8.8a2 2 0 0 1-2-2.5L8 6Z"/><circle cx="10.5" cy="11" r="0.4" fill="currentColor"/><circle cx="13.5" cy="11" r="0.4" fill="currentColor"/><circle cx="12" cy="14" r="0.4" fill="currentColor"/></svg>`,
+};
+
+const TIPS_DEL_DIA = [
+  "Elegir alimentos frescos y cocinar en casa te ayuda a controlar el sodio y mejorar tu salud renal.",
+  "Remojar y hervir las verduras (doble cocción, descartando el agua) reduce su contenido de potasio.",
+  "Lee las etiquetas: el sodio se esconde en salsas, conservas, embutidos y panes procesados.",
+  "Lácteos, frutos secos y bebidas de cola son ricos en fósforo; modera sus porciones.",
+  "El agua de cocción de legumbres y verduras concentra potasio — evita reutilizarla en sopas o salsas.",
+  "Las especias y hierbas frescas son una buena forma de dar sabor sin recurrir a la sal.",
+  "Revisa siempre el alimento que identifica la app: la confirmación manual evita errores importantes.",
+];
+
 let FOODS = [];
 let currentImageDataUrl = null;
 let pendingManualTarget = null; // { itemIndex } when correcting a specific result
@@ -33,6 +49,10 @@ const els = {
   foodDatalist: document.getElementById("food-datalist"),
   manualCancel: document.getElementById("manual-cancel"),
   manualConfirm: document.getElementById("manual-confirm"),
+  aboutBtn: document.getElementById("about-btn"),
+  aboutModal: document.getElementById("about-modal"),
+  aboutClose: document.getElementById("about-close"),
+  tipText: document.getElementById("tip-text"),
 };
 
 let lastAnalysis = []; // current analysis results, mutable for manual correction
@@ -43,6 +63,7 @@ async function init() {
   FOODS = await fetch("nutrientes.json").then((r) => r.json());
   populateDatalist();
   renderHistory();
+  renderTipOfDay();
 
   els.cameraInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
   els.fileInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
@@ -50,6 +71,14 @@ async function init() {
   els.clearHistoryBtn.addEventListener("click", clearHistory);
   els.manualCancel.addEventListener("click", closeModal);
   els.manualConfirm.addEventListener("click", confirmManualSelection);
+  els.aboutBtn.addEventListener("click", () => { els.aboutModal.hidden = false; });
+  els.aboutClose.addEventListener("click", () => { els.aboutModal.hidden = true; });
+}
+
+function renderTipOfDay() {
+  const start = new Date(new Date().getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((new Date() - start) / 86400000);
+  els.tipText.textContent = TIPS_DEL_DIA[dayOfYear % TIPS_DEL_DIA.length];
 }
 
 function populateDatalist() {
@@ -248,8 +277,9 @@ function badge(nutriente, valorMg) {
   return `
     <div class="semaforo-badge nivel-${nivel}">
       <span class="label">${NUTRIENTE_LABEL[nutriente]}</span>
+      <span class="badge-icon-circle">${NUTRIENTE_ICON[nutriente]}</span>
       <span class="value">${valorMg} mg</span>
-      <span class="tag">${nivelTag(nivel)}</span>
+      <span class="tag-pill">${nivelTag(nivel)}</span>
     </div>`;
 }
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Servidor local para la app de Dieta Renal.
+"""Servidor local para la app KidneyChef.
 
 Sirve los archivos estáticos de public/ y expone POST /api/analyze,
 que reenvía la foto a la API de Claude (visión) para identificar el
@@ -182,7 +182,7 @@ def main():
     load_dotenv()
     port = int(os.environ.get("PORT", 8000))
     server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
-    print(f"Dieta Renal corriendo en http://localhost:{port}")
+    print(f"KidneyChef corriendo en http://localhost:{port}")
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("AVISO: no se encontró ANTHROPIC_API_KEY. Crea un archivo .env (ver .env.example).")
     try:

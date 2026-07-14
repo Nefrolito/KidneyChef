@@ -1,4 +1,4 @@
-# Dieta Renal — Semáforo Nutricional
+# KidneyChef — Semáforo Nutricional
 
 Prototipo web para pacientes con enfermedad renal crónica: toma o sube una foto
 de tu comida y obtén un semáforo (verde/amarillo/rojo) de potasio, fósforo y
@@ -51,3 +51,10 @@ cámara).
   equivocarse; siempre se puede corregir manualmente el alimento identificado.
 - Si la IA identifica un alimento que no está en la base de datos, se pide
   seleccionarlo manualmente de la lista existente.
+
+## Créditos
+
+- Foto decorativa de la pantalla de captura: "Healthy Vegetable Bowl" por
+  Jonas Zeschke (FitTasteTic), Wikimedia Commons, licencia
+  [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/deed.es).
+  https://commons.wikimedia.org/wiki/File:Healthy_Vegetable_Bowl.jpg
