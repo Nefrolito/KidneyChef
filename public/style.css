@@ -260,32 +260,50 @@ h1, h2, h3 {
 .btn-secondary:hover { filter: brightness(1.08); }
 
 .btn-analyze {
+  position: relative;
   width: 100%;
-  background: linear-gradient(135deg, #3fdb8c, #128a45);
+  overflow: hidden;
+  background: linear-gradient(135deg, #4dfb9d, #0f7a3d);
   color: white;
   padding: 1.2rem 1.1rem;
   font-size: 1.12rem;
-  border: 2.5px solid rgba(255, 255, 255, 0.45);
-  box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.14), 0 14px 32px rgba(22, 163, 74, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  border: 2.5px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.16), 0 14px 34px rgba(22, 163, 74, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   animation: pulse-glow 2.2s ease-in-out infinite;
 }
-.btn-analyze .btn-icon-circle { width: 42px; height: 42px; background: rgba(255, 255, 255, 0.3); flex-shrink: 0; }
+.btn-analyze::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.55) 48%, transparent 66%);
+  background-size: 220% 100%;
+  background-position: 150% 0;
+  animation: shine-sweep 3s ease-in-out infinite;
+  pointer-events: none;
+}
+.btn-analyze .btn-icon-circle { width: 42px; height: 42px; background: rgba(255, 255, 255, 0.32); flex-shrink: 0; position: relative; z-index: 1; }
+.btn-analyze .btn-text { flex: 1; min-width: 0; position: relative; z-index: 1; }
 .btn-analyze .btn-text strong { font-size: 1.1rem; letter-spacing: -0.01em; white-space: nowrap; }
 .btn-analyze .btn-text small { font-size: 0.74rem; white-space: nowrap; }
-.btn-analyze .btn-text { flex: 1; min-width: 0; }
-.btn-analyze .btn-chevron { flex-shrink: 0; opacity: 0.95; width: 22px; height: 22px; }
-.btn-analyze:hover:not(:disabled) { filter: brightness(1.07); box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.18), 0 16px 36px rgba(22, 163, 74, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+.btn-analyze .btn-chevron { flex-shrink: 0; opacity: 0.95; width: 22px; height: 22px; position: relative; z-index: 1; }
+.btn-analyze:hover:not(:disabled) { filter: brightness(1.07); box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.2), 0 16px 38px rgba(22, 163, 74, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.4); }
 .btn-analyze:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; border-color: transparent; animation: none; transform: none; }
+.btn-analyze:disabled::after { animation: none; display: none; }
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.14), 0 14px 32px rgba(22, 163, 74, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.16), 0 14px 34px rgba(22, 163, 74, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.4);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 0 9px rgba(22, 163, 74, 0.05), 0 16px 38px rgba(22, 163, 74, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    transform: scale(1.012);
+    box-shadow: 0 0 0 10px rgba(22, 163, 74, 0.06), 0 16px 40px rgba(22, 163, 74, 0.68), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transform: scale(1.015);
   }
+}
+
+@keyframes shine-sweep {
+  0%, 15% { background-position: 150% 0; }
+  55%, 100% { background-position: -50% 0; }
 }
 
 .btn-ghost {
