@@ -150,6 +150,32 @@ body {
   margin-top: 0.5rem;
 }
 
+.confidence-note {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: -0.4rem 0 0.75rem;
+}
+.confidence-note.confidence-low {
+  color: var(--amarillo);
+  font-weight: 600;
+}
+
+.alternatives-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 0.75rem;
+}
+.alt-chip {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
 .history-header { display: flex; justify-content: space-between; align-items: center; }
 
 .daily-summary {

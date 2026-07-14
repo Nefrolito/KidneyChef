@@ -19,17 +19,33 @@ PUBLIC_DIR = ROOT / "public"
 ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5")
 ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 
-PROMPT = """Eres un asistente que identifica alimentos en fotografías para una app de \
-nutrición renal. Mira la imagen y responde EXCLUSIVAMENTE con un array JSON válido \
-(sin texto adicional, sin bloques de código markdown), con esta forma:
+KNOWN_FOODS = json.loads((PUBLIC_DIR / "nutrientes.json").read_text())
+KNOWN_FOODS_LIST = ", ".join(f["nombre"] for f in KNOWN_FOODS)
 
-[{"alimento": "nombre genérico y simple en español (ej: manzana, pechuga de pollo, arroz blanco)", \
-"porcion_g": numero_estimado_de_gramos, "confianza": numero_entre_0_y_1}]
+PROMPT = f"""Eres un asistente que identifica alimentos en fotografías para una app de \
+nutrición renal usada por pacientes con enfermedad renal crónica. La precisión importa: \
+una identificación incorrecta puede llevar a una estimación de potasio/fósforo/sodio \
+equivocada. Mira la imagen con cuidado, fijándote en color, textura, forma, y el contexto \
+del plato, antes de responder.
 
-Incluye un objeto por cada alimento distinto que identifiques en la foto (máximo 6). \
-Usa nombres genéricos simples (sin marcas ni preparaciones muy específicas) para poder \
-buscarlos en una base de datos nutricional. Estima la porción visible en gramos de forma \
-razonable según el tamaño aparente del alimento en la imagen."""
+Responde EXCLUSIVAMENTE con un array JSON válido (sin texto adicional, sin bloques de \
+código markdown), con esta forma:
+
+[{{"alimento": "nombre del alimento", "porcion_g": numero_estimado_de_gramos, \
+"confianza": numero_entre_0_y_1, "alternativas": ["otro nombre posible", "..."]}}]
+
+Reglas:
+- Incluye un objeto por cada alimento distinto que identifiques en la foto (máximo 6).
+- Siempre que el alimento corresponda razonablemente a uno de esta lista conocida, usa \
+EXACTAMENTE ese nombre (coincidencia exacta de texto): {KNOWN_FOODS_LIST}.
+- Si no corresponde a ninguno de la lista, usa un nombre genérico simple en español (sin \
+marcas ni preparaciones muy específicas).
+- "confianza" debe reflejar tu certeza real: usa un valor bajo (menos de 0.5) si el \
+alimento es ambiguo, está parcialmente oculto, o podrías estar confundiéndolo con algo \
+visualmente similar.
+- "alternativas": incluye 1-2 nombres de la lista conocida que también podrían encajar si \
+no estás seguro (deja el array vacío si tienes alta confianza).
+- Estima la porción visible en gramos según el tamaño aparente del alimento en la imagen."""
 
 
 def load_dotenv():

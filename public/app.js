@@ -89,6 +89,7 @@ async function analyzeImage() {
       alimentoIA: item.alimento,
       porcionG: Number(item.porcion_g) || 100,
       confianza: item.confianza,
+      alternativas: Array.isArray(item.alternativas) ? item.alternativas : [],
       match: matchFood(item.alimento),
     }));
 
@@ -170,7 +171,39 @@ function renderResults() {
       const saveBtn = document.getElementById(`save-${idx}`);
       if (saveBtn) saveBtn.addEventListener("click", () => saveToHistory(idx));
     }
+    (item.alternativas || []).forEach((alt, altIdx) => {
+      const altBtn = document.getElementById(`alt-${idx}-${altIdx}`);
+      if (altBtn) altBtn.addEventListener("click", () => useAlternative(idx, alt));
+    });
   });
+}
+
+function confidenceNote(confianza) {
+  if (confianza === undefined || confianza === null) return "";
+  const pct = Math.round(confianza * 100);
+  if (confianza < 0.5) {
+    return `<p class="confidence-note confidence-low">⚠️ Confianza baja (${pct}%) — verifica que el alimento sea correcto.</p>`;
+  }
+  return `<p class="confidence-note">Confianza de la IA: ${pct}%</p>`;
+}
+
+function alternativesRow(item, idx) {
+  const alts = (item.alternativas || []).filter((a) => normalize(a) !== normalize(item.match ? item.match.nombre : ""));
+  if (alts.length === 0) return "";
+  const chips = alts
+    .map((alt, altIdx) => `<button class="alt-chip" id="alt-${idx}-${altIdx}">¿Era "${escapeHtml(alt)}"?</button>`)
+    .join("");
+  return `<div class="alternatives-row">${chips}</div>`;
+}
+
+function useAlternative(idx, altName) {
+  const found = matchFood(altName);
+  if (!found) return;
+  lastAnalysis[idx].match = found;
+  lastAnalysis[idx].alimentoIA = altName;
+  lastAnalysis[idx].alternativas = [];
+  lastAnalysis[idx].confianza = null;
+  renderResults();
 }
 
 function renderFoodResult(item, idx) {
@@ -183,6 +216,7 @@ function renderFoodResult(item, idx) {
           <button id="correct-${idx}">Elegir alimento</button>
         </div>
         <p class="no-match">No encontramos este alimento en la base de datos. Selecciónalo manualmente para ver el semáforo.</p>
+        ${alternativesRow(item, idx)}
       </div>`;
   }
 
@@ -200,6 +234,8 @@ function renderFoodResult(item, idx) {
         <button id="correct-${idx}">Corregir</button>
       </div>
       <p class="portion-note">Porción estimada: ${porcionG} g</p>
+      ${confidenceNote(item.confianza)}
+      ${alternativesRow(item, idx)}
       <div class="semaforo-row">
         ${["potasio_mg", "fosforo_mg", "sodio_mg"].map((k) => badge(k, valores[k])).join("")}
       </div>
@@ -238,6 +274,8 @@ function confirmManualSelection() {
     return;
   }
   lastAnalysis[pendingManualTarget].match = found;
+  lastAnalysis[pendingManualTarget].alternativas = [];
+  lastAnalysis[pendingManualTarget].confianza = null;
   closeModal();
   renderResults();
 }
