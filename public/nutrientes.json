@@ -37,6 +37,7 @@
   {"id": "pimiento", "nombre": "Pimiento", "categoria": "Verdura", "alias": ["pepper", "aji", "chile morron"], "potasio_mg": 211, "fosforo_mg": 26, "sodio_mg": 4},
   {"id": "cebolla", "nombre": "Cebolla", "categoria": "Verdura", "alias": ["onion"], "potasio_mg": 146, "fosforo_mg": 29, "sodio_mg": 4},
   {"id": "ajo", "nombre": "Ajo", "categoria": "Verdura", "alias": ["garlic"], "potasio_mg": 401, "fosforo_mg": 153, "sodio_mg": 17},
+  {"id": "aceituna", "nombre": "Aceituna", "categoria": "Verdura", "alias": ["olive", "olives", "aceitunas"], "potasio_mg": 42, "fosforo_mg": 4, "sodio_mg": 1556},
   {"id": "apio", "nombre": "Apio", "categoria": "Verdura", "alias": ["celery"], "potasio_mg": 260, "fosforo_mg": 24, "sodio_mg": 80},
   {"id": "champinon", "nombre": "Champiñón / Hongo", "categoria": "Verdura", "alias": ["mushroom", "hongos", "setas"], "potasio_mg": 318, "fosforo_mg": 86, "sodio_mg": 5},
   {"id": "calabaza", "nombre": "Calabaza / Zapallo", "categoria": "Verdura", "alias": ["pumpkin", "auyama", "zapallo"], "potasio_mg": 340, "fosforo_mg": 44, "sodio_mg": 1},
