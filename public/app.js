@@ -18,6 +18,52 @@ const NUTRIENTE_ICON = {
   sodio_mg: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l1 3H8Z"/><path d="M8 6h8l1.2 12.5A2 2 0 0 1 15.2 21H8.8a2 2 0 0 1-2-2.5L8 6Z"/><circle cx="10.5" cy="11" r="0.4" fill="currentColor"/><circle cx="13.5" cy="11" r="0.4" fill="currentColor"/><circle cx="12" cy="14" r="0.4" fill="currentColor"/></svg>`,
 };
 
+// Estructura de planes: hoy solo existe el plan básico (gratuito). Los planes
+// pagados se agregarán aquí más adelante, cada uno con su propio set de
+// umbrales/features habilitados según lo que indique el nefrólogo(a) del
+// paciente.
+const PLANS = {
+  basico: {
+    id: "basico",
+    nombre: "KidneyChef Plan Básico",
+    precio: "Gratis",
+    features: {
+      semaforoEstandar: true,
+      historialLocal: true,
+      consejoDelDia: true,
+      umbralesPersonalizados: false,
+      reportesExportables: false,
+      perfilesMultiples: false,
+    },
+  },
+};
+
+const PERFIL_STORAGE_KEY = "kidneyChefPerfil";
+
+function ensurePerfil() {
+  let perfil;
+  try {
+    perfil = JSON.parse(localStorage.getItem(PERFIL_STORAGE_KEY));
+  } catch {
+    perfil = null;
+  }
+  if (!perfil || !PLANS[perfil.planId]) {
+    perfil = { planId: "basico", creadoEn: new Date().toISOString() };
+    localStorage.setItem(PERFIL_STORAGE_KEY, JSON.stringify(perfil));
+  }
+  return perfil;
+}
+
+function getPlanActual() {
+  return PLANS[ensurePerfil().planId];
+}
+
+function renderPlan() {
+  const plan = getPlanActual();
+  els.planBadge.textContent = plan.nombre;
+  els.aboutPlan.textContent = `Tu plan actual: ${plan.nombre} (${plan.precio}).`;
+}
+
 const TIPS_DEL_DIA = [
   "Elegir alimentos frescos y cocinar en casa te ayuda a controlar el sodio y mejorar tu salud renal.",
   "Remojar y hervir las verduras (doble cocción, descartando el agua) reduce su contenido de potasio.",
@@ -53,6 +99,8 @@ const els = {
   aboutModal: document.getElementById("about-modal"),
   aboutClose: document.getElementById("about-close"),
   tipText: document.getElementById("tip-text"),
+  planBadge: document.getElementById("plan-badge"),
+  aboutPlan: document.getElementById("about-plan"),
 };
 
 let lastAnalysis = []; // current analysis results, mutable for manual correction
@@ -64,6 +112,7 @@ async function init() {
   populateDatalist();
   renderHistory();
   renderTipOfDay();
+  renderPlan();
 
   els.cameraInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
   els.fileInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
