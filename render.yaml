@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: kidneychef-api
+    runtime: python
+    plan: free
+    buildCommand: ""
+    startCommand: python3 server.py
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false

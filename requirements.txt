@@ -1,0 +1,4 @@
+# KidneyChef no usa dependencias externas: server.py solo usa la librería
+# estándar de Python. Este archivo existe para que Render (y otros hosts que
+# detectan el runtime por la presencia de requirements.txt) reconozcan el
+# proyecto como una app Python.

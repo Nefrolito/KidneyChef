@@ -131,13 +131,27 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print(f"[{self.log_date_time_string()}] {fmt % args}")
 
+    def _cors_headers(self):
+        # Permite que la app empaquetada (Capacitor, origen distinto al del
+        # servidor) llame a /api/analyze. No hay autenticación de por medio,
+        # así que esto no protege contra abuso del API key: ver README.
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+
     def _send_json(self, status, obj):
         body = json.dumps(obj).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
+        self._cors_headers()
         self.end_headers()
         self.wfile.write(body)
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self._cors_headers()
+        self.end_headers()
 
     def do_GET(self):
         path = self.path.split("?", 1)[0]
@@ -155,6 +169,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(data)))
+        self._cors_headers()
         self.end_headers()
         self.wfile.write(data)
 

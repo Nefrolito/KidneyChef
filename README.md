@@ -40,6 +40,32 @@ Abre http://localhost:8000 en el navegador (en el celular, usa la IP de tu
 computadora en la misma red, ej. http://192.168.1.5:8000, para poder usar la
 cámara).
 
+## Desplegar el backend en Render (para la app empaquetada o producción)
+
+La app nativa (Capacitor) no tiene un servidor Python corriendo en el
+teléfono, así que necesita un backend accesible por internet. Pasos:
+
+1. Sube este repo a GitHub (necesitas una cuenta de GitHub).
+2. Crea una cuenta en [render.com](https://render.com) (tiene plan gratuito,
+   no pide tarjeta).
+3. En el dashboard de Render: **New +** → **Blueprint**, y apunta al repo. Va a
+   detectar `render.yaml` automáticamente y crear el servicio.
+4. En la configuración del servicio, agrega la variable de entorno
+   `ANTHROPIC_API_KEY` con tu key real (nunca la subas al repo).
+5. Cuando termine el deploy, Render te da una URL tipo
+   `https://kidneychef-api.onrender.com`. Actualiza esa URL en
+   `public/app.js` (constante `API_BASE`) para que coincida con la tuya.
+
+**Advertencia de seguridad:** este backend no tiene autenticación ni límite de
+uso. Cualquiera que descubra la URL puede llamar a `/api/analyze` y consumir
+tu API key de Anthropic (con su costo asociado). Para una beta pública real,
+conviene agregar al menos un límite de tasa (rate limiting) o una clave
+compartida simple antes de difundir la URL ampliamente.
+
+El plan gratuito de Render "duerme" el servicio tras ~15 minutos sin uso; la
+primera petición después de eso tarda unos segundos extra en responder
+mientras despierta.
+
 ## Limitaciones importantes
 
 - Los valores nutricionales son de referencia general por 100 g (no
