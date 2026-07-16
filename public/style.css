@@ -495,6 +495,46 @@ h1, h2, h3 {
 .dot-rojo { background: var(--rojo); }
 .history-empty { color: var(--muted); font-size: 0.9rem; text-align: center; padding: 1.2rem 0; font-weight: 500; }
 
+.clinical-card h2 { margin: 0 0 0.3rem; font-size: 1.1rem; font-weight: 700; }
+.clinical-note { margin: 0 0 1rem; font-size: 0.8rem; color: var(--muted); }
+.clinical-field { margin-bottom: 0.9rem; }
+.clinical-field label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; }
+.clinical-field select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-family: inherit;
+}
+.clinical-checks { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+.clinical-check { display: flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; font-weight: 500; }
+.clinical-check input { width: 17px; height: 17px; accent-color: var(--brand); }
+
+.plan-upsell-card {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  background: var(--brand-50);
+  border-color: var(--brand-100);
+}
+.plan-upsell-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--brand-100);
+  color: var(--brand-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.plan-upsell-text h3 { margin: 0 0 0.35rem; font-size: 0.98rem; font-weight: 800; color: var(--brand-dark); }
+.plan-upsell-text p { margin: 0 0 0.35rem; font-size: 0.85rem; color: var(--text); line-height: 1.45; }
+.plan-upsell-hint { font-size: 0.76rem; color: var(--muted); font-style: italic; }
+
 .tip-card {
   display: flex;
   align-items: center;

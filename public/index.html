@@ -113,6 +113,35 @@
       <div id="history-list" class="history-list"></div>
     </section>
 
+    <section class="card clinical-card">
+      <h2>Tus datos clínicos</h2>
+      <p class="clinical-note">Ayudan a tu equipo tratante a ajustar tu Plan Clínico. Se guardan solo en este dispositivo.</p>
+      <div class="clinical-field">
+        <label for="etapa-erc">Etapa de enfermedad renal crónica (ERC)</label>
+        <select id="etapa-erc">
+          <option value="">Prefiero no decirlo</option>
+          <option value="3">Etapa 3</option>
+          <option value="4">Etapa 4</option>
+          <option value="5">Etapa 5</option>
+        </select>
+      </div>
+      <div class="clinical-checks">
+        <label class="clinical-check"><input type="checkbox" id="dato-diabetes"> Diabetes</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-hipertension"> Hipertensión</label>
+      </div>
+    </section>
+
+    <section id="plan-upsell" class="card plan-upsell-card" hidden>
+      <span class="plan-upsell-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="4.2"/></svg>
+      </span>
+      <div class="plan-upsell-text">
+        <h3>KidneyChef Plan Clínico</h3>
+        <p id="plan-upsell-text"></p>
+        <p class="plan-upsell-hint">Coméntaselo a tu nefrólogo(a) o nutricionista renal.</p>
+      </div>
+    </section>
+
     <section class="card tip-card">
       <span class="tip-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .8 1.7v.5h5.6v-.5c0-.7.3-1.3.8-1.7A6 6 0 0 0 12 3Z"/></svg>

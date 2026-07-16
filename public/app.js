@@ -36,7 +36,25 @@ const PLANS = {
       perfilesMultiples: false,
     },
   },
+  // Plan pagado único (en vez de un plan por cada combinación de etapa ERC /
+  // diabetes / hipertensión): el equipo tratante ajusta los umbrales según el
+  // caso puntual del paciente, registrado en perfil.datosClinicos.
+  clinico: {
+    id: "clinico",
+    nombre: "KidneyChef Plan Clínico",
+    precio: "De pago",
+    features: {
+      semaforoEstandar: true,
+      historialLocal: true,
+      consejoDelDia: true,
+      umbralesPersonalizados: true,
+      reportesExportables: true,
+      perfilesMultiples: true,
+    },
+  },
 };
+
+const ETAPAS_ERC = ["3", "4", "5"];
 
 const PERFIL_STORAGE_KEY = "kidneyChefPerfil";
 
@@ -48,20 +66,77 @@ function ensurePerfil() {
     perfil = null;
   }
   if (!perfil || !PLANS[perfil.planId]) {
-    perfil = { planId: "basico", creadoEn: new Date().toISOString() };
+    perfil = {
+      planId: "basico",
+      creadoEn: new Date().toISOString(),
+      datosClinicos: { etapaERC: null, diabetes: false, hipertension: false },
+      umbralesPersonalizados: null,
+    };
     localStorage.setItem(PERFIL_STORAGE_KEY, JSON.stringify(perfil));
   }
+  if (!perfil.datosClinicos) perfil.datosClinicos = { etapaERC: null, diabetes: false, hipertension: false };
+  if (perfil.umbralesPersonalizados === undefined) perfil.umbralesPersonalizados = null;
   return perfil;
+}
+
+function guardarPerfil(perfil) {
+  localStorage.setItem(PERFIL_STORAGE_KEY, JSON.stringify(perfil));
 }
 
 function getPlanActual() {
   return PLANS[ensurePerfil().planId];
 }
 
+function umbralesActivos() {
+  const perfil = ensurePerfil();
+  const plan = PLANS[perfil.planId];
+  if (plan.features.umbralesPersonalizados && perfil.umbralesPersonalizados) {
+    return perfil.umbralesPersonalizados;
+  }
+  return UMBRALES;
+}
+
 function renderPlan() {
   const plan = getPlanActual();
   els.planBadge.textContent = plan.nombre;
   els.aboutPlan.textContent = `Tu plan actual: ${plan.nombre} (${plan.precio}).`;
+}
+
+function renderDatosClinicos() {
+  const perfil = ensurePerfil();
+  els.etapaERC.value = perfil.datosClinicos.etapaERC || "";
+  els.diabetes.checked = !!perfil.datosClinicos.diabetes;
+  els.hipertension.checked = !!perfil.datosClinicos.hipertension;
+  renderPlanUpsell();
+}
+
+function guardarDatosClinicos() {
+  const perfil = ensurePerfil();
+  perfil.datosClinicos = {
+    etapaERC: els.etapaERC.value || null,
+    diabetes: els.diabetes.checked,
+    hipertension: els.hipertension.checked,
+  };
+  guardarPerfil(perfil);
+  renderPlanUpsell();
+}
+
+function renderPlanUpsell() {
+  const perfil = ensurePerfil();
+  const plan = getPlanActual();
+  if (plan.features.umbralesPersonalizados) {
+    els.planUpsell.hidden = true;
+    return;
+  }
+  const { etapaERC, diabetes, hipertension } = perfil.datosClinicos;
+  const detalles = [];
+  if (etapaERC) detalles.push(`ERC etapa ${etapaERC}`);
+  if (diabetes) detalles.push("diabetes");
+  if (hipertension) detalles.push("hipertensión");
+  els.planUpsellText.textContent = detalles.length
+    ? `Con ${detalles.join(", ")}, tu nefrólogo(a) o nutricionista podría ajustar tus umbrales de potasio/fósforo/sodio con el Plan Clínico, además de reportes exportables y varios perfiles.`
+    : "El Plan Clínico permite que tu nefrólogo(a) o nutricionista ajuste tus umbrales de potasio/fósforo/sodio a tu caso, además de reportes exportables y varios perfiles.";
+  els.planUpsell.hidden = false;
 }
 
 const TIPS_DEL_DIA = [
@@ -101,6 +176,11 @@ const els = {
   tipText: document.getElementById("tip-text"),
   planBadge: document.getElementById("plan-badge"),
   aboutPlan: document.getElementById("about-plan"),
+  etapaERC: document.getElementById("etapa-erc"),
+  diabetes: document.getElementById("dato-diabetes"),
+  hipertension: document.getElementById("dato-hipertension"),
+  planUpsell: document.getElementById("plan-upsell"),
+  planUpsellText: document.getElementById("plan-upsell-text"),
 };
 
 let lastAnalysis = []; // current analysis results, mutable for manual correction
@@ -113,6 +193,7 @@ async function init() {
   renderHistory();
   renderTipOfDay();
   renderPlan();
+  renderDatosClinicos();
 
   els.cameraInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
   els.fileInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
@@ -122,6 +203,9 @@ async function init() {
   els.manualConfirm.addEventListener("click", confirmManualSelection);
   els.aboutBtn.addEventListener("click", () => { els.aboutModal.hidden = false; });
   els.aboutClose.addEventListener("click", () => { els.aboutModal.hidden = true; });
+  els.etapaERC.addEventListener("change", guardarDatosClinicos);
+  els.diabetes.addEventListener("change", guardarDatosClinicos);
+  els.hipertension.addEventListener("change", guardarDatosClinicos);
 }
 
 function renderTipOfDay() {
@@ -226,7 +310,7 @@ function matchFood(name) {
 }
 
 function nivelFor(nutriente, valorMg) {
-  const t = UMBRALES[nutriente];
+  const t = umbralesActivos()[nutriente];
   if (valorMg <= t.verde) return "verde";
   if (valorMg <= t.amarillo) return "amarillo";
   return "rojo";
