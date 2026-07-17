@@ -3,7 +3,7 @@
 // las llamadas a la API deben apuntar al backend hosteado. Al abrir la app
 // como página web normal (http/https, local o ya desplegada), se usa una URL
 // relativa y todo queda en el mismo origen.
-const API_BASE = /^https?:$/.test(location.protocol) ? "" : "https://kidneychef.onrender.com";
+const API_BASE = /^https?:$/.test(location.protocol) ? "" : "https://kidneychef-api.onrender.com";
 
 // Umbrales de semáforo por PORCIÓN (mg), pensados como referencia educativa general.
 // Deben personalizarse con el equipo de nefrología/nutrición de cada paciente.
