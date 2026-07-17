@@ -96,6 +96,7 @@ h1, h2, h3 {
   transition: background 0.15s ease;
 }
 .icon-btn:hover { background: var(--brand-50); }
+.icon-btn img { border-radius: 50%; object-fit: cover; }
 .brand-mark { flex-shrink: 0; display: flex; filter: drop-shadow(0 2px 6px rgba(14, 116, 144, 0.35)); }
 .brand-text h1 {
   margin: 0;
