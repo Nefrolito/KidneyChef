@@ -9,11 +9,15 @@
     "cap:android": "cap open android"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.4.2",
     "@capacitor/core": "^8.4.2"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.2",
     "@capacitor/ios": "^8.4.2"
+  },
+  "allowScripts": {
+    "sharp@0.32.6": true
   }
 }
