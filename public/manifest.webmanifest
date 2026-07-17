@@ -1,46 +1,19 @@
 {
+  "name": "KidneyChef",
+  "short_name": "KidneyChef",
+  "description": "Semáforo nutricional de potasio, fósforo y sodio por foto, para dieta renal.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f8fa",
+  "theme_color": "#0e7490",
   "icons": [
-    {
-      "src": "../icons/icon-48.webp",
-      "type": "image/png",
-      "sizes": "48x48",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "../icons/icon-72.webp",
-      "type": "image/png",
-      "sizes": "72x72",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "../icons/icon-96.webp",
-      "type": "image/png",
-      "sizes": "96x96",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "../icons/icon-128.webp",
-      "type": "image/png",
-      "sizes": "128x128",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "../icons/icon-192.webp",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "../icons/icon-256.webp",
-      "type": "image/png",
-      "sizes": "256x256",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "../icons/icon-512.webp",
-      "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
-    }
+    { "src": "icons/icon-48.webp", "type": "image/webp", "sizes": "48x48", "purpose": "any maskable" },
+    { "src": "icons/icon-72.webp", "type": "image/webp", "sizes": "72x72", "purpose": "any maskable" },
+    { "src": "icons/icon-96.webp", "type": "image/webp", "sizes": "96x96", "purpose": "any maskable" },
+    { "src": "icons/icon-128.webp", "type": "image/webp", "sizes": "128x128", "purpose": "any maskable" },
+    { "src": "icons/icon-192.webp", "type": "image/webp", "sizes": "192x192", "purpose": "any maskable" },
+    { "src": "icons/icon-256.webp", "type": "image/webp", "sizes": "256x256", "purpose": "any maskable" },
+    { "src": "icons/icon-512.webp", "type": "image/webp", "sizes": "512x512", "purpose": "any maskable" }
   ]
 }

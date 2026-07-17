@@ -124,6 +124,8 @@ CONTENT_TYPES = {
     ".png": "image/png",
     ".svg": "image/svg+xml",
     ".ico": "image/x-icon",
+    ".webp": "image/webp",
+    ".webmanifest": "application/manifest+json",
 }
 
 
