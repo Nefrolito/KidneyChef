@@ -162,7 +162,6 @@ let pendingManualTarget = null; // { itemIndex } when correcting a specific resu
 
 const els = {
   cameraInput: document.getElementById("camera-input"),
-  fileInput: document.getElementById("file-input"),
   preview: document.getElementById("preview"),
   previewPlaceholder: document.getElementById("preview-placeholder"),
   analyzeBtn: document.getElementById("analyze-btn"),
@@ -203,7 +202,6 @@ async function init() {
   renderDatosClinicos();
 
   els.cameraInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
-  els.fileInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
   els.analyzeBtn.addEventListener("click", analyzeImage);
   els.clearHistoryBtn.addEventListener("click", clearHistory);
   els.manualCancel.addEventListener("click", closeModal);
