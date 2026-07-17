@@ -209,7 +209,7 @@ h1, h2, h3 {
   margin-bottom: 0.85rem;
 }
 .capture-actions .btn { flex: 1; min-width: 0; padding: 0.8rem 0.45rem; gap: 0.45rem; }
-.capture-actions .btn-icon-circle { width: 32px; height: 32px; }
+.capture-actions .btn-icon-circle { width: 26px; height: 26px; }
 .capture-actions .btn-text strong { font-size: 0.85rem; }
 .capture-actions .btn-text small { font-size: 0.66rem; }
 
@@ -284,7 +284,7 @@ h1, h2, h3 {
   position: relative;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(135deg, #4dfb9d, #0f7a3d);
+  background: linear-gradient(135deg, #17c964, #0a6b34);
   color: white;
   padding: 1.2rem 1.1rem;
   font-size: 1.12rem;
