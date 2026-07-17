@@ -62,7 +62,7 @@ h1, h2, h3 {
 }
 
 .topbar {
-  padding: 1.5rem 1rem 1.25rem;
+  padding: calc(1.5rem + env(safe-area-inset-top)) 1rem 1.25rem;
   background: linear-gradient(180deg, var(--brand-50) 0%, var(--bg) 100%);
   border-bottom: 1px solid var(--border);
 }
@@ -137,7 +137,7 @@ h1, h2, h3 {
 .container {
   max-width: 560px;
   margin: 0 auto;
-  padding: 1.25rem 1rem 3rem;
+  padding: 1.25rem 1rem calc(3rem + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
