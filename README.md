@@ -52,15 +52,39 @@ teléfono, así que necesita un backend accesible por internet. Pasos:
    detectar `render.yaml` automáticamente y crear el servicio.
 4. En la configuración del servicio, agrega la variable de entorno
    `ANTHROPIC_API_KEY` con tu key real (nunca la subas al repo).
-5. Cuando termine el deploy, Render te da una URL tipo
+5. Agrega también `APP_KEY` con **el mismo valor** que tiene la constante
+   `APP_KEY` en `public/app.js` (ver "Protección del backend" abajo).
+6. Cuando termine el deploy, Render te da una URL tipo
    `https://kidneychef-api.onrender.com`. Actualiza esa URL en
    `public/app.js` (constante `API_BASE`) para que coincida con la tuya.
 
-**Advertencia de seguridad:** este backend no tiene autenticación ni límite de
-uso. Cualquiera que descubra la URL puede llamar a `/api/analyze` y consumir
-tu API key de Anthropic (con su costo asociado). Para una beta pública real,
-conviene agregar al menos un límite de tasa (rate limiting) o una clave
-compartida simple antes de difundir la URL ampliamente.
+## Protección del backend
+
+Cada análisis cuesta dinero en la API de Anthropic, así que `/api/analyze` está
+protegido en tres capas:
+
+- **Clave de app** (`APP_KEY`): la app manda el header `X-App-Key` en cada
+  llamada; sin él el backend responde 401. **No es un secreto**: viaja en el
+  bundle del cliente y alguien técnico puede extraerla. Sirve para que quien
+  descubra la URL no pueda usar el backend directamente. Si la variable queda
+  vacía en el servidor, no se exige (cómodo para desarrollo local).
+- **Límite por IP**: 20 análisis por hora. Reparte el uso entre pacientes y
+  frena el abuso accidental (apretar el botón muchas veces).
+- **Límite global**: 500 análisis por día → techo de gasto de ~US$10/día en el
+  peor caso. Este es el resguardo que realmente acota el costo, porque la IP se
+  lee de `X-Forwarded-For` (Render corre detrás de un proxy) y ese header es
+  falsificable.
+
+Los cuatro límites se ajustan por variables de entorno sin tocar código:
+`RATE_LIMIT_PER_IP`, `RATE_LIMIT_PER_IP_WINDOW`, `RATE_LIMIT_GLOBAL`,
+`RATE_LIMIT_GLOBAL_WINDOW` (ventanas en segundos). También hay un tope de
+tamaño de payload (`MAX_BODY_BYTES`, 8 MB por defecto).
+
+**Limitación conocida:** los contadores viven en memoria, así que se reinician
+cuando Render duerme o redespliega el servicio. Durante un abuso sostenido el
+tráfico mantiene el servicio despierto y el contador sí acumula, que es el caso
+que importa para acotar el gasto. Si más adelante hace falta algo estricto, el
+siguiente paso sería un store persistente (Redis o una tabla en base de datos).
 
 El plan gratuito de Render "duerme" el servicio tras ~15 minutos sin uso; la
 primera petición después de eso tarda unos segundos extra en responder

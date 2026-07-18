@@ -1,9 +1,26 @@
-// En una app empaquetada (Capacitor) los assets se cargan desde un origen
-// local (capacitor://, ionic://, file://), sin servidor Python detrás — ahí
-// las llamadas a la API deben apuntar al backend hosteado. Al abrir la app
-// como página web normal (http/https, local o ya desplegada), se usa una URL
-// relativa y todo queda en el mismo origen.
-const API_BASE = /^https?:$/.test(location.protocol) ? "" : "https://kidneychef-api.onrender.com";
+// En la app empaquetada (Capacitor) los assets se sirven desde un origen local
+// del propio WebView, sin servidor Python detrás, así que una URL relativa
+// apuntaría al WebView y no al backend: ahí hay que usar la URL desplegada.
+// Como página web normal (local o ya desplegada) sí sirve la URL relativa.
+//
+// La detección mira window.Capacitor, que el bridge nativo inyecta en el
+// WebView. NO sirve mirar location.protocol: en Android el esquema por defecto
+// de Capacitor es "https" (igual que la web), así que ese chequeo dejaba a la
+// app de Android llamando a https://localhost/api/analyze en vez del backend.
+function esAppNativa() {
+  const cap = window.Capacitor;
+  if (!cap) return false;
+  if (typeof cap.isNativePlatform === "function") return cap.isNativePlatform();
+  return true;
+}
+
+const API_BASE = esAppNativa() ? "https://kidneychef-api.onrender.com" : "";
+
+// Clave compartida con el backend, enviada en cada análisis. No es un secreto:
+// viaja en el código del cliente y alguien técnico puede extraerla. Sirve para
+// que quien descubra la URL del backend no pueda usarlo directamente. Debe
+// coincidir con la variable APP_KEY configurada en el servidor.
+const APP_KEY = "Xhw465sJYD8cL1lobmCuebpbJ2EmT6aD";
 
 // Umbrales de semáforo por PORCIÓN (mg), pensados como referencia educativa general.
 // Deben personalizarse con el equipo de nefrología/nutrición de cada paciente.
@@ -246,7 +263,7 @@ async function analyzeImage() {
   try {
     const res = await fetch(`${API_BASE}/api/analyze`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
       body: JSON.stringify({ image: currentImageDataUrl }),
     });
     const data = await res.json();
