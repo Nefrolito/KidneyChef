@@ -20,6 +20,17 @@
       "unidad": "mg_por_100g",
       "bajo_hasta": 100,
       "moderado_hasta": 250
+    },
+    "clasificacion_contenido_estricta": {
+      "_PENDIENTE_VALIDAR": "CIFRAS DE CLAUDE, VALIDAR. Se aplica cuando hay factores de riesgo de hiperkalemia: los alimentos se marcan como altos en potasio antes que con los umbrales normales.",
+      "unidad": "mg_por_100g",
+      "bajo_hasta": 75,
+      "moderado_hasta": 175
+    },
+    "factores_riesgo_hiperkalemia": {
+      "_nota": "Camilo indicó que la diabetes justifica un nivel superior de restricción de potasio. Se unifica con los fármacos retenedores bajo el mismo mecanismo, porque clínicamente apuntan al mismo riesgo: en el diabético se suma la acidosis tubular renal tipo 4 / hipoaldosteronismo hiporreninémico, y con frecuencia además recibe bloqueo del SRAA.",
+      "activadores": ["diabetes", "farmacos_retenedores_de_potasio"],
+      "efecto": "usar_clasificacion_estricta_y_advertir"
     }
   },
   "fosforo": {
@@ -35,7 +46,6 @@
   },
   "carbohidratos": {
     "_nota": "Solo se activa si el paciente declara diabetes. El objetivo se individualiza (ADA); 180 g/día equivale a ~45 g por comida.",
-    "_PENDIENTE": "Camilo dijo que la diabetes también debería ajustar alguno de los otros nutrientes. Falta definir cuál y cómo.",
     "modo": "meta_diaria",
     "objetivo_g_dia_por_defecto": 180
   },
@@ -99,9 +109,7 @@
       ]
     },
     "quelantes_de_potasio": {
-      "_PENDIENTE": "Camilo aún no decide si se modelan (patirómero, ciclosilicato de sodio y zirconio). Serían el caso inverso: permiten mayor ingesta de potasio.",
-      "efecto": null,
-      "lista": []
+      "_FUERA_DE_ALCANCE": "Decisión de Camilo: no se modelan por ahora (patirómero, ciclosilicato de sodio y zirconio). Serían el caso inverso, permitirían mayor ingesta de potasio. Si se agregan más adelante, el paciente que los usa hoy simplemente ve la clasificación estándar, que es el lado seguro."
     }
   }
 }
