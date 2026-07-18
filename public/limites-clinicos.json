@@ -2,19 +2,16 @@
   "_fuente": "KDIGO 2024 / KDOQI 2020, según el resumen aportado por Camilo Ulloa.",
   "_principio_rector": "Las guías actuales ABANDONAN las restricciones universales de potasio y fósforo: solo el sodio tiene una meta numérica poblacional. Potasio y fósforo deben individualizarse según laboratorio, diuresis residual, modalidad de diálisis y contexto clínico. Por eso este archivo NO fija cifras de K ni de P por etapa.",
   "_ADVERTENCIA": "Los umbrales de clasificación relativa y los valores de referencia son un BORRADOR redactado por Claude y pendientes de validación por Camilo. Nada de esto debe llegar a un paciente sin su revisión.",
-
   "regla_porcion": {
     "_nota": "Para los nutrientes CON meta diaria (sodio, y los que el tratante individualice), el umbral por porción se deriva del límite diario: el día se reparte en 4 ocasiones de comida y un alimento que consume hasta la mitad de ese presupuesto es verde; hasta el total, amarillo; por encima, rojo.",
     "comidas_por_dia": 4,
     "fraccion_verde": 0.5
   },
-
   "sodio": {
     "_nota": "Único nutriente con meta numérica universal. KDIGO <2 g/día; KDOQI <2,3 g/día. Se unifica en 2000 mg/día para todos, con o sin hipertensión.",
     "modo": "meta_diaria",
     "objetivo_mg_dia": 2000
   },
-
   "potasio": {
     "_nota": "Sin cifra universal (KDIGO/KDOQI). En el plan básico se clasifica el CONTENIDO del alimento, sin afirmar que el paciente excedió un límite personal. En el plan clínico, cuando el tratante ingresa un objetivo individualizado según kalemia, pasa a modo meta_diaria y el semáforo mide contra ese límite real.",
     "modo_por_defecto": "contenido_relativo",
@@ -25,7 +22,6 @@
       "moderado_hasta": 250
     }
   },
-
   "fosforo": {
     "_nota": "Sin cifra universal. La guía prioriza REDUCIR ADITIVOS FOSFATADOS por sobre el conteo de fósforo total: el fósforo inorgánico añadido se absorbe mucho más que el orgánico de los alimentos naturales.",
     "modo_por_defecto": "contenido_relativo",
@@ -37,26 +33,29 @@
       "moderado_hasta": 150
     }
   },
-
   "carbohidratos": {
     "_nota": "Solo se activa si el paciente declara diabetes. El objetivo se individualiza (ADA); 180 g/día equivale a ~45 g por comida.",
     "_PENDIENTE": "Camilo dijo que la diabetes también debería ajustar alguno de los otros nutrientes. Falta definir cuál y cómo.",
     "modo": "meta_diaria",
     "objetivo_g_dia_por_defecto": 180
   },
-
   "liquidos": {
-    "_nota": "Solo se activa en las situaciones de diálisis, donde la restricción hídrica depende de la diuresis residual. Se registra manualmente porque la cámara no puede ver el agua.",
-    "modo": "meta_diaria",
-    "objetivo_ml_dia_por_situacion": {
-      "hemodialisis_diuresis_conservada": null,
-      "hemodialisis_anurico": null,
-      "peritoneal_diuresis_conservada": null,
-      "peritoneal_anurico": null
-    },
-    "_PENDIENTE": "FALTAN LAS CIFRAS DE CAMILO para las cuatro situaciones."
+    "_nota": "Solo se activa en diálisis. No es una cifra fija: se calcula desde la diuresis residual real del paciente, según la regla clínica aportada por Camilo. Se registra manualmente porque la cámara no puede ver el agua.",
+    "modo": "formula_diuresis",
+    "formula": "diuresis_residual_ml + margen_ml",
+    "margen_ml": 500,
+    "_ejemplos": [
+      "Anúrico (0 ml) -> 500 ml/día",
+      "Diuresis 400 ml -> 900 ml/día",
+      "Diuresis 1200 ml -> 1700 ml/día"
+    ],
+    "_requiere": "El paciente (o su tratante) registra su diuresis residual en ml/día. Ese mismo número define la meta y permite saber si conserva más o menos de 1 L, sin pedirle que se autoclasifique.",
+    "sin_dato": {
+      "_nota": "Si el paciente en diálisis no sabe su diuresis, se asume anúrico (0 ml) por seguridad: es el supuesto más restrictivo frente a sobrecarga hídrica.",
+      "asumir_diuresis_ml": 0,
+      "_ADVERTIR_AL_PACIENTE": "La app DEBE mostrar que 500 ml/día es un supuesto provisional y no su límite real. Una restricción hídrica excesiva en alguien que sí conserva diuresis también hace daño (deshidratación, hipotensión). El mensaje debe empujar a confirmar la cifra con su equipo tratante."
+    }
   },
-
   "situaciones": {
     "_para_que_sirven": "Ya NO fijan límites de K ni P. Sirven para: (1) activar el registro de líquidos en diálisis, (2) orientar al tratante con la consideración clínica de cada caso cuando individualice los objetivos, y (3) mostrarle al paciente en qué situación está registrado.",
     "3": {
@@ -71,28 +70,21 @@
       "etiqueta": "ERC etapa 5 (sin diálisis)",
       "consideracion": "Sodio <2 g/día. Potasio y fósforo individualizados según laboratorio."
     },
-    "hemodialisis_diuresis_conservada": {
-      "etiqueta": "En hemodiálisis, orina más de 1 L al día",
-      "consideracion": "Potasio según kalemia predialítica, diuresis y pauta de diálisis. La diuresis residual conservada permite mayor liberalidad hídrica y de potasio. Fósforo: coordinar dieta con quelantes."
+    "hemodialisis": {
+      "etiqueta": "En hemodiálisis",
+      "requiere_diuresis": true,
+      "consideracion": "Potasio según kalemia predialítica, diuresis residual y pauta de diálisis. Terapia intermitente: el potasio se acumula entre sesiones. Fósforo: coordinar dieta con quelantes. La meta de líquidos se calcula desde la diuresis registrada."
     },
-    "hemodialisis_anurico": {
-      "etiqueta": "En hemodiálisis, orina menos de 1 L al día",
-      "consideracion": "Sin función renal remanente que ayude a eliminar: la restricción hídrica y de potasio es más estricta. Fósforo: coordinar dieta con quelantes."
-    },
-    "peritoneal_diuresis_conservada": {
-      "etiqueta": "En diálisis peritoneal, orina más de 1 L al día",
-      "consideracion": "Terapia continua: el potasio suele poder liberalizarse más que en hemodiálisis, e incluso puede requerir aporte si hay hipopotasemia. Fósforo individualizado según depuración."
-    },
-    "peritoneal_anurico": {
-      "etiqueta": "En diálisis peritoneal, orina menos de 1 L al día",
-      "consideracion": "Terapia continua sin diuresis residual: mayor control hídrico. Potasio puede liberalizarse si hay hipopotasemia. Fósforo individualizado según depuración."
+    "peritoneal": {
+      "etiqueta": "En diálisis peritoneal",
+      "requiere_diuresis": true,
+      "consideracion": "Terapia continua: el potasio suele poder liberalizarse más que en hemodiálisis, e incluso puede requerir aporte si hay hipopotasemia. Fósforo individualizado según depuración. La meta de líquidos se calcula desde la diuresis registrada."
     },
     "sin_declarar": {
       "etiqueta": "Prefiero no decirlo",
       "consideracion": "Sin situación declarada: solo se aplica la meta de sodio y la clasificación de contenido de potasio y fósforo."
     }
   },
-
   "farmacos": {
     "retenedores_de_potasio": {
       "_nota": "No fijan una cifra (no existe cifra universal), pero son una señal clínica relevante: elevan el potasio sérico. La app se lo advierte al paciente y se lo destaca al tratante al individualizar el objetivo de potasio.",
