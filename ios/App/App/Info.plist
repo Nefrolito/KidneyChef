@@ -24,6 +24,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>KidneyChef usa la cámara para fotografiar tus comidas y estimar su contenido de potasio, fósforo y sodio.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>KidneyChef accede a tus fotos para analizar una comida que ya hayas fotografiado.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
