@@ -1,0 +1,112 @@
+{
+  "_ADVERTENCIA": "BORRADOR NO VALIDADO CLÍNICAMENTE. Estas cifras son un punto de partida redactado a partir de principios generales de KDOQI 2020 (nutrición en ERC), KDIGO y ADA. NO deben usarse con pacientes hasta que un nefrólogo(a) o nutricionista renal las revise y corrija.",
+  "_como_funciona": "Los límites DIARIOS son la fuente de verdad (así los expresan las guías). Los umbrales por porción del semáforo se derivan de ellos con la regla de abajo, en vez de definirse a mano.",
+  "_revisar": "Camilo: corrige los números de base_por_etapa y ajustes según tu criterio. Si un nutriente no debe restringirse en alguna etapa, pon null y no se mostrará semáforo para ese nutriente.",
+  "regla_porcion": {
+    "_nota": "Un día se reparte en 4 ocasiones de comida (3 comidas + 1 colación). Un alimento que consume hasta la mitad del presupuesto de esa comida es verde; hasta el total, amarillo; por encima, rojo.",
+    "comidas_por_dia": 4,
+    "fraccion_verde": 0.5
+  },
+  "base_por_etapa": {
+    "3": {
+      "_nota": "ERC etapa 3: habitualmente sin restricción estricta de potasio salvo hiperkalemia. Fósforo se cuida sobre todo evitando aditivos inorgánicos.",
+      "potasio_mg": 3500,
+      "fosforo_mg": 1000,
+      "sodio_mg": 2300,
+      "liquidos_ml": null,
+      "_liquidos": "Sin restricción hídrica de rutina en esta situación. Si queda en null, la app no muestra el registro de líquidos. Ponle un valor si quieres activarlo (ej. paciente con edema o insuficiencia cardíaca)."
+    },
+    "4": {
+      "_nota": "ERC etapa 4: restricción progresiva de potasio y fósforo.",
+      "potasio_mg": 2800,
+      "fosforo_mg": 900,
+      "sodio_mg": 2000,
+      "liquidos_ml": null,
+      "_liquidos": "Sin restricción hídrica de rutina en esta situación. Si queda en null, la app no muestra el registro de líquidos. Ponle un valor si quieres activarlo (ej. paciente con edema o insuficiencia cardíaca)."
+    },
+    "5": {
+      "_nota": "ERC etapa 5 prediálisis. OJO: en diálisis los requerimientos cambian (más proteína, potasio según kalemia); si vas a cubrir pacientes en diálisis conviene agregar esa condición aparte.",
+      "potasio_mg": 2300,
+      "fosforo_mg": 800,
+      "sodio_mg": 2000,
+      "liquidos_ml": null,
+      "_liquidos": "Sin restricción hídrica de rutina en esta situación. Si queda en null, la app no muestra el registro de líquidos. Ponle un valor si quieres activarlo (ej. paciente con edema o insuficiencia cardíaca)."
+    },
+    "sin_etapa": {
+      "_nota": "Paciente que no declara etapa: se usan los valores conservadores del plan básico.",
+      "potasio_mg": 1600,
+      "fosforo_mg": 800,
+      "sodio_mg": 1600,
+      "liquidos_ml": null,
+      "_liquidos": "Sin restricción hídrica de rutina en esta situación. Si queda en null, la app no muestra el registro de líquidos. Ponle un valor si quieres activarlo (ej. paciente con edema o insuficiencia cardíaca)."
+    },
+    "hemodialisis_diuresis_conservada": {
+      "_PENDIENTE": "FALTAN LAS CIFRAS DE CAMILO. Hemodiálisis con diuresis residual mayor a 1 L/día: la función renal remanente permite límites más liberales, sobre todo de líquidos y potasio.",
+      "potasio_mg": null,
+      "fosforo_mg": null,
+      "sodio_mg": null,
+      "liquidos_ml": null
+    },
+    "hemodialisis_anurico": {
+      "_PENDIENTE": "FALTAN LAS CIFRAS DE CAMILO. Hemodiálisis con diuresis menor a 1 L/día: sin función renal remanente que ayude a eliminar, la restricción de líquidos y potasio es más estricta.",
+      "potasio_mg": null,
+      "fosforo_mg": null,
+      "sodio_mg": null,
+      "liquidos_ml": null
+    },
+    "peritoneal_diuresis_conservada": {
+      "_PENDIENTE": "FALTAN LAS CIFRAS DE CAMILO. Peritoneal con diuresis residual mayor a 1 L/día.",
+      "potasio_mg": null,
+      "fosforo_mg": null,
+      "sodio_mg": null,
+      "liquidos_ml": null
+    },
+    "peritoneal_anurico": {
+      "_PENDIENTE": "FALTAN LAS CIFRAS DE CAMILO. Peritoneal con diuresis menor a 1 L/día.",
+      "potasio_mg": null,
+      "fosforo_mg": null,
+      "sodio_mg": null,
+      "liquidos_ml": null
+    }
+  },
+  "ajustes": {
+    "hipertension": {
+      "_nota": "Con hipertensión el sodio baja. Se aplica solo si el valor resultante es más restrictivo que el de la etapa.",
+      "sodio_mg": 1500
+    },
+    "diabetes": {
+      "_nota": "Habilita el semáforo de carbohidratos. El objetivo diario se individualiza (ADA); 180 g/día equivale a ~45 g por comida.",
+      "carbohidratos_g": 180,
+      "_PENDIENTE": "FALTAN LAS CIFRAS DE CAMILO. Dijiste que la diabetes también debe ajustar alguno de los otros nutrientes. Pon aquí el límite diario que corresponda y deja en null los que no cambien. Se aplicará la regla del más restrictivo frente al límite de la etapa.",
+      "potasio_mg": null,
+      "fosforo_mg": null,
+      "sodio_mg": null
+    },
+    "farmacos_retenedores_k": {
+      "_nota": "Fármacos que elevan el potasio sérico y anulan la permisividad de las etapas tempranas. En vez de un tope fijo, el paciente usa los límites de la etapa siguiente. En ERC 5 (y en diálisis) no hay escalón siguiente, así que no cambia nada.",
+      "_aplica_solo_a": "Se baja el escalón SOLO para potasio: estos fármacos afectan la kalemia, no los requerimientos de fósforo ni de sodio.",
+      "_farmacos_cubiertos": [
+        "Espironolactona",
+        "Eplerenona",
+        "Finerenona",
+        "IECA (enalapril, lisinopril, ramipril…)",
+        "ARA-II, antagonistas del receptor de angiotensina II (losartán, valsartán, irbesartán…)",
+        "Inhibidores directos de renina (aliskiren)"
+      ],
+      "regla": "bajar_un_escalon",
+      "escalon_siguiente": {
+        "3": "4",
+        "4": "5",
+        "5": "5",
+        "hemodialisis_diuresis_conservada": "hemodialisis_diuresis_conservada",
+        "hemodialisis_anurico": "hemodialisis_anurico",
+        "sin_etapa": "sin_etapa",
+        "peritoneal_diuresis_conservada": "peritoneal_diuresis_conservada",
+        "peritoneal_anurico": "peritoneal_anurico"
+      },
+      "nutrientes_afectados": [
+        "potasio_mg"
+      ]
+    }
+  }
+}
