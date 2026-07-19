@@ -1,116 +1,1846 @@
 [
-  {"id": "manzana", "nombre": "Manzana", "categoria": "Fruta", "alias": ["apple", "manzanas"], "potasio_mg": 107, "fosforo_mg": 11, "sodio_mg": 1},
-  {"id": "platano", "nombre": "Plátano / Banana", "categoria": "Fruta", "alias": ["banana", "banano", "platano", "guineo"], "potasio_mg": 358, "fosforo_mg": 22, "sodio_mg": 1},
-  {"id": "naranja", "nombre": "Naranja", "categoria": "Fruta", "alias": ["orange", "naranjas"], "potasio_mg": 181, "fosforo_mg": 14, "sodio_mg": 0},
-  {"id": "pera", "nombre": "Pera", "categoria": "Fruta", "alias": ["pears"], "potasio_mg": 116, "fosforo_mg": 12, "sodio_mg": 1},
-  {"id": "uva", "nombre": "Uva", "categoria": "Fruta", "alias": ["uvas", "grape", "grapes"], "potasio_mg": 191, "fosforo_mg": 20, "sodio_mg": 2},
-  {"id": "sandia", "nombre": "Sandía", "categoria": "Fruta", "alias": ["watermelon", "patilla"], "potasio_mg": 112, "fosforo_mg": 11, "sodio_mg": 1},
-  {"id": "melon", "nombre": "Melón", "categoria": "Fruta", "alias": ["cantaloupe", "melon"], "potasio_mg": 267, "fosforo_mg": 15, "sodio_mg": 16},
-  {"id": "fresa", "nombre": "Fresa", "categoria": "Fruta", "alias": ["fresas", "strawberry", "frutilla"], "potasio_mg": 153, "fosforo_mg": 24, "sodio_mg": 1},
-  {"id": "kiwi", "nombre": "Kiwi", "categoria": "Fruta", "alias": [], "potasio_mg": 312, "fosforo_mg": 34, "sodio_mg": 3},
-  {"id": "pina", "nombre": "Piña", "categoria": "Fruta", "alias": ["pineapple", "ananá"], "potasio_mg": 109, "fosforo_mg": 8, "sodio_mg": 1},
-  {"id": "mango", "nombre": "Mango", "categoria": "Fruta", "alias": [], "potasio_mg": 168, "fosforo_mg": 11, "sodio_mg": 1},
-  {"id": "durazno", "nombre": "Durazno / Melocotón", "categoria": "Fruta", "alias": ["peach", "melocoton"], "potasio_mg": 190, "fosforo_mg": 20, "sodio_mg": 0},
-  {"id": "ciruela", "nombre": "Ciruela", "categoria": "Fruta", "alias": ["plum"], "potasio_mg": 157, "fosforo_mg": 16, "sodio_mg": 0},
-  {"id": "cereza", "nombre": "Cereza", "categoria": "Fruta", "alias": ["cherry", "cerezas"], "potasio_mg": 222, "fosforo_mg": 21, "sodio_mg": 0},
-  {"id": "limon", "nombre": "Limón", "categoria": "Fruta", "alias": ["lemon", "lima"], "potasio_mg": 138, "fosforo_mg": 16, "sodio_mg": 2},
-  {"id": "aguacate", "nombre": "Aguacate / Palta", "categoria": "Fruta", "alias": ["avocado", "palta"], "potasio_mg": 485, "fosforo_mg": 52, "sodio_mg": 7},
-  {"id": "papaya", "nombre": "Papaya", "categoria": "Fruta", "alias": ["lechosa"], "potasio_mg": 182, "fosforo_mg": 10, "sodio_mg": 8},
-  {"id": "mandarina", "nombre": "Mandarina", "categoria": "Fruta", "alias": ["tangerine"], "potasio_mg": 166, "fosforo_mg": 20, "sodio_mg": 2},
-  {"id": "higo", "nombre": "Higo", "categoria": "Fruta", "alias": ["fig"], "potasio_mg": 232, "fosforo_mg": 14, "sodio_mg": 1},
-  {"id": "datil", "nombre": "Dátil", "categoria": "Fruta", "alias": ["date", "datiles"], "potasio_mg": 696, "fosforo_mg": 62, "sodio_mg": 2},
-  {"id": "arandano", "nombre": "Arándano", "categoria": "Fruta", "alias": ["blueberry", "arandanos"], "potasio_mg": 77, "fosforo_mg": 12, "sodio_mg": 1},
-  {"id": "frambuesa", "nombre": "Frambuesa", "categoria": "Fruta", "alias": ["raspberry"], "potasio_mg": 151, "fosforo_mg": 29, "sodio_mg": 1},
-  {"id": "granada", "nombre": "Granada", "categoria": "Fruta", "alias": ["pomegranate"], "potasio_mg": 236, "fosforo_mg": 36, "sodio_mg": 3},
-  {"id": "guayaba", "nombre": "Guayaba", "categoria": "Fruta", "alias": ["guava"], "potasio_mg": 417, "fosforo_mg": 40, "sodio_mg": 2},
-
-  {"id": "papa", "nombre": "Papa / Patata", "categoria": "Verdura", "alias": ["potato", "patata", "papas"], "potasio_mg": 425, "fosforo_mg": 57, "sodio_mg": 6},
-  {"id": "tomate", "nombre": "Tomate", "categoria": "Verdura", "alias": ["tomato", "jitomate"], "potasio_mg": 237, "fosforo_mg": 24, "sodio_mg": 5},
-  {"id": "lechuga", "nombre": "Lechuga", "categoria": "Verdura", "alias": ["lettuce"], "potasio_mg": 194, "fosforo_mg": 29, "sodio_mg": 10},
-  {"id": "zanahoria", "nombre": "Zanahoria", "categoria": "Verdura", "alias": ["carrot"], "potasio_mg": 320, "fosforo_mg": 35, "sodio_mg": 69},
-  {"id": "brocoli", "nombre": "Brócoli", "categoria": "Verdura", "alias": ["broccoli"], "potasio_mg": 316, "fosforo_mg": 66, "sodio_mg": 33},
-  {"id": "espinaca", "nombre": "Espinaca", "categoria": "Verdura", "alias": ["spinach"], "potasio_mg": 558, "fosforo_mg": 49, "sodio_mg": 79},
-  {"id": "coliflor", "nombre": "Coliflor", "categoria": "Verdura", "alias": ["cauliflower"], "potasio_mg": 299, "fosforo_mg": 44, "sodio_mg": 30},
-  {"id": "pepino", "nombre": "Pepino", "categoria": "Verdura", "alias": ["cucumber"], "potasio_mg": 147, "fosforo_mg": 24, "sodio_mg": 2},
-  {"id": "calabacin", "nombre": "Calabacín / Zucchini", "categoria": "Verdura", "alias": ["zucchini", "calabacita"], "potasio_mg": 261, "fosforo_mg": 38, "sodio_mg": 8},
-  {"id": "berenjena", "nombre": "Berenjena", "categoria": "Verdura", "alias": ["eggplant"], "potasio_mg": 229, "fosforo_mg": 24, "sodio_mg": 2},
-  {"id": "pimiento", "nombre": "Pimiento", "categoria": "Verdura", "alias": ["pepper", "aji", "chile morron"], "potasio_mg": 211, "fosforo_mg": 26, "sodio_mg": 4},
-  {"id": "cebolla", "nombre": "Cebolla", "categoria": "Verdura", "alias": ["onion"], "potasio_mg": 146, "fosforo_mg": 29, "sodio_mg": 4},
-  {"id": "ajo", "nombre": "Ajo", "categoria": "Verdura", "alias": ["garlic"], "potasio_mg": 401, "fosforo_mg": 153, "sodio_mg": 17},
-  {"id": "aceituna", "nombre": "Aceituna", "categoria": "Verdura", "alias": ["olive", "olives", "aceitunas"], "potasio_mg": 42, "fosforo_mg": 4, "sodio_mg": 1556},
-  {"id": "apio", "nombre": "Apio", "categoria": "Verdura", "alias": ["celery"], "potasio_mg": 260, "fosforo_mg": 24, "sodio_mg": 80},
-  {"id": "champinon", "nombre": "Champiñón / Hongo", "categoria": "Verdura", "alias": ["mushroom", "hongos", "setas"], "potasio_mg": 318, "fosforo_mg": 86, "sodio_mg": 5},
-  {"id": "calabaza", "nombre": "Calabaza / Zapallo", "categoria": "Verdura", "alias": ["pumpkin", "auyama", "zapallo"], "potasio_mg": 340, "fosforo_mg": 44, "sodio_mg": 1},
-  {"id": "remolacha", "nombre": "Remolacha / Betabel", "categoria": "Verdura", "alias": ["beet", "beetroot", "betabel"], "potasio_mg": 325, "fosforo_mg": 40, "sodio_mg": 78},
-  {"id": "esparrago", "nombre": "Espárrago", "categoria": "Verdura", "alias": ["asparagus"], "potasio_mg": 202, "fosforo_mg": 52, "sodio_mg": 2},
-  {"id": "col", "nombre": "Col / Repollo", "categoria": "Verdura", "alias": ["cabbage", "repollo"], "potasio_mg": 170, "fosforo_mg": 26, "sodio_mg": 18},
-  {"id": "acelga", "nombre": "Acelga", "categoria": "Verdura", "alias": ["chard", "swiss chard"], "potasio_mg": 379, "fosforo_mg": 46, "sodio_mg": 213},
-
-  {"id": "frijol_negro", "nombre": "Frijoles negros cocidos", "categoria": "Legumbre", "alias": ["black beans", "frijoles", "porotos"], "potasio_mg": 355, "fosforo_mg": 140, "sodio_mg": 1},
-  {"id": "lenteja", "nombre": "Lentejas cocidas", "categoria": "Legumbre", "alias": ["lentils", "lentejas"], "potasio_mg": 369, "fosforo_mg": 180, "sodio_mg": 2},
-  {"id": "garbanzo", "nombre": "Garbanzos cocidos", "categoria": "Legumbre", "alias": ["chickpeas", "garbanzos"], "potasio_mg": 291, "fosforo_mg": 168, "sodio_mg": 7},
-  {"id": "guisante", "nombre": "Guisantes / Arvejas cocidos", "categoria": "Legumbre", "alias": ["peas", "arvejas", "chicharos"], "potasio_mg": 244, "fosforo_mg": 108, "sodio_mg": 5},
-  {"id": "haba", "nombre": "Habas cocidas", "categoria": "Legumbre", "alias": ["fava beans", "habas"], "potasio_mg": 268, "fosforo_mg": 99, "sodio_mg": 5},
-
-  {"id": "arroz_blanco", "nombre": "Arroz blanco cocido", "categoria": "Cereal", "alias": ["white rice", "arroz"], "potasio_mg": 35, "fosforo_mg": 43, "sodio_mg": 1},
-  {"id": "arroz_integral", "nombre": "Arroz integral cocido", "categoria": "Cereal", "alias": ["brown rice"], "potasio_mg": 86, "fosforo_mg": 121, "sodio_mg": 5},
-  {"id": "pasta", "nombre": "Pasta cocida", "categoria": "Cereal", "alias": ["fideos", "spaghetti", "macarrones"], "potasio_mg": 44, "fosforo_mg": 58, "sodio_mg": 1},
-  {"id": "pan_blanco", "nombre": "Pan blanco", "categoria": "Cereal", "alias": ["white bread", "pan"], "potasio_mg": 115, "fosforo_mg": 98, "sodio_mg": 490},
-  {"id": "pan_integral", "nombre": "Pan integral", "categoria": "Cereal", "alias": ["whole wheat bread"], "potasio_mg": 250, "fosforo_mg": 220, "sodio_mg": 400},
-  {"id": "avena", "nombre": "Avena cruda", "categoria": "Cereal", "alias": ["oats", "oatmeal"], "potasio_mg": 429, "fosforo_mg": 523, "sodio_mg": 2},
-  {"id": "quinoa", "nombre": "Quinoa cocida", "categoria": "Cereal", "alias": ["quinua"], "potasio_mg": 172, "fosforo_mg": 152, "sodio_mg": 7},
-  {"id": "maiz", "nombre": "Maíz / Choclo cocido", "categoria": "Cereal", "alias": ["corn", "choclo", "elote"], "potasio_mg": 270, "fosforo_mg": 89, "sodio_mg": 15},
-  {"id": "tortilla_maiz", "nombre": "Tortilla de maíz", "categoria": "Cereal", "alias": ["corn tortilla"], "potasio_mg": 152, "fosforo_mg": 90, "sodio_mg": 12},
-  {"id": "tortilla_harina", "nombre": "Tortilla de harina", "categoria": "Cereal", "alias": ["flour tortilla"], "potasio_mg": 96, "fosforo_mg": 130, "sodio_mg": 585},
-
-  {"id": "leche_entera", "nombre": "Leche entera", "categoria": "Lácteo", "alias": ["whole milk", "leche"], "potasio_mg": 150, "fosforo_mg": 91, "sodio_mg": 43},
-  {"id": "leche_descremada", "nombre": "Leche descremada", "categoria": "Lácteo", "alias": ["skim milk"], "potasio_mg": 156, "fosforo_mg": 101, "sodio_mg": 42},
-  {"id": "yogur", "nombre": "Yogur natural", "categoria": "Lácteo", "alias": ["yogurt"], "potasio_mg": 141, "fosforo_mg": 111, "sodio_mg": 46},
-  {"id": "queso_fresco", "nombre": "Queso fresco", "categoria": "Lácteo", "alias": ["fresh cheese"], "potasio_mg": 85, "fosforo_mg": 130, "sodio_mg": 320},
-  {"id": "queso_cheddar", "nombre": "Queso cheddar", "categoria": "Lácteo", "alias": ["cheddar"], "potasio_mg": 98, "fosforo_mg": 512, "sodio_mg": 621},
-  {"id": "queso_crema", "nombre": "Queso crema", "categoria": "Lácteo", "alias": ["cream cheese"], "potasio_mg": 88, "fosforo_mg": 98, "sodio_mg": 273},
-  {"id": "mantequilla", "nombre": "Mantequilla", "categoria": "Lácteo", "alias": ["butter"], "potasio_mg": 24, "fosforo_mg": 24, "sodio_mg": 643},
-
-  {"id": "pollo", "nombre": "Pechuga de pollo", "categoria": "Carne", "alias": ["chicken", "chicken breast"], "potasio_mg": 256, "fosforo_mg": 210, "sodio_mg": 70},
-  {"id": "res", "nombre": "Carne de res", "categoria": "Carne", "alias": ["beef", "carne de vaca"], "potasio_mg": 318, "fosforo_mg": 198, "sodio_mg": 60},
-  {"id": "cerdo", "nombre": "Cerdo", "categoria": "Carne", "alias": ["pork", "chancho", "puerco"], "potasio_mg": 362, "fosforo_mg": 226, "sodio_mg": 55},
-  {"id": "salmon", "nombre": "Salmón", "categoria": "Pescado", "alias": ["salmon"], "potasio_mg": 384, "fosforo_mg": 252, "sodio_mg": 59},
-  {"id": "atun", "nombre": "Atún en lata", "categoria": "Pescado", "alias": ["tuna"], "potasio_mg": 237, "fosforo_mg": 158, "sodio_mg": 247},
-  {"id": "huevo", "nombre": "Huevo entero", "categoria": "Proteína", "alias": ["egg", "eggs", "huevos"], "potasio_mg": 126, "fosforo_mg": 198, "sodio_mg": 142},
-  {"id": "camaron", "nombre": "Camarón / Gamba", "categoria": "Pescado", "alias": ["shrimp", "gambas", "camarones"], "potasio_mg": 259, "fosforo_mg": 214, "sodio_mg": 566},
-  {"id": "pavo", "nombre": "Pavo (pechuga)", "categoria": "Carne", "alias": ["turkey"], "potasio_mg": 239, "fosforo_mg": 200, "sodio_mg": 63},
-  {"id": "tofu", "nombre": "Tofu", "categoria": "Proteína", "alias": [], "potasio_mg": 121, "fosforo_mg": 190, "sodio_mg": 7},
-
-  {"id": "almendra", "nombre": "Almendras", "categoria": "Fruto seco", "alias": ["almonds"], "potasio_mg": 733, "fosforo_mg": 481, "sodio_mg": 1},
-  {"id": "nuez", "nombre": "Nueces", "categoria": "Fruto seco", "alias": ["walnuts"], "potasio_mg": 441, "fosforo_mg": 346, "sodio_mg": 2},
-  {"id": "mani", "nombre": "Maní / Cacahuate", "categoria": "Fruto seco", "alias": ["peanut", "peanuts", "cacahuete"], "potasio_mg": 705, "fosforo_mg": 376, "sodio_mg": 18},
-  {"id": "girasol", "nombre": "Semillas de girasol", "categoria": "Fruto seco", "alias": ["sunflower seeds"], "potasio_mg": 645, "fosforo_mg": 660, "sodio_mg": 9},
-  {"id": "chia", "nombre": "Semillas de chía", "categoria": "Fruto seco", "alias": ["chia seeds"], "potasio_mg": 407, "fosforo_mg": 860, "sodio_mg": 16},
-
-  {"id": "pan_hamburguesa", "nombre": "Pan de hamburguesa", "categoria": "Procesado", "alias": ["burger bun"], "potasio_mg": 115, "fosforo_mg": 98, "sodio_mg": 460},
-  {"id": "papas_fritas", "nombre": "Papas fritas / Chips", "categoria": "Procesado", "alias": ["potato chips", "chips"], "potasio_mg": 1275, "fosforo_mg": 190, "sodio_mg": 525},
-  {"id": "jamon", "nombre": "Jamón", "categoria": "Procesado", "alias": ["ham"], "potasio_mg": 350, "fosforo_mg": 220, "sodio_mg": 1200},
-  {"id": "tocino", "nombre": "Tocino", "categoria": "Procesado", "alias": ["bacon"], "potasio_mg": 565, "fosforo_mg": 220, "sodio_mg": 1717},
-  {"id": "salchicha", "nombre": "Embutido / Salchicha", "categoria": "Procesado", "alias": ["sausage", "hot dog"], "potasio_mg": 220, "fosforo_mg": 160, "sodio_mg": 850},
-  {"id": "queso_procesado", "nombre": "Queso procesado (tipo americano)", "categoria": "Procesado", "alias": ["american cheese", "processed cheese"], "potasio_mg": 120, "fosforo_mg": 700, "sodio_mg": 1560},
-  {"id": "salsa_soya", "nombre": "Salsa de soya", "categoria": "Condimento", "alias": ["soy sauce"], "potasio_mg": 400, "fosforo_mg": 170, "sodio_mg": 5493},
-  {"id": "sal", "nombre": "Sal de mesa", "categoria": "Condimento", "alias": ["salt"], "potasio_mg": 8, "fosforo_mg": 0, "sodio_mg": 38758},
-  {"id": "caldo_cubo", "nombre": "Caldo en cubo", "categoria": "Condimento", "alias": ["bouillon cube"], "potasio_mg": 220, "fosforo_mg": 90, "sodio_mg": 20000},
-  {"id": "cola", "nombre": "Refresco de cola", "categoria": "Bebida", "alias": ["soda", "cola", "gaseosa"], "potasio_mg": 2, "fosforo_mg": 14, "sodio_mg": 4},
-  {"id": "jugo_naranja", "nombre": "Jugo de naranja envasado", "categoria": "Bebida", "alias": ["orange juice"], "potasio_mg": 200, "fosforo_mg": 17, "sodio_mg": 1},
-  {"id": "chocolate", "nombre": "Chocolate negro", "categoria": "Procesado", "alias": ["dark chocolate"], "potasio_mg": 715, "fosforo_mg": 308, "sodio_mg": 20},
-  {"id": "galleta", "nombre": "Galletas dulces", "categoria": "Procesado", "alias": ["cookies"], "potasio_mg": 120, "fosforo_mg": 90, "sodio_mg": 350},
-  {"id": "pizza", "nombre": "Pizza", "categoria": "Procesado", "alias": [], "potasio_mg": 172, "fosforo_mg": 180, "sodio_mg": 598},
-
-  {"id": "cafe", "nombre": "Café negro", "categoria": "Bebida", "alias": ["coffee"], "potasio_mg": 49, "fosforo_mg": 3, "sodio_mg": 2},
-  {"id": "te", "nombre": "Té negro", "categoria": "Bebida", "alias": ["tea"], "potasio_mg": 37, "fosforo_mg": 4, "sodio_mg": 3},
-  {"id": "agua_coco", "nombre": "Agua de coco", "categoria": "Bebida", "alias": ["coconut water"], "potasio_mg": 250, "fosforo_mg": 20, "sodio_mg": 105},
-  {"id": "cerveza", "nombre": "Cerveza", "categoria": "Bebida", "alias": ["beer"], "potasio_mg": 27, "fosforo_mg": 13, "sodio_mg": 4},
-  {"id": "vino", "nombre": "Vino tinto", "categoria": "Bebida", "alias": ["red wine", "wine"], "potasio_mg": 127, "fosforo_mg": 15, "sodio_mg": 6},
-  {"id": "leche_almendra", "nombre": "Leche de almendra", "categoria": "Bebida", "alias": ["almond milk"], "potasio_mg": 176, "fosforo_mg": 33, "sodio_mg": 63},
-  {"id": "jugo_tomate", "nombre": "Jugo de tomate", "categoria": "Bebida", "alias": ["tomato juice"], "potasio_mg": 220, "fosforo_mg": 20, "sodio_mg": 250},
-
-  {"id": "ketchup", "nombre": "Kétchup", "categoria": "Condimento", "alias": ["ketchup", "catsup"], "potasio_mg": 281, "fosforo_mg": 27, "sodio_mg": 907},
-  {"id": "mostaza", "nombre": "Mostaza", "categoria": "Condimento", "alias": ["mustard"], "potasio_mg": 138, "fosforo_mg": 105, "sodio_mg": 1135},
-  {"id": "mayonesa", "nombre": "Mayonesa", "categoria": "Condimento", "alias": ["mayonnaise", "mayo"], "potasio_mg": 22, "fosforo_mg": 15, "sodio_mg": 635}
+  {
+    "id": "manzana",
+    "nombre": "Manzana",
+    "categoria": "Fruta",
+    "alias": [
+      "apple",
+      "manzanas"
+    ],
+    "potasio_mg": 107,
+    "fosforo_mg": 11,
+    "sodio_mg": 1,
+    "carbohidratos_g": 13.8,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)",
+      "fdc_id": "171688"
+    }
+  },
+  {
+    "id": "platano",
+    "nombre": "Plátano / Banana",
+    "categoria": "Fruta",
+    "alias": [
+      "banana",
+      "banano",
+      "platano",
+      "guineo"
+    ],
+    "potasio_mg": 358,
+    "fosforo_mg": 22,
+    "sodio_mg": 1,
+    "carbohidratos_g": 22.8,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Bananas, raw",
+      "fdc_id": "173944"
+    }
+  },
+  {
+    "id": "naranja",
+    "nombre": "Naranja",
+    "categoria": "Fruta",
+    "alias": [
+      "orange",
+      "naranjas"
+    ],
+    "potasio_mg": 181,
+    "fosforo_mg": 14,
+    "sodio_mg": 0,
+    "carbohidratos_g": 11.8,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Oranges, raw, all commercial varieties",
+      "fdc_id": "169097"
+    }
+  },
+  {
+    "id": "pera",
+    "nombre": "Pera",
+    "categoria": "Fruta",
+    "alias": [
+      "pears"
+    ],
+    "potasio_mg": 116,
+    "fosforo_mg": 12,
+    "sodio_mg": 1,
+    "carbohidratos_g": 15.2,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pears, raw",
+      "fdc_id": "169118"
+    }
+  },
+  {
+    "id": "uva",
+    "nombre": "Uva",
+    "categoria": "Fruta",
+    "alias": [
+      "uvas",
+      "grape",
+      "grapes"
+    ],
+    "potasio_mg": 191,
+    "fosforo_mg": 20,
+    "sodio_mg": 2,
+    "carbohidratos_g": 18.1,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Grapes, red or green (European type, such as Thompson seedless), raw",
+      "fdc_id": "174683"
+    }
+  },
+  {
+    "id": "sandia",
+    "nombre": "Sandía",
+    "categoria": "Fruta",
+    "alias": [
+      "watermelon",
+      "patilla"
+    ],
+    "potasio_mg": 112,
+    "fosforo_mg": 11,
+    "sodio_mg": 1,
+    "carbohidratos_g": 7.5,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Watermelon, raw",
+      "fdc_id": "167765"
+    }
+  },
+  {
+    "id": "melon",
+    "nombre": "Melón",
+    "categoria": "Fruta",
+    "alias": [
+      "cantaloupe",
+      "melon"
+    ],
+    "potasio_mg": 267,
+    "fosforo_mg": 15,
+    "sodio_mg": 16,
+    "carbohidratos_g": 8.2,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Melons, cantaloupe, raw",
+      "fdc_id": "169092"
+    }
+  },
+  {
+    "id": "fresa",
+    "nombre": "Fresa",
+    "categoria": "Fruta",
+    "alias": [
+      "fresas",
+      "strawberry",
+      "frutilla"
+    ],
+    "potasio_mg": 153,
+    "fosforo_mg": 24,
+    "sodio_mg": 1,
+    "carbohidratos_g": 7.7,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Strawberries, raw",
+      "fdc_id": "167762"
+    }
+  },
+  {
+    "id": "kiwi",
+    "nombre": "Kiwi",
+    "categoria": "Fruta",
+    "alias": [],
+    "potasio_mg": 312,
+    "fosforo_mg": 34,
+    "sodio_mg": 3,
+    "carbohidratos_g": 14.7,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Kiwifruit, green, raw",
+      "fdc_id": "168153"
+    }
+  },
+  {
+    "id": "pina",
+    "nombre": "Piña",
+    "categoria": "Fruta",
+    "alias": [
+      "pineapple",
+      "ananá"
+    ],
+    "potasio_mg": 109,
+    "fosforo_mg": 8,
+    "sodio_mg": 1,
+    "carbohidratos_g": 13.1,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pineapple, raw, all varieties",
+      "fdc_id": "169124"
+    }
+  },
+  {
+    "id": "mango",
+    "nombre": "Mango",
+    "categoria": "Fruta",
+    "alias": [],
+    "potasio_mg": 168,
+    "fosforo_mg": 14,
+    "sodio_mg": 1,
+    "carbohidratos_g": 15.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Mangos, raw",
+      "fdc_id": "169910"
+    }
+  },
+  {
+    "id": "durazno",
+    "nombre": "Durazno / Melocotón",
+    "categoria": "Fruta",
+    "alias": [
+      "peach",
+      "melocoton"
+    ],
+    "potasio_mg": 190,
+    "fosforo_mg": 20,
+    "sodio_mg": 0,
+    "carbohidratos_g": 9.5,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Peaches, yellow, raw",
+      "fdc_id": "169928"
+    }
+  },
+  {
+    "id": "ciruela",
+    "nombre": "Ciruela",
+    "categoria": "Fruta",
+    "alias": [
+      "plum"
+    ],
+    "potasio_mg": 157,
+    "fosforo_mg": 16,
+    "sodio_mg": 0,
+    "carbohidratos_g": 11.4,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Plums, raw",
+      "fdc_id": "169949"
+    }
+  },
+  {
+    "id": "cereza",
+    "nombre": "Cereza",
+    "categoria": "Fruta",
+    "alias": [
+      "cherry",
+      "cerezas"
+    ],
+    "potasio_mg": 222,
+    "fosforo_mg": 21,
+    "sodio_mg": 0,
+    "carbohidratos_g": 16.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Cherries, sweet, raw",
+      "fdc_id": "171719"
+    }
+  },
+  {
+    "id": "limon",
+    "nombre": "Limón",
+    "categoria": "Fruta",
+    "alias": [
+      "lemon",
+      "lima"
+    ],
+    "potasio_mg": 138,
+    "fosforo_mg": 16,
+    "sodio_mg": 2,
+    "carbohidratos_g": 9.3,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Lemons, raw, without peel",
+      "fdc_id": "167746"
+    }
+  },
+  {
+    "id": "aguacate",
+    "nombre": "Aguacate / Palta",
+    "categoria": "Fruta",
+    "alias": [
+      "avocado",
+      "palta"
+    ],
+    "potasio_mg": 485,
+    "fosforo_mg": 52,
+    "sodio_mg": 7,
+    "carbohidratos_g": 8.5,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Avocados, raw, all commercial varieties",
+      "fdc_id": "171705"
+    }
+  },
+  {
+    "id": "papaya",
+    "nombre": "Papaya",
+    "categoria": "Fruta",
+    "alias": [
+      "lechosa"
+    ],
+    "potasio_mg": 182,
+    "fosforo_mg": 10,
+    "sodio_mg": 8,
+    "carbohidratos_g": 10.8,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Papayas, raw",
+      "fdc_id": "169926"
+    }
+  },
+  {
+    "id": "mandarina",
+    "nombre": "Mandarina",
+    "categoria": "Fruta",
+    "alias": [
+      "tangerine"
+    ],
+    "potasio_mg": 166,
+    "fosforo_mg": 20,
+    "sodio_mg": 2,
+    "carbohidratos_g": 13.3,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Tangerines, (mandarin oranges), raw",
+      "fdc_id": "169105"
+    }
+  },
+  {
+    "id": "higo",
+    "nombre": "Higo",
+    "categoria": "Fruta",
+    "alias": [
+      "fig"
+    ],
+    "potasio_mg": 232,
+    "fosforo_mg": 14,
+    "sodio_mg": 1,
+    "carbohidratos_g": 19.2,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Figs, raw",
+      "fdc_id": "173021"
+    }
+  },
+  {
+    "id": "datil",
+    "nombre": "Dátil",
+    "categoria": "Fruta",
+    "alias": [
+      "date",
+      "datiles"
+    ],
+    "potasio_mg": 696,
+    "fosforo_mg": 62,
+    "sodio_mg": 1,
+    "carbohidratos_g": 75.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Dates, medjool",
+      "fdc_id": "168191"
+    }
+  },
+  {
+    "id": "arandano",
+    "nombre": "Arándano",
+    "categoria": "Fruta",
+    "alias": [
+      "blueberry",
+      "arandanos"
+    ],
+    "potasio_mg": 77,
+    "fosforo_mg": 12,
+    "sodio_mg": 1,
+    "carbohidratos_g": 14.5,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Blueberries, raw",
+      "fdc_id": "171711"
+    }
+  },
+  {
+    "id": "frambuesa",
+    "nombre": "Frambuesa",
+    "categoria": "Fruta",
+    "alias": [
+      "raspberry"
+    ],
+    "potasio_mg": 151,
+    "fosforo_mg": 29,
+    "sodio_mg": 1,
+    "carbohidratos_g": 11.9,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Raspberries, raw",
+      "fdc_id": "167755"
+    }
+  },
+  {
+    "id": "granada",
+    "nombre": "Granada",
+    "categoria": "Fruta",
+    "alias": [
+      "pomegranate"
+    ],
+    "potasio_mg": 236,
+    "fosforo_mg": 36,
+    "sodio_mg": 3,
+    "carbohidratos_g": 18.7,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pomegranates, raw",
+      "fdc_id": "169134"
+    }
+  },
+  {
+    "id": "guayaba",
+    "nombre": "Guayaba",
+    "categoria": "Fruta",
+    "alias": [
+      "guava"
+    ],
+    "potasio_mg": 417,
+    "fosforo_mg": 40,
+    "sodio_mg": 2,
+    "carbohidratos_g": 14.3,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Guavas, common, raw",
+      "fdc_id": "173044"
+    }
+  },
+  {
+    "id": "papa",
+    "nombre": "Papa / Patata",
+    "categoria": "Verdura",
+    "alias": [
+      "potato",
+      "patata",
+      "papas"
+    ],
+    "potasio_mg": 425,
+    "fosforo_mg": 57,
+    "sodio_mg": 6,
+    "carbohidratos_g": 17.5,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Potatoes, flesh and skin, raw",
+      "fdc_id": "170026"
+    }
+  },
+  {
+    "id": "tomate",
+    "nombre": "Tomate",
+    "categoria": "Verdura",
+    "alias": [
+      "tomato",
+      "jitomate"
+    ],
+    "potasio_mg": 237,
+    "fosforo_mg": 24,
+    "sodio_mg": 5,
+    "carbohidratos_g": 3.9,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Tomatoes, red, ripe, raw, year round average",
+      "fdc_id": "170457"
+    }
+  },
+  {
+    "id": "lechuga",
+    "nombre": "Lechuga",
+    "categoria": "Verdura",
+    "alias": [
+      "lettuce"
+    ],
+    "potasio_mg": 238,
+    "fosforo_mg": 33,
+    "sodio_mg": 5,
+    "carbohidratos_g": 2.2,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Lettuce, butterhead (includes boston and bibb types), raw",
+      "fdc_id": "168429"
+    }
+  },
+  {
+    "id": "zanahoria",
+    "nombre": "Zanahoria",
+    "categoria": "Verdura",
+    "alias": [
+      "carrot"
+    ],
+    "potasio_mg": 320,
+    "fosforo_mg": 35,
+    "sodio_mg": 69,
+    "carbohidratos_g": 9.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Carrots, raw",
+      "fdc_id": "170393"
+    }
+  },
+  {
+    "id": "brocoli",
+    "nombre": "Brócoli",
+    "categoria": "Verdura",
+    "alias": [
+      "broccoli"
+    ],
+    "potasio_mg": 316,
+    "fosforo_mg": 66,
+    "sodio_mg": 33,
+    "carbohidratos_g": 6.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Broccoli, raw",
+      "fdc_id": "170379"
+    }
+  },
+  {
+    "id": "espinaca",
+    "nombre": "Espinaca",
+    "categoria": "Verdura",
+    "alias": [
+      "spinach"
+    ],
+    "potasio_mg": 558,
+    "fosforo_mg": 49,
+    "sodio_mg": 79,
+    "carbohidratos_g": 3.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Spinach, raw",
+      "fdc_id": "168462"
+    }
+  },
+  {
+    "id": "coliflor",
+    "nombre": "Coliflor",
+    "categoria": "Verdura",
+    "alias": [
+      "cauliflower"
+    ],
+    "potasio_mg": 299,
+    "fosforo_mg": 44,
+    "sodio_mg": 30,
+    "carbohidratos_g": 5.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Cauliflower, raw",
+      "fdc_id": "169986"
+    }
+  },
+  {
+    "id": "pepino",
+    "nombre": "Pepino",
+    "categoria": "Verdura",
+    "alias": [
+      "cucumber"
+    ],
+    "potasio_mg": 147,
+    "fosforo_mg": 24,
+    "sodio_mg": 2,
+    "carbohidratos_g": 3.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Cucumber, with peel, raw",
+      "fdc_id": "168409"
+    }
+  },
+  {
+    "id": "calabacin",
+    "nombre": "Calabacín / Zucchini",
+    "categoria": "Verdura",
+    "alias": [
+      "zucchini",
+      "calabacita"
+    ],
+    "potasio_mg": 261,
+    "fosforo_mg": 38,
+    "sodio_mg": 8,
+    "carbohidratos_g": 3.1,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Squash, summer, zucchini, includes skin, raw",
+      "fdc_id": "169291"
+    }
+  },
+  {
+    "id": "berenjena",
+    "nombre": "Berenjena",
+    "categoria": "Verdura",
+    "alias": [
+      "eggplant"
+    ],
+    "potasio_mg": 229,
+    "fosforo_mg": 24,
+    "sodio_mg": 2,
+    "carbohidratos_g": 5.9,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Eggplant, raw",
+      "fdc_id": "169228"
+    }
+  },
+  {
+    "id": "pimiento",
+    "nombre": "Pimiento",
+    "categoria": "Verdura",
+    "alias": [
+      "pepper",
+      "aji",
+      "chile morron"
+    ],
+    "potasio_mg": 211,
+    "fosforo_mg": 26,
+    "sodio_mg": 4,
+    "carbohidratos_g": 6.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Peppers, sweet, red, raw",
+      "fdc_id": "170108"
+    }
+  },
+  {
+    "id": "cebolla",
+    "nombre": "Cebolla",
+    "categoria": "Verdura",
+    "alias": [
+      "onion"
+    ],
+    "potasio_mg": 146,
+    "fosforo_mg": 29,
+    "sodio_mg": 4,
+    "carbohidratos_g": 9.3,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Onions, raw",
+      "fdc_id": "170000"
+    }
+  },
+  {
+    "id": "ajo",
+    "nombre": "Ajo",
+    "categoria": "Verdura",
+    "alias": [
+      "garlic"
+    ],
+    "potasio_mg": 401,
+    "fosforo_mg": 153,
+    "sodio_mg": 17,
+    "carbohidratos_g": 33.1,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Garlic, raw",
+      "fdc_id": "169230"
+    }
+  },
+  {
+    "id": "aceituna",
+    "nombre": "Aceituna",
+    "categoria": "Verdura",
+    "alias": [
+      "olive",
+      "olives",
+      "aceitunas"
+    ],
+    "potasio_mg": 8,
+    "fosforo_mg": 3,
+    "sodio_mg": 735,
+    "carbohidratos_g": 6.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Olives, ripe, canned (small-extra large)",
+      "fdc_id": "169094"
+    }
+  },
+  {
+    "id": "apio",
+    "nombre": "Apio",
+    "categoria": "Verdura",
+    "alias": [
+      "celery"
+    ],
+    "potasio_mg": 260,
+    "fosforo_mg": 24,
+    "sodio_mg": 80,
+    "carbohidratos_g": 3.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Celery, raw",
+      "fdc_id": "169988"
+    }
+  },
+  {
+    "id": "champinon",
+    "nombre": "Champiñón / Hongo",
+    "categoria": "Verdura",
+    "alias": [
+      "mushroom",
+      "hongos",
+      "setas"
+    ],
+    "potasio_mg": 318,
+    "fosforo_mg": 86,
+    "sodio_mg": 5,
+    "carbohidratos_g": 3.3,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Mushrooms, white, raw",
+      "fdc_id": "169251"
+    }
+  },
+  {
+    "id": "calabaza",
+    "nombre": "Calabaza / Zapallo",
+    "categoria": "Verdura",
+    "alias": [
+      "pumpkin",
+      "auyama",
+      "zapallo"
+    ],
+    "potasio_mg": 340,
+    "fosforo_mg": 44,
+    "sodio_mg": 1,
+    "carbohidratos_g": 6.5,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pumpkin, raw",
+      "fdc_id": "168448"
+    }
+  },
+  {
+    "id": "remolacha",
+    "nombre": "Remolacha / Betabel",
+    "categoria": "Verdura",
+    "alias": [
+      "beet",
+      "beetroot",
+      "betabel"
+    ],
+    "potasio_mg": 325,
+    "fosforo_mg": 40,
+    "sodio_mg": 78,
+    "carbohidratos_g": 9.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beets, raw",
+      "fdc_id": "169145"
+    }
+  },
+  {
+    "id": "esparrago",
+    "nombre": "Espárrago",
+    "categoria": "Verdura",
+    "alias": [
+      "asparagus"
+    ],
+    "potasio_mg": 202,
+    "fosforo_mg": 52,
+    "sodio_mg": 2,
+    "carbohidratos_g": 3.9,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Asparagus, raw",
+      "fdc_id": "168389"
+    }
+  },
+  {
+    "id": "col",
+    "nombre": "Col / Repollo",
+    "categoria": "Verdura",
+    "alias": [
+      "cabbage",
+      "repollo"
+    ],
+    "potasio_mg": 170,
+    "fosforo_mg": 26,
+    "sodio_mg": 18,
+    "carbohidratos_g": 5.8,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Cabbage, raw",
+      "fdc_id": "169975"
+    }
+  },
+  {
+    "id": "acelga",
+    "nombre": "Acelga",
+    "categoria": "Verdura",
+    "alias": [
+      "chard",
+      "swiss chard"
+    ],
+    "potasio_mg": 379,
+    "fosforo_mg": 46,
+    "sodio_mg": 213,
+    "carbohidratos_g": 3.7,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Chard, swiss, raw",
+      "fdc_id": "169991"
+    }
+  },
+  {
+    "id": "frijol_negro",
+    "nombre": "Frijoles negros cocidos",
+    "categoria": "Legumbre",
+    "alias": [
+      "black beans",
+      "frijoles",
+      "porotos"
+    ],
+    "potasio_mg": 355,
+    "fosforo_mg": 140,
+    "sodio_mg": 1,
+    "carbohidratos_g": 23.7,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beans, black, mature seeds, cooked, boiled, without salt",
+      "fdc_id": "173735"
+    }
+  },
+  {
+    "id": "lenteja",
+    "nombre": "Lentejas cocidas",
+    "categoria": "Legumbre",
+    "alias": [
+      "lentils",
+      "lentejas"
+    ],
+    "potasio_mg": 369,
+    "fosforo_mg": 180,
+    "sodio_mg": 2,
+    "carbohidratos_g": 20.1,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Lentils, mature seeds, cooked, boiled, without salt",
+      "fdc_id": "172421"
+    }
+  },
+  {
+    "id": "garbanzo",
+    "nombre": "Garbanzos cocidos",
+    "categoria": "Legumbre",
+    "alias": [
+      "chickpeas",
+      "garbanzos"
+    ],
+    "potasio_mg": 291,
+    "fosforo_mg": 168,
+    "sodio_mg": 7,
+    "carbohidratos_g": 27.4,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
+      "fdc_id": "173757"
+    }
+  },
+  {
+    "id": "guisante",
+    "nombre": "Guisantes / Arvejas cocidos",
+    "categoria": "Legumbre",
+    "alias": [
+      "peas",
+      "arvejas",
+      "chicharos"
+    ],
+    "potasio_mg": 271,
+    "fosforo_mg": 117,
+    "sodio_mg": 3,
+    "carbohidratos_g": 15.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Peas, green, cooked, boiled, drained, without salt",
+      "fdc_id": "170420"
+    }
+  },
+  {
+    "id": "haba",
+    "nombre": "Habas cocidas",
+    "categoria": "Legumbre",
+    "alias": [
+      "fava beans",
+      "habas"
+    ],
+    "potasio_mg": 268,
+    "fosforo_mg": 125,
+    "sodio_mg": 5,
+    "carbohidratos_g": 19.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Broadbeans (fava beans), mature seeds, cooked, boiled, without salt",
+      "fdc_id": "173753"
+    }
+  },
+  {
+    "id": "arroz_blanco",
+    "nombre": "Arroz blanco cocido",
+    "categoria": "Cereal",
+    "alias": [
+      "white rice",
+      "arroz"
+    ],
+    "potasio_mg": 35,
+    "fosforo_mg": 43,
+    "sodio_mg": 1,
+    "carbohidratos_g": 28.2,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Rice, white, long-grain, regular, enriched, cooked",
+      "fdc_id": "168878"
+    }
+  },
+  {
+    "id": "arroz_integral",
+    "nombre": "Arroz integral cocido",
+    "categoria": "Cereal",
+    "alias": [
+      "brown rice"
+    ],
+    "potasio_mg": 86,
+    "fosforo_mg": 103,
+    "sodio_mg": 4,
+    "carbohidratos_g": 25.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)",
+      "fdc_id": "169704"
+    }
+  },
+  {
+    "id": "pasta",
+    "nombre": "Pasta cocida",
+    "categoria": "Cereal",
+    "alias": [
+      "fideos",
+      "spaghetti",
+      "macarrones"
+    ],
+    "potasio_mg": 44,
+    "fosforo_mg": 58,
+    "sodio_mg": 1,
+    "carbohidratos_g": 30.9,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pasta, cooked, enriched, without added salt",
+      "fdc_id": "169737"
+    }
+  },
+  {
+    "id": "pan_blanco",
+    "nombre": "Pan blanco",
+    "categoria": "Cereal",
+    "alias": [
+      "white bread",
+      "pan"
+    ],
+    "potasio_mg": 119,
+    "fosforo_mg": 94,
+    "sodio_mg": 298,
+    "carbohidratos_g": 49.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Bread, white, commercially prepared, low sodium, no salt",
+      "fdc_id": "172818"
+    }
+  },
+  {
+    "id": "pan_integral",
+    "nombre": "Pan integral",
+    "categoria": "Cereal",
+    "alias": [
+      "whole wheat bread"
+    ],
+    "potasio_mg": 254,
+    "fosforo_mg": 212,
+    "sodio_mg": 455,
+    "carbohidratos_g": 42.7,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Bread, whole-wheat, commercially prepared",
+      "fdc_id": "172688"
+    }
+  },
+  {
+    "id": "avena",
+    "nombre": "Avena cruda",
+    "categoria": "Cereal",
+    "alias": [
+      "oats",
+      "oatmeal"
+    ],
+    "potasio_mg": 358,
+    "fosforo_mg": 458,
+    "sodio_mg": 3,
+    "carbohidratos_g": 68.2,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Cereals, QUAKER, Quick Oats, Dry",
+      "fdc_id": "172989"
+    }
+  },
+  {
+    "id": "quinoa",
+    "nombre": "Quinoa cocida",
+    "categoria": "Cereal",
+    "alias": [
+      "quinua"
+    ],
+    "potasio_mg": 172,
+    "fosforo_mg": 152,
+    "sodio_mg": 7,
+    "carbohidratos_g": 21.3,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Quinoa, cooked",
+      "fdc_id": "168917"
+    }
+  },
+  {
+    "id": "maiz",
+    "nombre": "Maíz / Choclo cocido",
+    "categoria": "Cereal",
+    "alias": [
+      "corn",
+      "choclo",
+      "elote"
+    ],
+    "potasio_mg": 218,
+    "fosforo_mg": 77,
+    "sodio_mg": 1,
+    "carbohidratos_g": 21.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Corn, sweet, yellow, cooked, boiled, drained, without salt",
+      "fdc_id": "169999"
+    }
+  },
+  {
+    "id": "tortilla_maiz",
+    "nombre": "Tortilla de maíz",
+    "categoria": "Cereal",
+    "alias": [
+      "corn tortilla"
+    ],
+    "potasio_mg": 186,
+    "fosforo_mg": 314,
+    "sodio_mg": 45,
+    "carbohidratos_g": 44.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Tortillas, ready-to-bake or -fry, corn",
+      "fdc_id": "175036"
+    }
+  },
+  {
+    "id": "tortilla_harina",
+    "nombre": "Tortilla de harina",
+    "categoria": "Cereal",
+    "alias": [
+      "flour tortilla"
+    ],
+    "potasio_mg": 125,
+    "fosforo_mg": 206,
+    "sodio_mg": 736,
+    "carbohidratos_g": 49.4,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Tortillas, ready-to-bake or -fry, flour, refrigerated",
+      "fdc_id": "175037"
+    }
+  },
+  {
+    "id": "leche_entera",
+    "nombre": "Leche entera",
+    "categoria": "Lácteo",
+    "alias": [
+      "whole milk",
+      "leche"
+    ],
+    "potasio_mg": 132,
+    "fosforo_mg": 84,
+    "sodio_mg": 43,
+    "carbohidratos_g": 4.8,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Milk, whole, 3.25% milkfat, without added vitamin A and vitamin D",
+      "fdc_id": "172217"
+    }
+  },
+  {
+    "id": "leche_descremada",
+    "nombre": "Leche descremada",
+    "categoria": "Lácteo",
+    "alias": [
+      "skim milk"
+    ],
+    "potasio_mg": 156,
+    "fosforo_mg": 101,
+    "sodio_mg": 42,
+    "carbohidratos_g": 5.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)",
+      "fdc_id": "171269"
+    }
+  },
+  {
+    "id": "yogur",
+    "nombre": "Yogur natural",
+    "categoria": "Lácteo",
+    "alias": [
+      "yogurt"
+    ],
+    "potasio_mg": 155,
+    "fosforo_mg": 95,
+    "sodio_mg": 46,
+    "carbohidratos_g": 4.7,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Yogurt, plain, whole milk",
+      "fdc_id": "171284"
+    }
+  },
+  {
+    "id": "queso_fresco",
+    "nombre": "Queso fresco",
+    "categoria": "Lácteo",
+    "alias": [
+      "fresh cheese"
+    ],
+    "potasio_mg": 129,
+    "fosforo_mg": 385,
+    "sodio_mg": 751,
+    "carbohidratos_g": 3.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Cheese, fresh, queso fresco",
+      "fdc_id": "172223"
+    }
+  },
+  {
+    "id": "queso_cheddar",
+    "nombre": "Queso cheddar",
+    "categoria": "Lácteo",
+    "alias": [
+      "cheddar"
+    ],
+    "potasio_mg": 76,
+    "fosforo_mg": 455,
+    "sodio_mg": 653,
+    "carbohidratos_g": 3.4,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Cheese, cheddar (Includes foods for USDA's Food Distribution Program)",
+      "fdc_id": "173414"
+    }
+  },
+  {
+    "id": "queso_crema",
+    "nombre": "Queso crema",
+    "categoria": "Lácteo",
+    "alias": [
+      "cream cheese"
+    ],
+    "potasio_mg": 132,
+    "fosforo_mg": 107,
+    "sodio_mg": 314,
+    "carbohidratos_g": 5.5,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Cheese, cream",
+      "fdc_id": "173418"
+    }
+  },
+  {
+    "id": "mantequilla",
+    "nombre": "Mantequilla",
+    "categoria": "Lácteo",
+    "alias": [
+      "butter"
+    ],
+    "potasio_mg": 24,
+    "fosforo_mg": 24,
+    "sodio_mg": 643,
+    "carbohidratos_g": 0.1,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Butter, salted",
+      "fdc_id": "173410"
+    }
+  },
+  {
+    "id": "pollo",
+    "nombre": "Pechuga de pollo",
+    "categoria": "Carne",
+    "alias": [
+      "chicken",
+      "chicken breast"
+    ],
+    "potasio_mg": 256,
+    "fosforo_mg": 228,
+    "sodio_mg": 74,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
+      "fdc_id": "171477"
+    }
+  },
+  {
+    "id": "res",
+    "nombre": "Carne de res",
+    "categoria": "Carne",
+    "alias": [
+      "beef",
+      "carne de vaca"
+    ],
+    "potasio_mg": 318,
+    "fosforo_mg": 198,
+    "sodio_mg": 72,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beef, ground, 85% lean meat / 15% fat, patty, cooked, broiled",
+      "fdc_id": "174032"
+    }
+  },
+  {
+    "id": "cerdo",
+    "nombre": "Cerdo",
+    "categoria": "Carne",
+    "alias": [
+      "pork",
+      "chancho",
+      "puerco"
+    ],
+    "potasio_mg": 356,
+    "fosforo_mg": 228,
+    "sodio_mg": 56,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pork, fresh, loin, center loin (chops), bone-in, separable lean only, cooked, broiled",
+      "fdc_id": "168240"
+    }
+  },
+  {
+    "id": "salmon",
+    "nombre": "Salmón",
+    "categoria": "Pescado",
+    "alias": [
+      "salmon"
+    ],
+    "potasio_mg": 384,
+    "fosforo_mg": 252,
+    "sodio_mg": 61,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
+      "fdc_id": "175168"
+    }
+  },
+  {
+    "id": "atun",
+    "nombre": "Atún en lata",
+    "categoria": "Pescado",
+    "alias": [
+      "tuna"
+    ],
+    "potasio_mg": 179,
+    "fosforo_mg": 139,
+    "sodio_mg": 247,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)",
+      "fdc_id": "173709"
+    }
+  },
+  {
+    "id": "huevo",
+    "nombre": "Huevo entero",
+    "categoria": "Proteína",
+    "alias": [
+      "egg",
+      "eggs",
+      "huevos"
+    ],
+    "potasio_mg": 138,
+    "fosforo_mg": 198,
+    "sodio_mg": 142,
+    "carbohidratos_g": 0.7,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Egg, whole, raw, fresh",
+      "fdc_id": "171287"
+    }
+  },
+  {
+    "id": "camaron",
+    "nombre": "Camarón / Gamba",
+    "categoria": "Pescado",
+    "alias": [
+      "shrimp",
+      "gambas",
+      "camarones"
+    ],
+    "potasio_mg": 259,
+    "fosforo_mg": 237,
+    "sodio_mg": 111,
+    "carbohidratos_g": 0.2,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Crustaceans, shrimp, cooked",
+      "fdc_id": "175180"
+    }
+  },
+  {
+    "id": "pavo",
+    "nombre": "Pavo (pechuga)",
+    "categoria": "Carne",
+    "alias": [
+      "turkey"
+    ],
+    "potasio_mg": 249,
+    "fosforo_mg": 255,
+    "sodio_mg": 238,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Turkey, breast, from whole bird, meat only, with added solution, roasted",
+      "fdc_id": "174519"
+    }
+  },
+  {
+    "id": "tofu",
+    "nombre": "Tofu",
+    "categoria": "Proteína",
+    "alias": [],
+    "potasio_mg": 237,
+    "fosforo_mg": 190,
+    "sodio_mg": 14,
+    "carbohidratos_g": 2.8,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Tofu, raw, firm, prepared with calcium sulfate",
+      "fdc_id": "172475"
+    }
+  },
+  {
+    "id": "almendra",
+    "nombre": "Almendras",
+    "categoria": "Fruto seco",
+    "alias": [
+      "almonds"
+    ],
+    "potasio_mg": 733,
+    "fosforo_mg": 481,
+    "sodio_mg": 1,
+    "carbohidratos_g": 21.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Nuts, almonds",
+      "fdc_id": "170567"
+    }
+  },
+  {
+    "id": "nuez",
+    "nombre": "Nueces",
+    "categoria": "Fruto seco",
+    "alias": [
+      "walnuts"
+    ],
+    "potasio_mg": 441,
+    "fosforo_mg": 346,
+    "sodio_mg": 2,
+    "carbohidratos_g": 13.7,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Nuts, walnuts, english",
+      "fdc_id": "170187"
+    }
+  },
+  {
+    "id": "mani",
+    "nombre": "Maní / Cacahuate",
+    "categoria": "Fruto seco",
+    "alias": [
+      "peanut",
+      "peanuts",
+      "cacahuete"
+    ],
+    "potasio_mg": 705,
+    "fosforo_mg": 376,
+    "sodio_mg": 18,
+    "carbohidratos_g": 16.1,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Peanuts, all types, raw",
+      "fdc_id": "172430"
+    }
+  },
+  {
+    "id": "girasol",
+    "nombre": "Semillas de girasol",
+    "categoria": "Fruto seco",
+    "alias": [
+      "sunflower seeds"
+    ],
+    "potasio_mg": 645,
+    "fosforo_mg": 660,
+    "sodio_mg": 9,
+    "carbohidratos_g": 20.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Seeds, sunflower seed kernels, dried",
+      "fdc_id": "170562"
+    }
+  },
+  {
+    "id": "chia",
+    "nombre": "Semillas de chía",
+    "categoria": "Fruto seco",
+    "alias": [
+      "chia seeds"
+    ],
+    "potasio_mg": 407,
+    "fosforo_mg": 860,
+    "sodio_mg": 16,
+    "carbohidratos_g": 42.1,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Seeds, chia seeds, dried",
+      "fdc_id": "170554"
+    }
+  },
+  {
+    "id": "pan_hamburguesa",
+    "nombre": "Pan de hamburguesa",
+    "categoria": "Procesado",
+    "alias": [
+      "burger bun"
+    ],
+    "potasio_mg": 122,
+    "fosforo_mg": 101,
+    "sodio_mg": 494,
+    "carbohidratos_g": 50.1,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Rolls, hamburger or hotdog, plain",
+      "fdc_id": "172796"
+    }
+  },
+  {
+    "id": "papas_fritas",
+    "nombre": "Papas fritas / Chips",
+    "categoria": "Procesado",
+    "alias": [
+      "potato chips",
+      "chips"
+    ],
+    "potasio_mg": 1196,
+    "fosforo_mg": 153,
+    "sodio_mg": 527,
+    "carbohidratos_g": 53.8,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Snacks, potato chips, plain, salted",
+      "fdc_id": "169677"
+    }
+  },
+  {
+    "id": "jamon",
+    "nombre": "Jamón",
+    "categoria": "Procesado",
+    "alias": [
+      "ham"
+    ],
+    "potasio_mg": 287,
+    "fosforo_mg": 153,
+    "sodio_mg": 814,
+    "carbohidratos_g": 3.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Ham, sliced, regular (approximately 11% fat)",
+      "fdc_id": "173864"
+    }
+  },
+  {
+    "id": "tocino",
+    "nombre": "Tocino",
+    "categoria": "Procesado",
+    "alias": [
+      "bacon"
+    ],
+    "potasio_mg": 539,
+    "fosforo_mg": 506,
+    "sodio_mg": 2193,
+    "carbohidratos_g": 1.4,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pork, cured, bacon, cooked, baked",
+      "fdc_id": "167914"
+    }
+  },
+  {
+    "id": "salchicha",
+    "nombre": "Embutido / Salchicha",
+    "categoria": "Procesado",
+    "alias": [
+      "sausage",
+      "hot dog"
+    ],
+    "potasio_mg": 364,
+    "fosforo_mg": 134,
+    "sodio_mg": 865,
+    "carbohidratos_g": 3.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Frankfurter, beef, unheated",
+      "fdc_id": "173862"
+    }
+  },
+  {
+    "id": "queso_procesado",
+    "nombre": "Queso procesado (tipo americano)",
+    "categoria": "Procesado",
+    "alias": [
+      "american cheese",
+      "processed cheese"
+    ],
+    "potasio_mg": 132,
+    "fosforo_mg": 641,
+    "sodio_mg": 1671,
+    "carbohidratos_g": 4.8,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Cheese, pasteurized process, American, fortified with vitamin D",
+      "fdc_id": "170853"
+    }
+  },
+  {
+    "id": "salsa_soya",
+    "nombre": "Salsa de soya",
+    "categoria": "Condimento",
+    "alias": [
+      "soy sauce"
+    ],
+    "potasio_mg": 212,
+    "fosforo_mg": 130,
+    "sodio_mg": 5586,
+    "carbohidratos_g": 5.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Soy sauce made from soy (tamari)",
+      "fdc_id": "174278"
+    }
+  },
+  {
+    "id": "sal",
+    "nombre": "Sal de mesa",
+    "categoria": "Condimento",
+    "alias": [
+      "salt"
+    ],
+    "potasio_mg": 8,
+    "fosforo_mg": 0,
+    "sodio_mg": 38758,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Salt, table",
+      "fdc_id": "173468"
+    }
+  },
+  {
+    "id": "caldo_cubo",
+    "nombre": "Caldo en cubo",
+    "categoria": "Condimento",
+    "alias": [
+      "bouillon cube"
+    ],
+    "potasio_mg": 403,
+    "fosforo_mg": 225,
+    "sodio_mg": 24000,
+    "carbohidratos_g": 16.1,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Soup, beef broth, cubed, dry",
+      "fdc_id": "171561"
+    }
+  },
+  {
+    "id": "cola",
+    "nombre": "Refresco de cola",
+    "categoria": "Bebida",
+    "alias": [
+      "soda",
+      "cola",
+      "gaseosa"
+    ],
+    "potasio_mg": 5,
+    "fosforo_mg": 9,
+    "sodio_mg": 3,
+    "carbohidratos_g": 10.4,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beverages, carbonated, cola, regular",
+      "fdc_id": "174852"
+    }
+  },
+  {
+    "id": "jugo_naranja",
+    "nombre": "Jugo de naranja envasado",
+    "categoria": "Bebida",
+    "alias": [
+      "orange juice"
+    ],
+    "potasio_mg": 178,
+    "fosforo_mg": 17,
+    "sodio_mg": 2,
+    "carbohidratos_g": 11.5,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Orange juice, chilled, includes from concentrate",
+      "fdc_id": "169100"
+    }
+  },
+  {
+    "id": "chocolate",
+    "nombre": "Chocolate negro",
+    "categoria": "Procesado",
+    "alias": [
+      "dark chocolate"
+    ],
+    "potasio_mg": 715,
+    "fosforo_mg": 308,
+    "sodio_mg": 20,
+    "carbohidratos_g": 45.9,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Chocolate, dark, 70-85% cacao solids",
+      "fdc_id": "170273"
+    }
+  },
+  {
+    "id": "galleta",
+    "nombre": "Galletas dulces",
+    "categoria": "Procesado",
+    "alias": [
+      "cookies"
+    ],
+    "potasio_mg": 87,
+    "fosforo_mg": 99,
+    "sodio_mg": 385,
+    "carbohidratos_g": 67.3,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Cookies, sugar, commercially prepared, regular (includes vanilla)",
+      "fdc_id": "174971"
+    }
+  },
+  {
+    "id": "pizza",
+    "nombre": "Pizza",
+    "categoria": "Procesado",
+    "alias": [],
+    "potasio_mg": 152,
+    "fosforo_mg": 179,
+    "sodio_mg": 447,
+    "carbohidratos_g": 29.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pizza, cheese topping, regular crust, frozen, cooked",
+      "fdc_id": "170317"
+    }
+  },
+  {
+    "id": "cafe",
+    "nombre": "Café negro",
+    "categoria": "Bebida",
+    "alias": [
+      "coffee"
+    ],
+    "potasio_mg": 49,
+    "fosforo_mg": 3,
+    "sodio_mg": 2,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beverages, coffee, brewed, prepared with tap water",
+      "fdc_id": "171890"
+    }
+  },
+  {
+    "id": "te",
+    "nombre": "Té negro",
+    "categoria": "Bebida",
+    "alias": [
+      "tea"
+    ],
+    "potasio_mg": 37,
+    "fosforo_mg": 1,
+    "sodio_mg": 3,
+    "carbohidratos_g": 0.3,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beverages, tea, black, brewed, prepared with tap water",
+      "fdc_id": "173227"
+    }
+  },
+  {
+    "id": "agua_coco",
+    "nombre": "Agua de coco",
+    "categoria": "Bebida",
+    "alias": [
+      "coconut water"
+    ],
+    "potasio_mg": 250,
+    "fosforo_mg": 20,
+    "sodio_mg": 105,
+    "carbohidratos_g": 3.7,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Nuts, coconut water (liquid from coconuts)",
+      "fdc_id": "170174"
+    }
+  },
+  {
+    "id": "cerveza",
+    "nombre": "Cerveza",
+    "categoria": "Bebida",
+    "alias": [
+      "beer"
+    ],
+    "potasio_mg": 27,
+    "fosforo_mg": 14,
+    "sodio_mg": 4,
+    "carbohidratos_g": 3.5,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Alcoholic beverage, beer, regular, all",
+      "fdc_id": "168746"
+    }
+  },
+  {
+    "id": "vino",
+    "nombre": "Vino tinto",
+    "categoria": "Bebida",
+    "alias": [
+      "red wine",
+      "wine"
+    ],
+    "potasio_mg": 127,
+    "fosforo_mg": 23,
+    "sodio_mg": 4,
+    "carbohidratos_g": 2.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Alcoholic beverage, wine, table, red",
+      "fdc_id": "173190"
+    }
+  },
+  {
+    "id": "leche_almendra",
+    "nombre": "Leche de almendra",
+    "categoria": "Bebida",
+    "alias": [
+      "almond milk"
+    ],
+    "potasio_mg": 67,
+    "fosforo_mg": 9,
+    "sodio_mg": 72,
+    "carbohidratos_g": 1.3,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beverages, almond milk, unsweetened, shelf stable",
+      "fdc_id": "174832"
+    }
+  },
+  {
+    "id": "jugo_tomate",
+    "nombre": "Jugo de tomate",
+    "categoria": "Bebida",
+    "alias": [
+      "tomato juice"
+    ],
+    "potasio_mg": 217,
+    "fosforo_mg": 19,
+    "sodio_mg": 253,
+    "carbohidratos_g": 3.5,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Tomato juice, canned, with salt added",
+      "fdc_id": "170458"
+    }
+  },
+  {
+    "id": "ketchup",
+    "nombre": "Kétchup",
+    "categoria": "Condimento",
+    "alias": [
+      "ketchup",
+      "catsup"
+    ],
+    "potasio_mg": 281,
+    "fosforo_mg": 26,
+    "sodio_mg": 907,
+    "carbohidratos_g": 27.4,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Catsup",
+      "fdc_id": "168556"
+    }
+  },
+  {
+    "id": "mostaza",
+    "nombre": "Mostaza",
+    "categoria": "Condimento",
+    "alias": [
+      "mustard"
+    ],
+    "potasio_mg": 152,
+    "fosforo_mg": 108,
+    "sodio_mg": 1104,
+    "carbohidratos_g": 5.8,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Mustard, prepared, yellow",
+      "fdc_id": "172234"
+    }
+  },
+  {
+    "id": "mayonesa",
+    "nombre": "Mayonesa",
+    "categoria": "Condimento",
+    "alias": [
+      "mayonnaise",
+      "mayo"
+    ],
+    "potasio_mg": 20,
+    "fosforo_mg": 21,
+    "sodio_mg": 635,
+    "carbohidratos_g": 0.6,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Salad dressing, mayonnaise, regular",
+      "fdc_id": "171009"
+    }
+  }
 ]
