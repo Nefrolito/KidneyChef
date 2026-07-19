@@ -15,7 +15,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)",
       "fdc_id": "171688"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "platano",
@@ -35,7 +36,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Bananas, raw",
       "fdc_id": "173944"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "naranja",
@@ -53,7 +55,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Oranges, raw, all commercial varieties",
       "fdc_id": "169097"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "pera",
@@ -70,7 +73,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pears, raw",
       "fdc_id": "169118"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "uva",
@@ -89,7 +93,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Grapes, red or green (European type, such as Thompson seedless), raw",
       "fdc_id": "174683"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "sandia",
@@ -107,7 +112,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Watermelon, raw",
       "fdc_id": "167765"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "melon",
@@ -125,7 +131,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Melons, cantaloupe, raw",
       "fdc_id": "169092"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "fresa",
@@ -144,7 +151,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Strawberries, raw",
       "fdc_id": "167762"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "kiwi",
@@ -159,7 +167,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Kiwifruit, green, raw",
       "fdc_id": "168153"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "pina",
@@ -177,7 +186,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pineapple, raw, all varieties",
       "fdc_id": "169124"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "mango",
@@ -192,7 +202,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Mangos, raw",
       "fdc_id": "169910"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "durazno",
@@ -210,7 +221,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Peaches, yellow, raw",
       "fdc_id": "169928"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "ciruela",
@@ -227,7 +239,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Plums, raw",
       "fdc_id": "169949"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "cereza",
@@ -245,7 +258,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cherries, sweet, raw",
       "fdc_id": "171719"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "limon",
@@ -263,7 +277,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Lemons, raw, without peel",
       "fdc_id": "167746"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "aguacate",
@@ -281,7 +296,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Avocados, raw, all commercial varieties",
       "fdc_id": "171705"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "papaya",
@@ -298,7 +314,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Papayas, raw",
       "fdc_id": "169926"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "mandarina",
@@ -315,7 +332,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tangerines, (mandarin oranges), raw",
       "fdc_id": "169105"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "higo",
@@ -332,7 +350,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Figs, raw",
       "fdc_id": "173021"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "datil",
@@ -350,7 +369,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Dates, medjool",
       "fdc_id": "168191"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "arandano",
@@ -368,7 +388,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Blueberries, raw",
       "fdc_id": "171711"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "frambuesa",
@@ -385,7 +406,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Raspberries, raw",
       "fdc_id": "167755"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "granada",
@@ -402,7 +424,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pomegranates, raw",
       "fdc_id": "169134"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "guayaba",
@@ -419,7 +442,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Guavas, common, raw",
       "fdc_id": "173044"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "papa",
@@ -438,7 +462,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Potatoes, flesh and skin, raw",
       "fdc_id": "170026"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "tomate",
@@ -456,7 +481,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tomatoes, red, ripe, raw, year round average",
       "fdc_id": "170457"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "lechuga",
@@ -473,7 +499,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Lettuce, butterhead (includes boston and bibb types), raw",
       "fdc_id": "168429"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "zanahoria",
@@ -490,7 +517,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Carrots, raw",
       "fdc_id": "170393"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "brocoli",
@@ -507,7 +535,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Broccoli, raw",
       "fdc_id": "170379"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "espinaca",
@@ -524,7 +553,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Spinach, raw",
       "fdc_id": "168462"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "coliflor",
@@ -541,7 +571,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cauliflower, raw",
       "fdc_id": "169986"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "pepino",
@@ -558,7 +589,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cucumber, with peel, raw",
       "fdc_id": "168409"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "calabacin",
@@ -576,7 +608,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Squash, summer, zucchini, includes skin, raw",
       "fdc_id": "169291"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "berenjena",
@@ -593,7 +626,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Eggplant, raw",
       "fdc_id": "169228"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "pimiento",
@@ -612,7 +646,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Peppers, sweet, red, raw",
       "fdc_id": "170108"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "cebolla",
@@ -629,7 +664,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Onions, raw",
       "fdc_id": "170000"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "ajo",
@@ -646,7 +682,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Garlic, raw",
       "fdc_id": "169230"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "aceituna",
@@ -665,7 +702,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Olives, ripe, canned (small-extra large)",
       "fdc_id": "169094"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "apio",
@@ -682,7 +720,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Celery, raw",
       "fdc_id": "169988"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "champinon",
@@ -701,7 +740,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Mushrooms, white, raw",
       "fdc_id": "169251"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "calabaza",
@@ -720,7 +760,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pumpkin, raw",
       "fdc_id": "168448"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "remolacha",
@@ -739,7 +780,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beets, raw",
       "fdc_id": "169145"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "esparrago",
@@ -756,7 +798,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Asparagus, raw",
       "fdc_id": "168389"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "col",
@@ -774,7 +817,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cabbage, raw",
       "fdc_id": "169975"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "acelga",
@@ -792,7 +836,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Chard, swiss, raw",
       "fdc_id": "169991"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "frijol_negro",
@@ -811,7 +856,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beans, black, mature seeds, cooked, boiled, without salt",
       "fdc_id": "173735"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "lenteja",
@@ -829,7 +875,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Lentils, mature seeds, cooked, boiled, without salt",
       "fdc_id": "172421"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "garbanzo",
@@ -847,7 +894,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
       "fdc_id": "173757"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "guisante",
@@ -866,7 +914,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Peas, green, cooked, boiled, drained, without salt",
       "fdc_id": "170420"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "haba",
@@ -884,7 +933,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Broadbeans (fava beans), mature seeds, cooked, boiled, without salt",
       "fdc_id": "173753"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "arroz_blanco",
@@ -902,7 +952,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Rice, white, long-grain, regular, enriched, cooked",
       "fdc_id": "168878"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "arroz_integral",
@@ -919,7 +970,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)",
       "fdc_id": "169704"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "pasta",
@@ -938,7 +990,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pasta, cooked, enriched, without added salt",
       "fdc_id": "169737"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "pan_blanco",
@@ -956,7 +1009,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Bread, white, commercially prepared, low sodium, no salt",
       "fdc_id": "172818"
-    }
+    },
+    "aditivos_fosfato": "posible",
+    "aditivos_fosfato_nota": "Mejoradores de masa en pan industrial."
   },
   {
     "id": "pan_integral",
@@ -973,7 +1028,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Bread, whole-wheat, commercially prepared",
       "fdc_id": "172688"
-    }
+    },
+    "aditivos_fosfato": "posible",
+    "aditivos_fosfato_nota": "Mejoradores de masa en pan industrial."
   },
   {
     "id": "avena",
@@ -991,7 +1048,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cereals, QUAKER, Quick Oats, Dry",
       "fdc_id": "172989"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "quinoa",
@@ -1008,7 +1066,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Quinoa, cooked",
       "fdc_id": "168917"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "maiz",
@@ -1027,7 +1086,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Corn, sweet, yellow, cooked, boiled, drained, without salt",
       "fdc_id": "169999"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "tortilla_maiz",
@@ -1044,7 +1104,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tortillas, ready-to-bake or -fry, corn",
       "fdc_id": "175036"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "tortilla_harina",
@@ -1061,7 +1122,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tortillas, ready-to-bake or -fry, flour, refrigerated",
       "fdc_id": "175037"
-    }
+    },
+    "aditivos_fosfato": "posible",
+    "aditivos_fosfato_nota": "Polvos de hornear fosfatados en la masa."
   },
   {
     "id": "leche_entera",
@@ -1079,7 +1142,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Milk, whole, 3.25% milkfat, without added vitamin A and vitamin D",
       "fdc_id": "172217"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "leche_descremada",
@@ -1096,7 +1160,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)",
       "fdc_id": "171269"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "yogur",
@@ -1113,7 +1178,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Yogurt, plain, whole milk",
       "fdc_id": "171284"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "queso_fresco",
@@ -1130,7 +1196,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cheese, fresh, queso fresco",
       "fdc_id": "172223"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "queso_cheddar",
@@ -1147,7 +1214,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cheese, cheddar (Includes foods for USDA's Food Distribution Program)",
       "fdc_id": "173414"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "queso_crema",
@@ -1164,7 +1232,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cheese, cream",
       "fdc_id": "173418"
-    }
+    },
+    "aditivos_fosfato": "posible",
+    "aditivos_fosfato_nota": "Algunos quesos untables llevan estabilizantes fosfatados."
   },
   {
     "id": "mantequilla",
@@ -1181,7 +1251,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Butter, salted",
       "fdc_id": "173410"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "pollo",
@@ -1199,7 +1270,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
       "fdc_id": "171477"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "res",
@@ -1217,7 +1289,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beef, ground, 85% lean meat / 15% fat, patty, cooked, broiled",
       "fdc_id": "174032"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "cerdo",
@@ -1236,7 +1309,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pork, fresh, loin, center loin (chops), bone-in, separable lean only, cooked, broiled",
       "fdc_id": "168240"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "salmon",
@@ -1253,7 +1327,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
       "fdc_id": "175168"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "atun",
@@ -1270,7 +1345,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)",
       "fdc_id": "173709"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "huevo",
@@ -1289,7 +1365,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Egg, whole, raw, fresh",
       "fdc_id": "171287"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "camaron",
@@ -1308,7 +1385,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Crustaceans, shrimp, cooked",
       "fdc_id": "175180"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "pavo",
@@ -1325,7 +1403,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Turkey, breast, from whole bird, meat only, with added solution, roasted",
       "fdc_id": "174519"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "tofu",
@@ -1340,7 +1419,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tofu, raw, firm, prepared with calcium sulfate",
       "fdc_id": "172475"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "almendra",
@@ -1357,7 +1437,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Nuts, almonds",
       "fdc_id": "170567"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "nuez",
@@ -1374,7 +1455,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Nuts, walnuts, english",
       "fdc_id": "170187"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "mani",
@@ -1393,7 +1475,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Peanuts, all types, raw",
       "fdc_id": "172430"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "girasol",
@@ -1410,7 +1493,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Seeds, sunflower seed kernels, dried",
       "fdc_id": "170562"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "chia",
@@ -1427,7 +1511,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Seeds, chia seeds, dried",
       "fdc_id": "170554"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "pan_hamburguesa",
@@ -1444,7 +1529,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Rolls, hamburger or hotdog, plain",
       "fdc_id": "172796"
-    }
+    },
+    "aditivos_fosfato": "posible",
+    "aditivos_fosfato_nota": "Mejoradores de masa en pan industrial."
   },
   {
     "id": "papas_fritas",
@@ -1462,7 +1549,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Snacks, potato chips, plain, salted",
       "fdc_id": "169677"
-    }
+    },
+    "aditivos_fosfato": "posible",
+    "aditivos_fosfato_nota": "Algunos snacks usan fosfatos como aditivo."
   },
   {
     "id": "jamon",
@@ -1479,7 +1568,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Ham, sliced, regular (approximately 11% fat)",
       "fdc_id": "173864"
-    }
+    },
+    "aditivos_fosfato": "alto",
+    "aditivos_fosfato_nota": "Fosfatos en la salmuera de curado e inyección."
   },
   {
     "id": "tocino",
@@ -1496,7 +1587,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pork, cured, bacon, cooked, baked",
       "fdc_id": "167914"
-    }
+    },
+    "aditivos_fosfato": "alto",
+    "aditivos_fosfato_nota": "Fosfatos en la salmuera de curado."
   },
   {
     "id": "salchicha",
@@ -1514,7 +1607,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Frankfurter, beef, unheated",
       "fdc_id": "173862"
-    }
+    },
+    "aditivos_fosfato": "alto",
+    "aditivos_fosfato_nota": "Fosfatos añadidos como retenedores de agua en embutidos."
   },
   {
     "id": "queso_procesado",
@@ -1532,7 +1627,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cheese, pasteurized process, American, fortified with vitamin D",
       "fdc_id": "170853"
-    }
+    },
+    "aditivos_fosfato": "alto",
+    "aditivos_fosfato_nota": "Sales fundentes de fosfato son parte esencial del queso fundido."
   },
   {
     "id": "salsa_soya",
@@ -1549,7 +1646,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Soy sauce made from soy (tamari)",
       "fdc_id": "174278"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "sal",
@@ -1566,7 +1664,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Salt, table",
       "fdc_id": "173468"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "caldo_cubo",
@@ -1583,7 +1682,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Soup, beef broth, cubed, dry",
       "fdc_id": "171561"
-    }
+    },
+    "aditivos_fosfato": "posible",
+    "aditivos_fosfato_nota": "Frecuente en cubos y sopas deshidratadas."
   },
   {
     "id": "cola",
@@ -1602,7 +1703,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beverages, carbonated, cola, regular",
       "fdc_id": "174852"
-    }
+    },
+    "aditivos_fosfato": "alto",
+    "aditivos_fosfato_nota": "Ácido fosfórico es ingrediente característico de las bebidas cola."
   },
   {
     "id": "jugo_naranja",
@@ -1619,7 +1722,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Orange juice, chilled, includes from concentrate",
       "fdc_id": "169100"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "chocolate",
@@ -1636,7 +1740,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Chocolate, dark, 70-85% cacao solids",
       "fdc_id": "170273"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "galleta",
@@ -1653,7 +1758,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cookies, sugar, commercially prepared, regular (includes vanilla)",
       "fdc_id": "174971"
-    }
+    },
+    "aditivos_fosfato": "posible",
+    "aditivos_fosfato_nota": "Leudantes fosfatados según formulación."
   },
   {
     "id": "pizza",
@@ -1668,7 +1775,9 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pizza, cheese topping, regular crust, frozen, cooked",
       "fdc_id": "170317"
-    }
+    },
+    "aditivos_fosfato": "posible",
+    "aditivos_fosfato_nota": "Aporta queso procesado y masa con leudantes fosfatados."
   },
   {
     "id": "cafe",
@@ -1685,7 +1794,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beverages, coffee, brewed, prepared with tap water",
       "fdc_id": "171890"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "te",
@@ -1702,7 +1812,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beverages, tea, black, brewed, prepared with tap water",
       "fdc_id": "173227"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "agua_coco",
@@ -1719,7 +1830,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Nuts, coconut water (liquid from coconuts)",
       "fdc_id": "170174"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "cerveza",
@@ -1736,7 +1848,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Alcoholic beverage, beer, regular, all",
       "fdc_id": "168746"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "vino",
@@ -1754,7 +1867,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Alcoholic beverage, wine, table, red",
       "fdc_id": "173190"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "leche_almendra",
@@ -1771,7 +1885,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beverages, almond milk, unsweetened, shelf stable",
       "fdc_id": "174832"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "jugo_tomate",
@@ -1788,7 +1903,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tomato juice, canned, with salt added",
       "fdc_id": "170458"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "ketchup",
@@ -1806,7 +1922,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Catsup",
       "fdc_id": "168556"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "mostaza",
@@ -1823,7 +1940,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Mustard, prepared, yellow",
       "fdc_id": "172234"
-    }
+    },
+    "aditivos_fosfato": null
   },
   {
     "id": "mayonesa",
@@ -1841,6 +1959,1018 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Salad dressing, mayonnaise, regular",
       "fdc_id": "171009"
+    },
+    "aditivos_fosfato": null
+  },
+  {
+    "id": "marraqueta",
+    "nombre": "Marraqueta / pan batido",
+    "categoria": "Cereal",
+    "alias": [
+      "marraqueta",
+      "pan batido",
+      "pan frances"
+    ],
+    "potasio_mg": 66,
+    "fosforo_mg": 67,
+    "sodio_mg": 466,
+    "carbohidratos_g": 47.3,
+    "aditivos_fosfato": "posible",
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "harina": 62,
+        "sal": 1.2
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "hallulla",
+    "nombre": "Hallulla",
+    "categoria": "Cereal",
+    "alias": [
+      "hallulla"
+    ],
+    "potasio_mg": 62,
+    "fosforo_mg": 96,
+    "sodio_mg": 587,
+    "carbohidratos_g": 44.7,
+    "aditivos_fosfato": "posible",
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "harina": 58,
+        "manteca": 8,
+        "sal": 1.1,
+        "polvo_hornear": 1.5
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "sopaipilla",
+    "nombre": "Sopaipilla",
+    "categoria": "Cereal",
+    "alias": [
+      "sopaipillas"
+    ],
+    "potasio_mg": 116,
+    "fosforo_mg": 57,
+    "sodio_mg": 389,
+    "carbohidratos_g": 35.6,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "harina": 45,
+        "zapallo": 20,
+        "manteca": 14,
+        "sal": 1.0
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "empanada_pino",
+    "nombre": "Empanada de pino",
+    "categoria": "Procesado",
+    "alias": [
+      "empanada",
+      "empanada de horno"
+    ],
+    "potasio_mg": 148,
+    "fosforo_mg": 102,
+    "sodio_mg": 489,
+    "carbohidratos_g": 28.2,
+    "aditivos_fosfato": "posible",
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "harina": 34,
+        "vacuno": 20,
+        "cebolla": 22,
+        "huevo": 6,
+        "manteca": 7,
+        "sal": 1.2,
+        "aji_color": 0.3
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "empanada_queso",
+    "nombre": "Empanada de queso",
+    "categoria": "Procesado",
+    "alias": [
+      "empanada frita"
+    ],
+    "potasio_mg": 72,
+    "fosforo_mg": 183,
+    "sodio_mg": 601,
+    "carbohidratos_g": 29.6,
+    "aditivos_fosfato": "posible",
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "harina": 38,
+        "queso_gauda": 26,
+        "aceite": 12,
+        "sal": 1.0
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "completo",
+    "nombre": "Completo",
+    "categoria": "Procesado",
+    "alias": [
+      "hot dog",
+      "completo italiano"
+    ],
+    "potasio_mg": 203,
+    "fosforo_mg": 97,
+    "sodio_mg": 611,
+    "carbohidratos_g": 20.5,
+    "aditivos_fosfato": "alto",
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "pan_blanco": 35,
+        "vienesa": 25,
+        "palta": 18,
+        "tomate": 15,
+        "sal": 0.6
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "churrasco",
+    "nombre": "Churrasco / sándwich de carne",
+    "categoria": "Procesado",
+    "alias": [
+      "sandwich de carne",
+      "barros luco"
+    ],
+    "potasio_mg": 171,
+    "fosforo_mg": 172,
+    "sodio_mg": 535,
+    "carbohidratos_g": 20.1,
+    "aditivos_fosfato": "posible",
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "pan_blanco": 40,
+        "vacuno": 35,
+        "queso_gauda": 10,
+        "sal": 0.8
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "cazuela_vacuno",
+    "nombre": "Cazuela de vacuno",
+    "categoria": "Plato preparado",
+    "alias": [
+      "cazuela"
+    ],
+    "potasio_mg": 176,
+    "fosforo_mg": 55,
+    "sodio_mg": 282,
+    "carbohidratos_g": 8.8,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "vacuno": 14,
+        "papa_cocida": 22,
+        "zapallo_cocido": 14,
+        "choclo_cocido": 8,
+        "cebolla": 5,
+        "arroz_crudo": 2,
+        "sal": 0.7
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "cazuela_ave",
+    "nombre": "Cazuela de ave",
+    "categoria": "Plato preparado",
+    "alias": [
+      "cazuela de pollo"
+    ],
+    "potasio_mg": 165,
+    "fosforo_mg": 50,
+    "sodio_mg": 285,
+    "carbohidratos_g": 8.8,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "pollo": 14,
+        "papa_cocida": 22,
+        "zapallo_cocido": 14,
+        "choclo_cocido": 8,
+        "cebolla": 5,
+        "arroz_crudo": 2,
+        "sal": 0.7
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "charquican",
+    "nombre": "Charquicán",
+    "categoria": "Plato preparado",
+    "alias": [
+      "charquican"
+    ],
+    "potasio_mg": 227,
+    "fosforo_mg": 55,
+    "sodio_mg": 320,
+    "carbohidratos_g": 10.1,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "papa_cocida": 34,
+        "zapallo_cocido": 22,
+        "vacuno": 12,
+        "choclo_cocido": 8,
+        "cebolla": 6,
+        "aceite": 3,
+        "sal": 0.8
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "porotos_granados",
+    "nombre": "Porotos granados",
+    "categoria": "Legumbre",
+    "alias": [
+      "porotos con mazamorra"
+    ],
+    "potasio_mg": 215,
+    "fosforo_mg": 68,
+    "sodio_mg": 311,
+    "carbohidratos_g": 13.1,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "porotos_negros": 34,
+        "zapallo_cocido": 22,
+        "choclo_cocido": 16,
+        "cebolla": 6,
+        "aceite": 3,
+        "sal": 0.8
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "pastel_choclo",
+    "nombre": "Pastel de choclo",
+    "categoria": "Plato preparado",
+    "alias": [
+      "pastel de maiz"
+    ],
+    "potasio_mg": 188,
+    "fosforo_mg": 93,
+    "sodio_mg": 371,
+    "carbohidratos_g": 14.4,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "choclo_cocido": 48,
+        "vacuno": 16,
+        "cebolla": 10,
+        "leche": 8,
+        "huevo": 5,
+        "azucar": 3,
+        "sal": 0.9
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "humita",
+    "nombre": "Humita",
+    "categoria": "Plato preparado",
+    "alias": [
+      "humitas"
+    ],
+    "potasio_mg": 168,
+    "fosforo_mg": 60,
+    "sodio_mg": 353,
+    "carbohidratos_g": 15.3,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "choclo_cocido": 68,
+        "cebolla": 8,
+        "leche": 6,
+        "manteca": 5,
+        "sal": 0.9
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "carbonada",
+    "nombre": "Carbonada",
+    "categoria": "Plato preparado",
+    "alias": [
+      "carbonada"
+    ],
+    "potasio_mg": 180,
+    "fosforo_mg": 54,
+    "sodio_mg": 286,
+    "carbohidratos_g": 9.4,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "vacuno": 12,
+        "papa_cocida": 20,
+        "zapallo_cocido": 12,
+        "zanahoria_cocida": 8,
+        "choclo_cocido": 7,
+        "fideo_crudo": 3,
+        "cebolla": 5,
+        "sal": 0.7
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "lentejas_guisadas",
+    "nombre": "Lentejas guisadas",
+    "categoria": "Legumbre",
+    "alias": [
+      "lentejas"
+    ],
+    "potasio_mg": 260,
+    "fosforo_mg": 116,
+    "sodio_mg": 316,
+    "carbohidratos_g": 13.8,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "lenteja_cocida": 62,
+        "cebolla": 8,
+        "zanahoria": 6,
+        "aceite": 3,
+        "sal": 0.8
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "arroz_pollo",
+    "nombre": "Arroz con pollo",
+    "categoria": "Plato preparado",
+    "alias": [
+      "arroz con pollo"
+    ],
+    "potasio_mg": 98,
+    "fosforo_mg": 68,
+    "sodio_mg": 331,
+    "carbohidratos_g": 21.8,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "arroz_crudo": 26,
+        "pollo": 18,
+        "cebolla": 6,
+        "zanahoria": 5,
+        "aceite": 3,
+        "sal": 0.8
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "tallarines_salsa",
+    "nombre": "Tallarines con salsa de tomate",
+    "categoria": "Plato preparado",
+    "alias": [
+      "tallarines",
+      "pasta con salsa"
+    ],
+    "potasio_mg": 147,
+    "fosforo_mg": 66,
+    "sodio_mg": 314,
+    "carbohidratos_g": 24.1,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "fideo_crudo": 30,
+        "tomate": 30,
+        "cebolla": 6,
+        "aceite": 3,
+        "sal": 0.8
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "pure_papas",
+    "nombre": "Puré de papas",
+    "categoria": "Verdura",
+    "alias": [
+      "pure"
+    ],
+    "potasio_mg": 256,
+    "fosforo_mg": 42,
+    "sodio_mg": 313,
+    "carbohidratos_g": 15.1,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "papa_cocida": 72,
+        "leche": 14,
+        "mantequilla": 5,
+        "sal": 0.7
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "ensalada_chilena",
+    "nombre": "Ensalada chilena",
+    "categoria": "Verdura",
+    "alias": [
+      "ensalada de tomate y cebolla"
+    ],
+    "potasio_mg": 188,
+    "fosforo_mg": 23,
+    "sodio_mg": 237,
+    "carbohidratos_g": 5.0,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "tomate": 62,
+        "cebolla": 28,
+        "aceite": 5,
+        "sal": 0.6
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "pebre",
+    "nombre": "Pebre",
+    "categoria": "Condimento",
+    "alias": [
+      "pebre chileno"
+    ],
+    "potasio_mg": 203,
+    "fosforo_mg": 24,
+    "sodio_mg": 473,
+    "carbohidratos_g": 4.9,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "tomate": 45,
+        "cebolla": 30,
+        "cilantro": 10,
+        "aceite": 8,
+        "sal": 1.2
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "papas_cocidas",
+    "nombre": "Papas cocidas",
+    "categoria": "Verdura",
+    "alias": [
+      "papa cocida",
+      "papas hervidas"
+    ],
+    "potasio_mg": 321,
+    "fosforo_mg": 39,
+    "sodio_mg": 160,
+    "carbohidratos_g": 19.6,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "papa_cocida": 98,
+        "sal": 0.4
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "papas_duquesa",
+    "nombre": "Papas doradas al horno",
+    "categoria": "Verdura",
+    "alias": [
+      "papas al horno"
+    ],
+    "potasio_mg": 361,
+    "fosforo_mg": 48,
+    "sodio_mg": 276,
+    "carbohidratos_g": 14.9,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "papa": 85,
+        "aceite": 8,
+        "sal": 0.7
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "pollo_asado",
+    "nombre": "Pollo asado",
+    "categoria": "Carne",
+    "alias": [
+      "pollo al horno"
+    ],
+    "potasio_mg": 224,
+    "fosforo_mg": 179,
+    "sodio_mg": 467,
+    "carbohidratos_g": 0.0,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "pollo": 92,
+        "aceite": 3,
+        "sal": 1.0
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "costillar_cerdo",
+    "nombre": "Costillar de cerdo",
+    "categoria": "Carne",
+    "alias": [
+      "costillar"
+    ],
+    "potasio_mg": 333,
+    "fosforo_mg": 202,
+    "sodio_mg": 480,
+    "carbohidratos_g": 0.0,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "cerdo": 92,
+        "aceite": 3,
+        "sal": 1.1
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "merluza_frita",
+    "nombre": "Merluza frita",
+    "categoria": "Pescado",
+    "alias": [
+      "pescado frito",
+      "merluza"
+    ],
+    "potasio_mg": 314,
+    "fosforo_mg": 159,
+    "sodio_mg": 389,
+    "carbohidratos_g": 6.1,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "merluza": 74,
+        "harina": 8,
+        "aceite": 12,
+        "sal": 0.9
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "merluza_vapor",
+    "nombre": "Merluza al vapor",
+    "categoria": "Pescado",
+    "alias": [
+      "pescado al vapor"
+    ],
+    "potasio_mg": 401,
+    "fosforo_mg": 197,
+    "sodio_mg": 246,
+    "carbohidratos_g": 0.0,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "merluza": 97,
+        "sal": 0.5
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "chorrillana",
+    "nombre": "Chorrillana",
+    "categoria": "Plato preparado",
+    "alias": [
+      "chorrillana"
+    ],
+    "potasio_mg": 283,
+    "fosforo_mg": 98,
+    "sodio_mg": 420,
+    "carbohidratos_g": 8.7,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "papa": 42,
+        "vacuno": 22,
+        "cebolla": 14,
+        "huevo": 10,
+        "aceite": 9,
+        "sal": 1.0
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "arroz_leche",
+    "nombre": "Arroz con leche",
+    "categoria": "Postre",
+    "alias": [
+      "arroz con leche"
+    ],
+    "potasio_mg": 98,
+    "fosforo_mg": 68,
+    "sodio_mg": 27,
+    "carbohidratos_g": 24.2,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "arroz_crudo": 14,
+        "leche": 62,
+        "azucar": 10
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "leche_asada",
+    "nombre": "Leche asada",
+    "categoria": "Postre",
+    "alias": [
+      "leche asada",
+      "flan"
+    ],
+    "potasio_mg": 112,
+    "fosforo_mg": 91,
+    "sodio_mg": 54,
+    "carbohidratos_g": 17.3,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "leche": 66,
+        "huevo": 18,
+        "azucar": 14
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "mote_huesillo",
+    "nombre": "Mote con huesillo",
+    "categoria": "Postre",
+    "alias": [
+      "mote con huesillo"
+    ],
+    "potasio_mg": 67,
+    "fosforo_mg": 63,
+    "sodio_mg": 1,
+    "carbohidratos_g": 21.5,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "trigo_mote": 12,
+        "durazno_conserva": 16,
+        "azucar": 10
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "acelga_cocida",
+    "nombre": "Acelga cocida",
+    "categoria": "Verdura",
+    "alias": [
+      "acelgas"
+    ],
+    "potasio_mg": 527,
+    "fosforo_mg": 32,
+    "sodio_mg": 366,
+    "carbohidratos_g": 4.0,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "acelga_cocida_ing": 96,
+        "aceite": 2,
+        "sal": 0.5
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "longaniza",
+    "nombre": "Longaniza",
+    "categoria": "Procesado",
+    "alias": [
+      "longaniza chilena"
+    ],
+    "potasio_mg": 294,
+    "fosforo_mg": 173,
+    "sodio_mg": 899,
+    "carbohidratos_g": 0.3,
+    "aditivos_fosfato": "alto",
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "cerdo": 78,
+        "manteca": 12,
+        "sal": 2.2,
+        "aji_color": 0.5
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "queso_chanco",
+    "nombre": "Queso chanco",
+    "categoria": "Lácteo",
+    "alias": [
+      "queso chanco",
+      "queso mantecoso"
+    ],
+    "potasio_mg": 121,
+    "fosforo_mg": 546,
+    "sodio_mg": 819,
+    "carbohidratos_g": 2.2,
+    "aditivos_fosfato": "posible",
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "queso_gauda": 100
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "palta_molida",
+    "nombre": "Palta molida",
+    "categoria": "Fruta",
+    "alias": [
+      "palta molida",
+      "guacamole"
+    ],
+    "potasio_mg": 446,
+    "fosforo_mg": 48,
+    "sodio_mg": 239,
+    "carbohidratos_g": 7.8,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "palta": 92,
+        "sal": 0.6
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "te_con_leche",
+    "nombre": "Té con leche",
+    "categoria": "Bebida",
+    "alias": [
+      "te con leche"
+    ],
+    "potasio_mg": 33,
+    "fosforo_mg": 21,
+    "sodio_mg": 11,
+    "carbohidratos_g": 6.2,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
+      "receta_g_por_100g": {
+        "leche": 25,
+        "azucar": 5
+      },
+      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    }
+  },
+  {
+    "id": "jurel_conserva",
+    "nombre": "Jurel en conserva",
+    "categoria": "Pescado",
+    "alias": [
+      "jurel",
+      "caballa en conserva"
+    ],
+    "potasio_mg": 194,
+    "fosforo_mg": 301,
+    "sodio_mg": 379,
+    "carbohidratos_g": 0.0,
+    "aditivos_fosfato": "posible",
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Fish, mackerel, jack, canned, drained solids",
+      "fdc_id": "175121"
+    }
+  },
+  {
+    "id": "sardina_conserva",
+    "nombre": "Sardinas en conserva",
+    "categoria": "Pescado",
+    "alias": [
+      "sardinas"
+    ],
+    "potasio_mg": 397,
+    "fosforo_mg": 490,
+    "sodio_mg": 307,
+    "carbohidratos_g": 0.0,
+    "aditivos_fosfato": "posible",
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Fish, sardine, Atlantic, canned in oil, drained solids with bone",
+      "fdc_id": "175139"
+    }
+  },
+  {
+    "id": "mortadela",
+    "nombre": "Mortadela",
+    "categoria": "Procesado",
+    "alias": [
+      "mortadela"
+    ],
+    "potasio_mg": 351,
+    "fosforo_mg": 154,
+    "sodio_mg": 1013,
+    "carbohidratos_g": 4.3,
+    "aditivos_fosfato": "alto",
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Bologna, beef",
+      "fdc_id": "172012"
+    }
+  },
+  {
+    "id": "pate",
+    "nombre": "Paté",
+    "categoria": "Procesado",
+    "alias": [
+      "pate"
+    ],
+    "potasio_mg": 138,
+    "fosforo_mg": 200,
+    "sodio_mg": 697,
+    "carbohidratos_g": 1.5,
+    "aditivos_fosfato": "posible",
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pate, liver, not specified, canned",
+      "fdc_id": "172930"
+    }
+  },
+  {
+    "id": "margarina",
+    "nombre": "Margarina",
+    "categoria": "Lácteo",
+    "alias": [
+      "margarina"
+    ],
+    "potasio_mg": 17,
+    "fosforo_mg": 5,
+    "sodio_mg": 657,
+    "carbohidratos_g": 0.8,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Margarine, regular, 80% fat, composite, tub, with salt",
+      "fdc_id": "172347"
+    }
+  },
+  {
+    "id": "manjar",
+    "nombre": "Manjar / Dulce de leche",
+    "categoria": "Postre",
+    "alias": [
+      "manjar",
+      "dulce de leche"
+    ],
+    "potasio_mg": 350,
+    "fosforo_mg": 193,
+    "sodio_mg": 129,
+    "carbohidratos_g": 55.4,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Dulce de Leche",
+      "fdc_id": "173461"
+    }
+  },
+  {
+    "id": "mermelada",
+    "nombre": "Mermelada",
+    "categoria": "Procesado",
+    "alias": [
+      "mermelada",
+      "jalea"
+    ],
+    "potasio_mg": 77,
+    "fosforo_mg": 19,
+    "sodio_mg": 32,
+    "carbohidratos_g": 68.9,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Jams and preserves",
+      "fdc_id": "169641"
+    }
+  },
+  {
+    "id": "miel",
+    "nombre": "Miel",
+    "categoria": "Condimento",
+    "alias": [
+      "miel"
+    ],
+    "potasio_mg": 52,
+    "fosforo_mg": 4,
+    "sodio_mg": 4,
+    "carbohidratos_g": 82.4,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Honey",
+      "fdc_id": "169640"
+    }
+  },
+  {
+    "id": "yogur_fruta",
+    "nombre": "Yogur con fruta",
+    "categoria": "Lácteo",
+    "alias": [
+      "yogurt con fruta"
+    ],
+    "potasio_mg": 177,
+    "fosforo_mg": 109,
+    "sodio_mg": 53,
+    "carbohidratos_g": 18.6,
+    "aditivos_fosfato": null,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Yogurt, fruit, low fat,9 g protein/8 oz",
+      "fdc_id": "170889"
+    }
+  },
+  {
+    "id": "bebida_gaseosa",
+    "nombre": "Bebida gaseosa (no cola)",
+    "categoria": "Bebida",
+    "alias": [
+      "bebida",
+      "gaseosa",
+      "refresco"
+    ],
+    "potasio_mg": 1,
+    "fosforo_mg": 0,
+    "sodio_mg": 10,
+    "carbohidratos_g": 10.4,
+    "aditivos_fosfato": "posible",
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beverages, carbonated, lemon-lime soda, no caffeine",
+      "fdc_id": "173205"
     }
   }
 ]
