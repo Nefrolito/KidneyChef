@@ -16,7 +16,17 @@
       "descripcion": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)",
       "fdc_id": "171688"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 40,
+    "indice_glucemico_meta": {
+      "n_estudios": 14,
+      "rango": [
+        28,
+        45
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "platano",
@@ -37,7 +47,17 @@
       "descripcion": "Bananas, raw",
       "fdc_id": "173944"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 52,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        47,
+        57
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "naranja",
@@ -56,7 +76,17 @@
       "descripcion": "Oranges, raw, all commercial varieties",
       "fdc_id": "169097"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 42,
+    "indice_glucemico_meta": {
+      "n_estudios": 6,
+      "rango": [
+        31,
+        48
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "pera",
@@ -74,7 +104,17 @@
       "descripcion": "Pears, raw",
       "fdc_id": "169118"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 38,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        33,
+        43
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "uva",
@@ -94,7 +134,17 @@
       "descripcion": "Grapes, red or green (European type, such as Thompson seedless), raw",
       "fdc_id": "174683"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 50,
+    "indice_glucemico_meta": {
+      "n_estudios": 8,
+      "rango": [
+        43,
+        59
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "sandia",
@@ -113,7 +163,17 @@
       "descripcion": "Watermelon, raw",
       "fdc_id": "167765"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 72,
+    "indice_glucemico_meta": {
+      "n_estudios": 3,
+      "rango": [
+        55,
+        80
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "melon",
@@ -132,7 +192,17 @@
       "descripcion": "Melons, cantaloupe, raw",
       "fdc_id": "169092"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 68,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        65,
+        70
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "fresa",
@@ -152,7 +222,8 @@
       "descripcion": "Strawberries, raw",
       "fdc_id": "167762"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "kiwi",
@@ -168,7 +239,17 @@
       "descripcion": "Kiwifruit, green, raw",
       "fdc_id": "168153"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 52,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        47,
+        58
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "pina",
@@ -187,7 +268,17 @@
       "descripcion": "Pineapple, raw, all varieties",
       "fdc_id": "169124"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 74,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        66,
+        82
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "mango",
@@ -203,7 +294,17 @@
       "descripcion": "Mangos, raw",
       "fdc_id": "169910"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 48,
+    "indice_glucemico_meta": {
+      "n_estudios": 1,
+      "rango": [
+        48,
+        48
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "durazno",
@@ -222,7 +323,17 @@
       "descripcion": "Peaches, yellow, raw",
       "fdc_id": "169928"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 42,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        28,
+        57
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "ciruela",
@@ -240,7 +351,17 @@
       "descripcion": "Plums, raw",
       "fdc_id": "169949"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 32,
+    "indice_glucemico_meta": {
+      "n_estudios": 3,
+      "rango": [
+        24,
+        53
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "cereza",
@@ -259,7 +380,17 @@
       "descripcion": "Cherries, sweet, raw",
       "fdc_id": "171719"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 26,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        22,
+        29
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "limon",
@@ -278,7 +409,8 @@
       "descripcion": "Lemons, raw, without peel",
       "fdc_id": "167746"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "aguacate",
@@ -297,7 +429,8 @@
       "descripcion": "Avocados, raw, all commercial varieties",
       "fdc_id": "171705"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "papaya",
@@ -315,7 +448,8 @@
       "descripcion": "Papayas, raw",
       "fdc_id": "169926"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "mandarina",
@@ -333,7 +467,17 @@
       "descripcion": "Tangerines, (mandarin oranges), raw",
       "fdc_id": "169105"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 50,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        47,
+        52
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "higo",
@@ -351,7 +495,17 @@
       "descripcion": "Figs, raw",
       "fdc_id": "173021"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 58,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        54,
+        61
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "datil",
@@ -370,7 +524,17 @@
       "descripcion": "Dates, medjool",
       "fdc_id": "168191"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 52,
+    "indice_glucemico_meta": {
+      "n_estudios": 58,
+      "rango": [
+        29,
+        75
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "arandano",
@@ -389,7 +553,17 @@
       "descripcion": "Blueberries, raw",
       "fdc_id": "171711"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 40,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        28,
+        53
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "frambuesa",
@@ -407,7 +581,8 @@
       "descripcion": "Raspberries, raw",
       "fdc_id": "167755"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "granada",
@@ -425,7 +600,8 @@
       "descripcion": "Pomegranates, raw",
       "fdc_id": "169134"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "guayaba",
@@ -443,7 +619,17 @@
       "descripcion": "Guavas, common, raw",
       "fdc_id": "173044"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 32,
+    "indice_glucemico_meta": {
+      "n_estudios": 6,
+      "rango": [
+        29,
+        49
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "papa",
@@ -463,7 +649,17 @@
       "descripcion": "Potatoes, flesh and skin, raw",
       "fdc_id": "170026"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 64,
+    "indice_glucemico_meta": {
+      "n_estudios": 28,
+      "rango": [
+        38,
+        120
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "tomate",
@@ -482,7 +678,8 @@
       "descripcion": "Tomatoes, red, ripe, raw, year round average",
       "fdc_id": "170457"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "lechuga",
@@ -500,7 +697,8 @@
       "descripcion": "Lettuce, butterhead (includes boston and bibb types), raw",
       "fdc_id": "168429"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "zanahoria",
@@ -518,7 +716,17 @@
       "descripcion": "Carrots, raw",
       "fdc_id": "170393"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 34,
+    "indice_glucemico_meta": {
+      "n_estudios": 10,
+      "rango": [
+        16,
+        92
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "brocoli",
@@ -536,7 +744,8 @@
       "descripcion": "Broccoli, raw",
       "fdc_id": "170379"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "espinaca",
@@ -554,7 +763,8 @@
       "descripcion": "Spinach, raw",
       "fdc_id": "168462"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "coliflor",
@@ -572,7 +782,8 @@
       "descripcion": "Cauliflower, raw",
       "fdc_id": "169986"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "pepino",
@@ -590,7 +801,8 @@
       "descripcion": "Cucumber, with peel, raw",
       "fdc_id": "168409"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "calabacin",
@@ -609,7 +821,8 @@
       "descripcion": "Squash, summer, zucchini, includes skin, raw",
       "fdc_id": "169291"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "berenjena",
@@ -627,7 +840,8 @@
       "descripcion": "Eggplant, raw",
       "fdc_id": "169228"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "pimiento",
@@ -647,7 +861,8 @@
       "descripcion": "Peppers, sweet, red, raw",
       "fdc_id": "170108"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "cebolla",
@@ -665,7 +880,8 @@
       "descripcion": "Onions, raw",
       "fdc_id": "170000"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "ajo",
@@ -683,7 +899,8 @@
       "descripcion": "Garlic, raw",
       "fdc_id": "169230"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "aceituna",
@@ -703,7 +920,8 @@
       "descripcion": "Olives, ripe, canned (small-extra large)",
       "fdc_id": "169094"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "apio",
@@ -721,7 +939,8 @@
       "descripcion": "Celery, raw",
       "fdc_id": "169988"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "champinon",
@@ -741,7 +960,8 @@
       "descripcion": "Mushrooms, white, raw",
       "fdc_id": "169251"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "calabaza",
@@ -761,7 +981,17 @@
       "descripcion": "Pumpkin, raw",
       "fdc_id": "168448"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 53,
+    "indice_glucemico_meta": {
+      "n_estudios": 3,
+      "rango": [
+        52,
+        75
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "remolacha",
@@ -781,7 +1011,17 @@
       "descripcion": "Beets, raw",
       "fdc_id": "169145"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 64,
+    "indice_glucemico_meta": {
+      "n_estudios": 1,
+      "rango": [
+        64,
+        64
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "esparrago",
@@ -799,7 +1039,8 @@
       "descripcion": "Asparagus, raw",
       "fdc_id": "168389"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "col",
@@ -818,7 +1059,8 @@
       "descripcion": "Cabbage, raw",
       "fdc_id": "169975"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "acelga",
@@ -837,7 +1079,8 @@
       "descripcion": "Chard, swiss, raw",
       "fdc_id": "169991"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "frijol_negro",
@@ -857,7 +1100,17 @@
       "descripcion": "Beans, black, mature seeds, cooked, boiled, without salt",
       "fdc_id": "173735"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 31,
+    "indice_glucemico_meta": {
+      "n_estudios": 1,
+      "rango": [
+        31,
+        31
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "lenteja",
@@ -876,7 +1129,17 @@
       "descripcion": "Lentils, mature seeds, cooked, boiled, without salt",
       "fdc_id": "172421"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 30,
+    "indice_glucemico_meta": {
+      "n_estudios": 16,
+      "rango": [
+        18,
+        53
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "garbanzo",
@@ -895,7 +1158,17 @@
       "descripcion": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
       "fdc_id": "173757"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 35,
+    "indice_glucemico_meta": {
+      "n_estudios": 15,
+      "rango": [
+        5,
+        51
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "guisante",
@@ -915,7 +1188,17 @@
       "descripcion": "Peas, green, cooked, boiled, drained, without salt",
       "fdc_id": "170420"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 27,
+    "indice_glucemico_meta": {
+      "n_estudios": 4,
+      "rango": [
+        23,
+        42
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "haba",
@@ -934,7 +1217,17 @@
       "descripcion": "Broadbeans (fava beans), mature seeds, cooked, boiled, without salt",
       "fdc_id": "173753"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 71,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        63,
+        79
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "arroz_blanco",
@@ -953,7 +1246,17 @@
       "descripcion": "Rice, white, long-grain, regular, enriched, cooked",
       "fdc_id": "168878"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 64,
+    "indice_glucemico_meta": {
+      "n_estudios": 41,
+      "rango": [
+        17,
+        114
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "arroz_integral",
@@ -971,7 +1274,17 @@
       "descripcion": "Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)",
       "fdc_id": "169704"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 68,
+    "indice_glucemico_meta": {
+      "n_estudios": 10,
+      "rango": [
+        48,
+        95
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "pasta",
@@ -991,7 +1304,17 @@
       "descripcion": "Pasta, cooked, enriched, without added salt",
       "fdc_id": "169737"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 46,
+    "indice_glucemico_meta": {
+      "n_estudios": 21,
+      "rango": [
+        33,
+        65
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "pan_blanco",
@@ -1011,7 +1334,17 @@
       "fdc_id": "172818"
     },
     "aditivos_fosfato": "posible",
-    "aditivos_fosfato_nota": "Mejoradores de masa en pan industrial."
+    "aditivos_fosfato_nota": "Mejoradores de masa en pan industrial.",
+    "indice_glucemico": 81,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        74,
+        88
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "pan_integral",
@@ -1030,7 +1363,17 @@
       "fdc_id": "172688"
     },
     "aditivos_fosfato": "posible",
-    "aditivos_fosfato_nota": "Mejoradores de masa en pan industrial."
+    "aditivos_fosfato_nota": "Mejoradores de masa en pan industrial.",
+    "indice_glucemico": 64,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        59,
+        70
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "avena",
@@ -1049,7 +1392,17 @@
       "descripcion": "Cereals, QUAKER, Quick Oats, Dry",
       "fdc_id": "172989"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 52,
+    "indice_glucemico_meta": {
+      "n_estudios": 52,
+      "rango": [
+        31,
+        95
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "quinoa",
@@ -1067,7 +1420,17 @@
       "descripcion": "Quinoa, cooked",
       "fdc_id": "168917"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 52,
+    "indice_glucemico_meta": {
+      "n_estudios": 6,
+      "rango": [
+        45,
+        54
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "maiz",
@@ -1087,7 +1450,17 @@
       "descripcion": "Corn, sweet, yellow, cooked, boiled, drained, without salt",
       "fdc_id": "169999"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 52,
+    "indice_glucemico_meta": {
+      "n_estudios": 22,
+      "rango": [
+        37,
+        62
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "tortilla_maiz",
@@ -1105,7 +1478,17 @@
       "descripcion": "Tortillas, ready-to-bake or -fry, corn",
       "fdc_id": "175036"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 52,
+    "indice_glucemico_meta": {
+      "n_estudios": 8,
+      "rango": [
+        40,
+        86
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "tortilla_harina",
@@ -1124,7 +1507,8 @@
       "fdc_id": "175037"
     },
     "aditivos_fosfato": "posible",
-    "aditivos_fosfato_nota": "Polvos de hornear fosfatados en la masa."
+    "aditivos_fosfato_nota": "Polvos de hornear fosfatados en la masa.",
+    "indice_glucemico": null
   },
   {
     "id": "leche_entera",
@@ -1143,7 +1527,8 @@
       "descripcion": "Milk, whole, 3.25% milkfat, without added vitamin A and vitamin D",
       "fdc_id": "172217"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "leche_descremada",
@@ -1161,7 +1546,17 @@
       "descripcion": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)",
       "fdc_id": "171269"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 34,
+    "indice_glucemico_meta": {
+      "n_estudios": 7,
+      "rango": [
+        27,
+        48
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "yogur",
@@ -1179,7 +1574,8 @@
       "descripcion": "Yogurt, plain, whole milk",
       "fdc_id": "171284"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "queso_fresco",
@@ -1197,7 +1593,8 @@
       "descripcion": "Cheese, fresh, queso fresco",
       "fdc_id": "172223"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "queso_cheddar",
@@ -1215,7 +1612,8 @@
       "descripcion": "Cheese, cheddar (Includes foods for USDA's Food Distribution Program)",
       "fdc_id": "173414"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "queso_crema",
@@ -1234,7 +1632,8 @@
       "fdc_id": "173418"
     },
     "aditivos_fosfato": "posible",
-    "aditivos_fosfato_nota": "Algunos quesos untables llevan estabilizantes fosfatados."
+    "aditivos_fosfato_nota": "Algunos quesos untables llevan estabilizantes fosfatados.",
+    "indice_glucemico": null
   },
   {
     "id": "mantequilla",
@@ -1252,7 +1651,8 @@
       "descripcion": "Butter, salted",
       "fdc_id": "173410"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "pollo",
@@ -1271,7 +1671,8 @@
       "descripcion": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
       "fdc_id": "171477"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "res",
@@ -1290,7 +1691,8 @@
       "descripcion": "Beef, ground, 85% lean meat / 15% fat, patty, cooked, broiled",
       "fdc_id": "174032"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "cerdo",
@@ -1310,7 +1712,8 @@
       "descripcion": "Pork, fresh, loin, center loin (chops), bone-in, separable lean only, cooked, broiled",
       "fdc_id": "168240"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "salmon",
@@ -1328,7 +1731,8 @@
       "descripcion": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
       "fdc_id": "175168"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "atun",
@@ -1346,7 +1750,8 @@
       "descripcion": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)",
       "fdc_id": "173709"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "huevo",
@@ -1366,7 +1771,8 @@
       "descripcion": "Egg, whole, raw, fresh",
       "fdc_id": "171287"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "camaron",
@@ -1386,7 +1792,8 @@
       "descripcion": "Crustaceans, shrimp, cooked",
       "fdc_id": "175180"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "pavo",
@@ -1404,7 +1811,8 @@
       "descripcion": "Turkey, breast, from whole bird, meat only, with added solution, roasted",
       "fdc_id": "174519"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "tofu",
@@ -1420,7 +1828,8 @@
       "descripcion": "Tofu, raw, firm, prepared with calcium sulfate",
       "fdc_id": "172475"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "almendra",
@@ -1438,7 +1847,8 @@
       "descripcion": "Nuts, almonds",
       "fdc_id": "170567"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "nuez",
@@ -1456,7 +1866,8 @@
       "descripcion": "Nuts, walnuts, english",
       "fdc_id": "170187"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "mani",
@@ -1476,7 +1887,8 @@
       "descripcion": "Peanuts, all types, raw",
       "fdc_id": "172430"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "girasol",
@@ -1494,7 +1906,8 @@
       "descripcion": "Seeds, sunflower seed kernels, dried",
       "fdc_id": "170562"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "chia",
@@ -1512,7 +1925,8 @@
       "descripcion": "Seeds, chia seeds, dried",
       "fdc_id": "170554"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "pan_hamburguesa",
@@ -1531,7 +1945,17 @@
       "fdc_id": "172796"
     },
     "aditivos_fosfato": "posible",
-    "aditivos_fosfato_nota": "Mejoradores de masa en pan industrial."
+    "aditivos_fosfato_nota": "Mejoradores de masa en pan industrial.",
+    "indice_glucemico": 62,
+    "indice_glucemico_meta": {
+      "n_estudios": 1,
+      "rango": [
+        62,
+        62
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "papas_fritas",
@@ -1551,7 +1975,17 @@
       "fdc_id": "169677"
     },
     "aditivos_fosfato": "posible",
-    "aditivos_fosfato_nota": "Algunos snacks usan fosfatos como aditivo."
+    "aditivos_fosfato_nota": "Algunos snacks usan fosfatos como aditivo.",
+    "indice_glucemico": 57,
+    "indice_glucemico_meta": {
+      "n_estudios": 3,
+      "rango": [
+        51,
+        60
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "jamon",
@@ -1570,7 +2004,8 @@
       "fdc_id": "173864"
     },
     "aditivos_fosfato": "alto",
-    "aditivos_fosfato_nota": "Fosfatos en la salmuera de curado e inyección."
+    "aditivos_fosfato_nota": "Fosfatos en la salmuera de curado e inyección.",
+    "indice_glucemico": null
   },
   {
     "id": "tocino",
@@ -1589,7 +2024,8 @@
       "fdc_id": "167914"
     },
     "aditivos_fosfato": "alto",
-    "aditivos_fosfato_nota": "Fosfatos en la salmuera de curado."
+    "aditivos_fosfato_nota": "Fosfatos en la salmuera de curado.",
+    "indice_glucemico": null
   },
   {
     "id": "salchicha",
@@ -1609,7 +2045,8 @@
       "fdc_id": "173862"
     },
     "aditivos_fosfato": "alto",
-    "aditivos_fosfato_nota": "Fosfatos añadidos como retenedores de agua en embutidos."
+    "aditivos_fosfato_nota": "Fosfatos añadidos como retenedores de agua en embutidos.",
+    "indice_glucemico": null
   },
   {
     "id": "queso_procesado",
@@ -1629,7 +2066,8 @@
       "fdc_id": "170853"
     },
     "aditivos_fosfato": "alto",
-    "aditivos_fosfato_nota": "Sales fundentes de fosfato son parte esencial del queso fundido."
+    "aditivos_fosfato_nota": "Sales fundentes de fosfato son parte esencial del queso fundido.",
+    "indice_glucemico": null
   },
   {
     "id": "salsa_soya",
@@ -1647,7 +2085,8 @@
       "descripcion": "Soy sauce made from soy (tamari)",
       "fdc_id": "174278"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "sal",
@@ -1665,7 +2104,8 @@
       "descripcion": "Salt, table",
       "fdc_id": "173468"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "caldo_cubo",
@@ -1684,7 +2124,8 @@
       "fdc_id": "171561"
     },
     "aditivos_fosfato": "posible",
-    "aditivos_fosfato_nota": "Frecuente en cubos y sopas deshidratadas."
+    "aditivos_fosfato_nota": "Frecuente en cubos y sopas deshidratadas.",
+    "indice_glucemico": null
   },
   {
     "id": "cola",
@@ -1705,7 +2146,17 @@
       "fdc_id": "174852"
     },
     "aditivos_fosfato": "alto",
-    "aditivos_fosfato_nota": "Ácido fosfórico es ingrediente característico de las bebidas cola."
+    "aditivos_fosfato_nota": "Ácido fosfórico es ingrediente característico de las bebidas cola.",
+    "indice_glucemico": 63,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        53,
+        73
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "jugo_naranja",
@@ -1723,7 +2174,17 @@
       "descripcion": "Orange juice, chilled, includes from concentrate",
       "fdc_id": "169100"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 50,
+    "indice_glucemico_meta": {
+      "n_estudios": 6,
+      "rango": [
+        41,
+        57
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "chocolate",
@@ -1741,7 +2202,17 @@
       "descripcion": "Chocolate, dark, 70-85% cacao solids",
       "fdc_id": "170273"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 44,
+    "indice_glucemico_meta": {
+      "n_estudios": 7,
+      "rango": [
+        23,
+        56
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "galleta",
@@ -1760,7 +2231,8 @@
       "fdc_id": "174971"
     },
     "aditivos_fosfato": "posible",
-    "aditivos_fosfato_nota": "Leudantes fosfatados según formulación."
+    "aditivos_fosfato_nota": "Leudantes fosfatados según formulación.",
+    "indice_glucemico": null
   },
   {
     "id": "pizza",
@@ -1777,7 +2249,17 @@
       "fdc_id": "170317"
     },
     "aditivos_fosfato": "posible",
-    "aditivos_fosfato_nota": "Aporta queso procesado y masa con leudantes fosfatados."
+    "aditivos_fosfato_nota": "Aporta queso procesado y masa con leudantes fosfatados.",
+    "indice_glucemico": 54,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        52,
+        56
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "cafe",
@@ -1795,7 +2277,8 @@
       "descripcion": "Beverages, coffee, brewed, prepared with tap water",
       "fdc_id": "171890"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "te",
@@ -1813,7 +2296,8 @@
       "descripcion": "Beverages, tea, black, brewed, prepared with tap water",
       "fdc_id": "173227"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "agua_coco",
@@ -1831,7 +2315,8 @@
       "descripcion": "Nuts, coconut water (liquid from coconuts)",
       "fdc_id": "170174"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "cerveza",
@@ -1849,7 +2334,17 @@
       "descripcion": "Alcoholic beverage, beer, regular, all",
       "fdc_id": "168746"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": 84,
+    "indice_glucemico_meta": {
+      "n_estudios": 4,
+      "rango": [
+        66,
+        119
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
+    }
   },
   {
     "id": "vino",
@@ -1868,7 +2363,8 @@
       "descripcion": "Alcoholic beverage, wine, table, red",
       "fdc_id": "173190"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "leche_almendra",
@@ -1886,7 +2382,8 @@
       "descripcion": "Beverages, almond milk, unsweetened, shelf stable",
       "fdc_id": "174832"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "jugo_tomate",
@@ -1904,7 +2401,8 @@
       "descripcion": "Tomato juice, canned, with salt added",
       "fdc_id": "170458"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "ketchup",
@@ -1923,7 +2421,8 @@
       "descripcion": "Catsup",
       "fdc_id": "168556"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "mostaza",
@@ -1941,7 +2440,8 @@
       "descripcion": "Mustard, prepared, yellow",
       "fdc_id": "172234"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "mayonesa",
@@ -1960,7 +2460,8 @@
       "descripcion": "Salad dressing, mayonnaise, regular",
       "fdc_id": "171009"
     },
-    "aditivos_fosfato": null
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   },
   {
     "id": "marraqueta",
@@ -1983,6 +2484,16 @@
         "sal": 1.2
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    },
+    "indice_glucemico": 81,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        74,
+        88
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   },
   {
@@ -2006,6 +2517,16 @@
         "polvo_hornear": 1.5
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    },
+    "indice_glucemico": 81,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        74,
+        88
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   },
   {
@@ -2029,7 +2550,8 @@
         "sal": 1.0
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "empanada_pino",
@@ -2056,7 +2578,8 @@
         "aji_color": 0.3
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "empanada_queso",
@@ -2079,7 +2602,8 @@
         "sal": 1.0
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "completo",
@@ -2104,7 +2628,8 @@
         "sal": 0.6
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "churrasco",
@@ -2128,7 +2653,8 @@
         "sal": 0.8
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "cazuela_vacuno",
@@ -2154,7 +2680,8 @@
         "sal": 0.7
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "cazuela_ave",
@@ -2180,7 +2707,8 @@
         "sal": 0.7
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "charquican",
@@ -2206,6 +2734,16 @@
         "sal": 0.8
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    },
+    "indice_glucemico": 64,
+    "indice_glucemico_meta": {
+      "n_estudios": 28,
+      "rango": [
+        38,
+        120
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   },
   {
@@ -2231,6 +2769,16 @@
         "sal": 0.8
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    },
+    "indice_glucemico": 31,
+    "indice_glucemico_meta": {
+      "n_estudios": 1,
+      "rango": [
+        31,
+        31
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   },
   {
@@ -2257,7 +2805,8 @@
         "sal": 0.9
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "humita",
@@ -2281,7 +2830,8 @@
         "sal": 0.9
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "carbonada",
@@ -2308,7 +2858,8 @@
         "sal": 0.7
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "lentejas_guisadas",
@@ -2332,6 +2883,16 @@
         "sal": 0.8
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    },
+    "indice_glucemico": 30,
+    "indice_glucemico_meta": {
+      "n_estudios": 16,
+      "rango": [
+        18,
+        53
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   },
   {
@@ -2357,7 +2918,8 @@
         "sal": 0.8
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "tallarines_salsa",
@@ -2382,6 +2944,16 @@
         "sal": 0.8
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    },
+    "indice_glucemico": 46,
+    "indice_glucemico_meta": {
+      "n_estudios": 21,
+      "rango": [
+        33,
+        65
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   },
   {
@@ -2405,6 +2977,16 @@
         "sal": 0.7
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    },
+    "indice_glucemico": 74,
+    "indice_glucemico_meta": {
+      "n_estudios": 6,
+      "rango": [
+        68,
+        84
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   },
   {
@@ -2428,7 +3010,8 @@
         "sal": 0.6
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "pebre",
@@ -2452,7 +3035,8 @@
         "sal": 1.2
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "papas_cocidas",
@@ -2474,6 +3058,16 @@
         "sal": 0.4
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    },
+    "indice_glucemico": 64,
+    "indice_glucemico_meta": {
+      "n_estudios": 28,
+      "rango": [
+        38,
+        120
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   },
   {
@@ -2496,6 +3090,16 @@
         "sal": 0.7
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    },
+    "indice_glucemico": 64,
+    "indice_glucemico_meta": {
+      "n_estudios": 28,
+      "rango": [
+        38,
+        120
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   },
   {
@@ -2518,7 +3122,8 @@
         "sal": 1.0
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "costillar_cerdo",
@@ -2540,7 +3145,8 @@
         "sal": 1.1
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "merluza_frita",
@@ -2564,7 +3170,8 @@
         "sal": 0.9
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "merluza_vapor",
@@ -2585,7 +3192,8 @@
         "sal": 0.5
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "chorrillana",
@@ -2610,7 +3218,8 @@
         "sal": 1.0
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "arroz_leche",
@@ -2632,6 +3241,16 @@
         "azucar": 10
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+    },
+    "indice_glucemico": 59,
+    "indice_glucemico_meta": {
+      "n_estudios": 1,
+      "rango": [
+        59,
+        59
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   },
   {
@@ -2655,7 +3274,8 @@
         "azucar": 14
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "mote_huesillo",
@@ -2677,7 +3297,8 @@
         "azucar": 10
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "acelga_cocida",
@@ -2699,7 +3320,8 @@
         "sal": 0.5
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "longaniza",
@@ -2722,7 +3344,8 @@
         "aji_color": 0.5
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "queso_chanco",
@@ -2743,7 +3366,8 @@
         "queso_gauda": 100
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "palta_molida",
@@ -2765,7 +3389,8 @@
         "sal": 0.6
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "te_con_leche",
@@ -2786,7 +3411,8 @@
         "azucar": 5
       },
       "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "jurel_conserva",
@@ -2805,7 +3431,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Fish, mackerel, jack, canned, drained solids",
       "fdc_id": "175121"
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "sardina_conserva",
@@ -2823,7 +3450,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Fish, sardine, Atlantic, canned in oil, drained solids with bone",
       "fdc_id": "175139"
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "mortadela",
@@ -2841,7 +3469,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Bologna, beef",
       "fdc_id": "172012"
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "pate",
@@ -2859,7 +3488,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pate, liver, not specified, canned",
       "fdc_id": "172930"
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "margarina",
@@ -2877,7 +3507,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Margarine, regular, 80% fat, composite, tub, with salt",
       "fdc_id": "172347"
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "manjar",
@@ -2896,7 +3527,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Dulce de Leche",
       "fdc_id": "173461"
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "mermelada",
@@ -2915,7 +3547,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Jams and preserves",
       "fdc_id": "169641"
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "miel",
@@ -2933,6 +3566,16 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Honey",
       "fdc_id": "169640"
+    },
+    "indice_glucemico": 65,
+    "indice_glucemico_meta": {
+      "n_estudios": 12,
+      "rango": [
+        49,
+        87
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   },
   {
@@ -2951,7 +3594,8 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Yogurt, fruit, low fat,9 g protein/8 oz",
       "fdc_id": "170889"
-    }
+    },
+    "indice_glucemico": null
   },
   {
     "id": "bebida_gaseosa",
@@ -2971,6 +3615,16 @@
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beverages, carbonated, lemon-lime soda, no caffeine",
       "fdc_id": "173205"
+    },
+    "indice_glucemico": 63,
+    "indice_glucemico_meta": {
+      "n_estudios": 2,
+      "rango": [
+        53,
+        73
+      ],
+      "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
+      "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
   }
 ]
