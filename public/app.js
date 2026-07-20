@@ -34,12 +34,14 @@ const NUTRIENTE_LABEL = {
   potasio_mg: "Potasio",
   fosforo_mg: "Fósforo",
   sodio_mg: "Sodio",
+  carbohidratos_g: "Carbohidratos",
 };
 
 const NUTRIENTE_ICON = {
   potasio_mg: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4C10 4 4 10 4 20c10 0 16-6 16-16Z"/><path d="M8.5 15.5 15.5 8.5"/></svg>`,
   fosforo_mg: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><circle cx="6" cy="18" r="2.3"/><circle cx="18" cy="6" r="2.3"/></svg>`,
   sodio_mg: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l1 3H8Z"/><path d="M8 6h8l1.2 12.5A2 2 0 0 1 15.2 21H8.8a2 2 0 0 1-2-2.5L8 6Z"/><circle cx="10.5" cy="11" r="0.4" fill="currentColor"/><circle cx="13.5" cy="11" r="0.4" fill="currentColor"/><circle cx="12" cy="14" r="0.4" fill="currentColor"/></svg>`,
+  carbohidratos_g: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3 0-5 2-5 4.5S9 12 12 12s5-2 5-4.5S15 3 12 3Z"/><path d="M5 14c2.5-1 4.5-1 7-1s4.5 0 7 1"/><path d="M6 18c2-.8 4-1 6-1s4 .2 6 1"/></svg>`,
 };
 
 // Estructura de planes: hoy solo existe el plan básico (gratuito). Los planes
@@ -120,6 +122,79 @@ function umbralesActivos() {
   return UMBRALES;
 }
 
+// --- Modelo clínico (KDIGO/KDOQI) ---------------------------------------
+// Cargado desde limites-clinicos.json. Mientras no esté cargado, la app cae
+// a los umbrales fijos de UMBRALES, así que nunca queda sin semáforo.
+let LIMITES = null;
+
+// ¿El paciente tiene factores que aumentan el riesgo de hiperkalemia?
+// Diabetes y bloqueo del SRAA se tratan igual: ambos justifican clasificar
+// el potasio con los cortes estrictos.
+function riesgoHiperkalemia() {
+  const d = ensurePerfil().datosClinicos || {};
+  return !!(d.diabetes || d.farmacosRetenedoresK);
+}
+
+// Meta diaria de un nutriente, o null si no corresponde fijar una.
+// Solo el sodio tiene meta universal; potasio y fósforo únicamente cuando el
+// equipo tratante los individualizó (plan clínico).
+function metaDiaria(nutriente) {
+  if (!LIMITES) return null;
+  const perfil = ensurePerfil();
+  const plan = PLANS[perfil.planId];
+  const propias = plan.features.umbralesPersonalizados ? perfil.metasDiarias : null;
+  if (propias && propias[nutriente] != null) return propias[nutriente];
+
+  if (nutriente === "sodio_mg") return LIMITES.sodio.objetivo_mg_dia;
+  if (nutriente === "carbohidratos_g") {
+    return perfil.datosClinicos && perfil.datosClinicos.diabetes
+      ? LIMITES.carbohidratos.objetivo_g_dia_por_defecto
+      : null;
+  }
+  return null; // potasio y fósforo: sin cifra universal
+}
+
+// Umbral por porción derivado de la meta diaria: el día se reparte en varias
+// comidas y un alimento que usa hasta la mitad de ese presupuesto es verde.
+function umbralPorcion(metaDia) {
+  const r = LIMITES.regla_porcion;
+  const amarillo = metaDia / r.comidas_por_dia;
+  return { verde: amarillo * r.fraccion_verde, amarillo };
+}
+
+// Clasifica un nutriente. Devuelve el nivel y en qué modo se evaluó, porque
+// el texto que se le muestra al paciente cambia según el caso.
+//   modo "meta"      -> la porción se comparó con su presupuesto real
+//   modo "contenido" -> se describe cuán alto es el alimento (mg/100 g)
+function clasificar(nutriente, valorPorcion, densidad100g) {
+  if (!LIMITES) {
+    const t = umbralesActivos()[nutriente];
+    if (!t) return { nivel: null, modo: "ninguno" };
+    const nivel = valorPorcion <= t.verde ? "verde" : valorPorcion <= t.amarillo ? "amarillo" : "rojo";
+    return { nivel, modo: "meta" };
+  }
+
+  const meta = metaDiaria(nutriente);
+  if (meta != null) {
+    const t = umbralPorcion(meta);
+    const nivel = valorPorcion <= t.verde ? "verde" : valorPorcion <= t.amarillo ? "amarillo" : "rojo";
+    return { nivel, modo: "meta" };
+  }
+
+  // Sin meta: se clasifica el contenido del alimento, no la porción.
+  const cfg = nutriente === "potasio_mg" ? LIMITES.potasio
+            : nutriente === "fosforo_mg" ? LIMITES.fosforo : null;
+  if (!cfg || densidad100g == null) return { nivel: null, modo: "ninguno" };
+
+  const c = (nutriente === "potasio_mg" && riesgoHiperkalemia() && cfg.clasificacion_contenido_estricta)
+    ? cfg.clasificacion_contenido_estricta
+    : cfg.clasificacion_contenido;
+
+  const nivel = densidad100g <= c.bajo_hasta ? "verde"
+              : densidad100g <= c.moderado_hasta ? "amarillo" : "rojo";
+  return { nivel, modo: "contenido" };
+}
+
 function renderPlan() {
   const plan = getPlanActual();
   els.planBadge.textContent = plan.nombre;
@@ -131,6 +206,7 @@ function renderDatosClinicos() {
   els.etapaERC.value = perfil.datosClinicos.etapaERC || "";
   els.diabetes.checked = !!perfil.datosClinicos.diabetes;
   els.hipertension.checked = !!perfil.datosClinicos.hipertension;
+  els.farmacosK.checked = !!perfil.datosClinicos.farmacosRetenedoresK;
   renderPlanUpsell();
 }
 
@@ -140,6 +216,7 @@ function guardarDatosClinicos() {
     etapaERC: els.etapaERC.value || null,
     diabetes: els.diabetes.checked,
     hipertension: els.hipertension.checked,
+    farmacosRetenedoresK: els.farmacosK.checked,
   };
   guardarPerfil(perfil);
   renderPlanUpsell();
@@ -152,11 +229,12 @@ function renderPlanUpsell() {
     els.planUpsell.hidden = true;
     return;
   }
-  const { etapaERC, diabetes, hipertension } = perfil.datosClinicos;
+  const { etapaERC, diabetes, hipertension, farmacosRetenedoresK } = perfil.datosClinicos;
   const detalles = [];
   if (etapaERC) detalles.push(`ERC etapa ${etapaERC}`);
   if (diabetes) detalles.push("diabetes");
   if (hipertension) detalles.push("hipertensión");
+  if (farmacosRetenedoresK) detalles.push("medicamentos que elevan el potasio");
   els.planUpsellText.textContent = detalles.length
     ? `Con ${detalles.join(", ")}, tu nefrólogo(a) o nutricionista podría ajustar tus umbrales de potasio/fósforo/sodio con el Plan Clínico, además de reportes exportables y varios perfiles.`
     : "El Plan Clínico permite que tu nefrólogo(a) o nutricionista ajuste tus umbrales de potasio/fósforo/sodio a tu caso, además de reportes exportables y varios perfiles.";
@@ -202,6 +280,7 @@ const els = {
   etapaERC: document.getElementById("etapa-erc"),
   diabetes: document.getElementById("dato-diabetes"),
   hipertension: document.getElementById("dato-hipertension"),
+  farmacosK: document.getElementById("dato-farmacos-k"),
   planUpsell: document.getElementById("plan-upsell"),
   planUpsellText: document.getElementById("plan-upsell-text"),
 };
@@ -212,6 +291,13 @@ init();
 
 async function init() {
   FOODS = await fetch("nutrientes.json").then((r) => r.json());
+  // Si el modelo clínico no carga, la app sigue funcionando con los umbrales
+  // fijos de UMBRALES en vez de quedarse sin semáforo.
+  try {
+    LIMITES = await fetch("limites-clinicos.json").then((r) => r.json());
+  } catch (e) {
+    console.warn("No se pudo cargar limites-clinicos.json, se usan umbrales por defecto", e);
+  }
   populateDatalist();
   renderHistory();
   renderTipOfDay();
@@ -228,6 +314,7 @@ async function init() {
   els.etapaERC.addEventListener("change", guardarDatosClinicos);
   els.diabetes.addEventListener("change", guardarDatosClinicos);
   els.hipertension.addEventListener("change", guardarDatosClinicos);
+  els.farmacosK.addEventListener("change", guardarDatosClinicos);
 }
 
 function renderTipOfDay() {
@@ -342,6 +429,12 @@ function nivelTag(nivel) {
   return { verde: "Bajo", amarillo: "Moderado", rojo: "Alto" }[nivel];
 }
 
+// Cuando no hay meta personal, el semáforo describe el contenido del alimento
+// en vez de afirmar que se excedió un límite que la app no conoce.
+function nivelTagContenido(nivel) {
+  return { verde: "Bajo", amarillo: "Medio", rojo: "Alto" }[nivel];
+}
+
 function renderResults() {
   els.results.hidden = false;
   els.resultsList.innerHTML = lastAnalysis
@@ -410,6 +503,9 @@ function renderFoodResult(item, idx) {
     fosforo_mg: Math.round(match.fosforo_mg * factor),
     sodio_mg: Math.round(match.sodio_mg * factor),
   };
+  if (match.carbohidratos_g != null) {
+    valores.carbohidratos_g = Math.round(match.carbohidratos_g * factor);
+  }
 
   return `
     <div class="food-result">
@@ -421,20 +517,83 @@ function renderFoodResult(item, idx) {
       ${confidenceNote(item.confianza)}
       ${alternativesRow(item, idx)}
       <div class="semaforo-row">
-        ${["potasio_mg", "fosforo_mg", "sodio_mg"].map((k) => badge(k, valores[k])).join("")}
+        ${nutrientesVisibles().map((k) => badge(k, valores[k], match[k])).join("")}
       </div>
+      ${notaSinMeta()}
+      ${avisoAditivos(match)}
       <button id="save-${idx}" class="btn btn-secondary" style="margin-top:0.75rem;width:100%;">Guardar en historial</button>
     </div>`;
 }
 
-function badge(nutriente, valorMg) {
-  const nivel = nivelFor(nutriente, valorMg);
+// Qué semáforos se muestran: los tres de siempre, más carbohidratos cuando el
+// paciente declaró diabetes.
+function nutrientesVisibles() {
+  const base = ["potasio_mg", "fosforo_mg", "sodio_mg"];
+  const d = ensurePerfil().datosClinicos || {};
+  if (d.diabetes) base.push("carbohidratos_g");
+  return base;
+}
+
+// La guía prioriza reducir aditivos fosfatados por sobre el conteo de fósforo
+// total, porque el fósforo inorgánico añadido se absorbe mucho más.
+function avisoAditivos(match) {
+  if (!match || !match.aditivos_fosfato) return "";
+  const alto = match.aditivos_fosfato === "alto";
+  const texto = alto
+    ? "Contiene aditivos con fósforo, que se absorbe casi por completo."
+    : "Puede contener aditivos con fósforo según la marca. Revisa la etiqueta.";
+  return `<p class="aviso-aditivos ${alto ? "aditivos-alto" : ""}">${texto}</p>`;
+}
+
+// Cuando potasio o fósforo se muestran por contenido, hay que decirle al
+// paciente qué significa esa etiqueta: describe el alimento, no que se haya
+// pasado de un límite. Las guías no fijan una cifra universal para ellos.
+function notaSinMeta() {
+  const sinMeta = ["potasio_mg", "fosforo_mg"]
+    .filter((k) => metaDiaria(k) == null)
+    .map((k) => NUTRIENTE_LABEL[k].toLowerCase());
+  if (!sinMeta.length || !LIMITES) return "";
+  const lista = sinMeta.join(" y ");
+  return `<p class="nota-sin-meta">En ${lista} se indica cuánto aporta el alimento, no si superaste tu límite: tu objetivo lo define tu equipo tratante.</p>`;
+}
+
+function badge(nutriente, valorPorcion, densidad100g) {
+  const unidad = nutriente === "carbohidratos_g" ? "g" : "mg";
+  const { nivel, modo } = clasificar(nutriente, valorPorcion, densidad100g);
+  if (!nivel) return "";
+  // En modo "contenido" el semáforo describe cuán alto es el alimento, no que
+  // el paciente se haya pasado de un límite: la etiqueta lo dice explícito.
+  const etiqueta = modo === "contenido" ? nivelTagContenido(nivel) : nivelTag(nivel);
   return `
     <div class="semaforo-badge nivel-${nivel}">
       <span class="label">${NUTRIENTE_LABEL[nutriente]}</span>
       <span class="badge-icon-circle">${NUTRIENTE_ICON[nutriente]}</span>
-      <span class="value">${valorMg} mg</span>
-      <span class="tag-pill">${nivelTag(nivel)}</span>
+      <span class="value">${valorPorcion} ${unidad}</span>
+      <span class="tag-pill">${etiqueta}</span>
+    </div>`;
+}
+
+// El total acumulado del día se compara contra la meta DIARIA completa, no
+// contra el umbral de una porción (ese era el error anterior: con dos o tres
+// comidas el resumen siempre marcaba rojo).
+// Si el nutriente no tiene meta, se muestra el total sin semáforo: la app no
+// conoce el límite personal del paciente y no debe inventarlo.
+function badgeDiario(nutriente, total) {
+  const unidad = nutriente === "carbohidratos_g" ? "g" : "mg";
+  const meta = metaDiaria(nutriente);
+  let nivel = null;
+  if (meta != null) {
+    nivel = total <= meta * 0.5 ? "verde" : total <= meta ? "amarillo" : "rojo";
+  }
+  const pie = meta != null
+    ? `<span class="tag-pill">${nivelTag(nivel)}</span>`
+    : `<span class="tag-neutro">sin meta fijada</span>`;
+  return `
+    <div class="semaforo-badge ${nivel ? "nivel-" + nivel : "nivel-neutro"}">
+      <span class="label">${NUTRIENTE_LABEL[nutriente]}</span>
+      <span class="badge-icon-circle">${NUTRIENTE_ICON[nutriente]}</span>
+      <span class="value">${total} ${unidad}</span>
+      ${pie}
     </div>`;
 }
 
@@ -475,6 +634,16 @@ function saveToHistory(idx) {
     potasio_mg: Math.round(item.match.potasio_mg * factor),
     fosforo_mg: Math.round(item.match.fosforo_mg * factor),
     sodio_mg: Math.round(item.match.sodio_mg * factor),
+    carbohidratos_g: item.match.carbohidratos_g != null
+      ? Math.round(item.match.carbohidratos_g * factor) : null,
+    // Densidades por 100 g: sin ellas no se puede reclasificar una entrada
+    // guardada cuando el nutriente se evalúa por contenido y no por meta.
+    por100g: {
+      potasio_mg: item.match.potasio_mg,
+      fosforo_mg: item.match.fosforo_mg,
+      sodio_mg: item.match.sodio_mg,
+      carbohidratos_g: item.match.carbohidratos_g,
+    },
     fecha: new Date().toISOString(),
   };
   const history = loadHistory();
@@ -504,16 +673,17 @@ function renderHistory() {
 
   const totals = today.reduce(
     (acc, h) => {
-      acc.potasio_mg += h.potasio_mg;
-      acc.fosforo_mg += h.fosforo_mg;
-      acc.sodio_mg += h.sodio_mg;
+      acc.potasio_mg += h.potasio_mg || 0;
+      acc.fosforo_mg += h.fosforo_mg || 0;
+      acc.sodio_mg += h.sodio_mg || 0;
+      acc.carbohidratos_g += h.carbohidratos_g || 0;
       return acc;
     },
-    { potasio_mg: 0, fosforo_mg: 0, sodio_mg: 0 }
+    { potasio_mg: 0, fosforo_mg: 0, sodio_mg: 0, carbohidratos_g: 0 }
   );
 
-  els.dailySummary.innerHTML = ["potasio_mg", "fosforo_mg", "sodio_mg"]
-    .map((k) => badge(k, totals[k]))
+  els.dailySummary.innerHTML = nutrientesVisibles()
+    .map((k) => badgeDiario(k, totals[k]))
     .join("");
 
   if (history.length === 0) {
@@ -525,8 +695,14 @@ function renderHistory() {
     .slice(0, 30)
     .map((h) => {
       const time = new Date(h.fecha).toLocaleString("es", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" });
-      const dots = ["potasio_mg", "fosforo_mg", "sodio_mg"]
-        .map((k) => `<span class="dot-${nivelFor(k, h[k])}" title="${NUTRIENTE_LABEL[k]}: ${h[k]} mg"></span>`)
+      const dots = nutrientesVisibles()
+        .map((k) => {
+          const d = h.por100g ? h.por100g[k] : null;
+          const { nivel } = clasificar(k, h[k] || 0, d);
+          if (!nivel) return "";
+          const u = k === "carbohidratos_g" ? "g" : "mg";
+          return `<span class="dot-${nivel}" title="${NUTRIENTE_LABEL[k]}: ${h[k] || 0} ${u}"></span>`;
+        })
         .join("");
       return `
         <div class="history-item">

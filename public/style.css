@@ -377,6 +377,12 @@ h1, h2, h3 {
   grid-template-columns: repeat(3, 1fr);
   gap: 0.6rem;
 }
+/* Con carbohidratos (paciente diabético) son 4: se acomodan en 2x2 para que
+   ninguno quede suelto en su propia fila. */
+.semaforo-row:has(> :nth-child(4)),
+.daily-summary:has(> :nth-child(4)) {
+  grid-template-columns: repeat(2, 1fr);
+}
 .semaforo-badge {
   border-radius: 14px;
   padding: 0.8rem 0.5rem 0.7rem;
@@ -617,3 +623,59 @@ h1, h2, h3 {
   margin-bottom: 1.1rem;
 }
 .modal-actions { display: flex; justify-content: flex-end; gap: 0.6rem; }
+
+/* Aviso de aditivos fosfatados: la guía los prioriza sobre el fósforo total */
+.aviso-aditivos {
+  margin: 0.6rem 0 0;
+  padding: 0.5rem 0.7rem;
+  border-radius: 10px;
+  background: var(--amarillo-bg);
+  border: 1px solid var(--amarillo-border);
+  color: var(--amarillo);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.aviso-aditivos.aditivos-alto {
+  background: var(--rojo-bg);
+  border-color: var(--rojo-border);
+  color: var(--rojo);
+}
+
+/* Nutriente sin meta personal: se muestra el total, sin semáforo */
+.semaforo-badge.nivel-neutro {
+  background: var(--surface-alt);
+  border-color: var(--border);
+}
+.nivel-neutro .value { color: var(--text); }
+.tag-neutro {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Explica que potasio/fósforo se muestran por contenido, no contra un límite */
+.nota-sin-meta {
+  margin: 0.6rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+/* Checkbox de medicamentos: necesita más espacio por el texto explicativo */
+.clinical-check-ancho {
+  align-items: flex-start;
+  margin-top: 0.9rem;
+  gap: 0.55rem;
+}
+.clinical-check-ancho input { margin-top: 0.15rem; }
+.clinical-check-ancho small {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--muted);
+  line-height: 1.35;
+}
