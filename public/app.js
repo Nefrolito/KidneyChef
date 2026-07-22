@@ -105,6 +105,7 @@ function ensurePerfil() {
   if (!perfil.datosClinicos) perfil.datosClinicos = { etapaERC: null, diabetes: false, hipertension: false, diuresisMl: null };
   if (perfil.datosClinicos.diuresisMl === undefined) perfil.datosClinicos.diuresisMl = null;
   if (perfil.umbralesPersonalizados === undefined) perfil.umbralesPersonalizados = null;
+  if (perfil.metasDiarias === undefined) perfil.metasDiarias = null;
   return perfil;
 }
 
@@ -281,6 +282,44 @@ function renderPlanUpsell() {
   els.planUpsell.hidden = false;
 }
 
+// --- Equipo tratante (formulario local de prueba) -----------------------
+// Sustituto temporal mientras no exista un panel remoto para el equipo
+// tratante: activa el Plan Clínico en este mismo dispositivo y deja fijar
+// perfil.metasDiarias a mano, para poder probar la barra real de K/P.
+function renderMetasTratante() {
+  const perfil = ensurePerfil();
+  const plan = getPlanActual();
+  els.activarPlanClinico.checked = perfil.planId === "clinico";
+  els.metasTratante.hidden = !plan.features.umbralesPersonalizados;
+  const metas = perfil.metasDiarias || {};
+  els.metaPotasio.value = metas.potasio_mg ?? "";
+  els.metaFosforo.value = metas.fosforo_mg ?? "";
+}
+
+function togglePlanClinico() {
+  const perfil = ensurePerfil();
+  perfil.planId = els.activarPlanClinico.checked ? "clinico" : "basico";
+  guardarPerfil(perfil);
+  renderPlan();
+  renderPlanUpsell();
+  renderMetasTratante();
+  renderCalculadora();
+  if (!els.results.hidden) renderResults();
+}
+
+function guardarMetasTratante() {
+  const perfil = ensurePerfil();
+  const potasioRaw = els.metaPotasio.value;
+  const fosforoRaw = els.metaFosforo.value;
+  perfil.metasDiarias = {
+    potasio_mg: potasioRaw === "" ? null : Number(potasioRaw),
+    fosforo_mg: fosforoRaw === "" ? null : Number(fosforoRaw),
+  };
+  guardarPerfil(perfil);
+  renderCalculadora();
+  if (!els.results.hidden) renderResults();
+}
+
 const TIPS_DEL_DIA = [
   "Elegir alimentos frescos y cocinar en casa te ayuda a controlar el sodio y mejorar tu salud renal.",
   "Remojar y hervir las verduras (doble cocción, descartando el agua) reduce su contenido de potasio.",
@@ -329,6 +368,10 @@ const els = {
   farmacosK: document.getElementById("dato-farmacos-k"),
   planUpsell: document.getElementById("plan-upsell"),
   planUpsellText: document.getElementById("plan-upsell-text"),
+  activarPlanClinico: document.getElementById("activar-plan-clinico"),
+  metasTratante: document.getElementById("metas-tratante"),
+  metaPotasio: document.getElementById("meta-potasio"),
+  metaFosforo: document.getElementById("meta-fosforo"),
 };
 
 let lastAnalysis = []; // current analysis results, mutable for manual correction
@@ -349,6 +392,7 @@ async function init() {
   renderTipOfDay();
   renderPlan();
   renderDatosClinicos();
+  renderMetasTratante();
 
   els.cameraInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
   els.analyzeBtn.addEventListener("click", analyzeImage);
@@ -362,6 +406,9 @@ async function init() {
   els.hipertension.addEventListener("change", guardarDatosClinicos);
   els.farmacosK.addEventListener("change", guardarDatosClinicos);
   els.datoDiuresis.addEventListener("change", guardarDatosClinicos);
+  els.activarPlanClinico.addEventListener("change", togglePlanClinico);
+  els.metaPotasio.addEventListener("change", guardarMetasTratante);
+  els.metaFosforo.addEventListener("change", guardarMetasTratante);
 
   document.querySelectorAll(".btn-liquido").forEach((btn) => {
     btn.addEventListener("click", () => registrarLiquido(Number(btn.dataset.ml)));

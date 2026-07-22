@@ -503,7 +503,8 @@ h1, h2, h3 {
 .dot-rojo { background: var(--rojo); }
 .history-empty { color: var(--muted); font-size: 0.9rem; text-align: center; padding: 1.2rem 0; font-weight: 500; }
 
-.clinical-card h2 { margin: 0 0 0.3rem; font-size: 1.1rem; font-weight: 700; }
+.clinical-card h2, .tratante-card h2 { margin: 0 0 0.3rem; font-size: 1.1rem; font-weight: 700; }
+#metas-tratante { margin-top: 1rem; }
 .clinical-note { margin: 0 0 1rem; font-size: 0.8rem; color: var(--muted); }
 .clinical-field { margin-bottom: 0.9rem; }
 .clinical-field label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; }
@@ -607,6 +608,7 @@ h1, h2, h3 {
   background: var(--brand-50);
   border-color: var(--brand-100);
 }
+.plan-upsell-card[hidden] { display: none; }
 .plan-upsell-icon {
   flex-shrink: 0;
   width: 40px;

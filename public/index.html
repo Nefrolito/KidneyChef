@@ -161,6 +161,32 @@
       </label>
     </section>
 
+    <section class="card tratante-card">
+      <h2>Equipo tratante (prueba local)</h2>
+      <p class="clinical-note">
+        Formulario temporal para probar el Plan Clínico en este dispositivo,
+        mientras no existe un panel remoto para el equipo tratante. Actívalo
+        y registra las metas de potasio y fósforo que indicó tu nefrólogo(a)
+        o nutricionista.
+      </p>
+      <label class="clinical-check clinical-check-ancho">
+        <input type="checkbox" id="activar-plan-clinico">
+        <span>Activar Plan Clínico en este dispositivo (prueba)</span>
+      </label>
+      <div id="metas-tratante" hidden>
+        <div class="clinical-field">
+          <label for="meta-potasio">Meta diaria de potasio</label>
+          <input type="number" id="meta-potasio" min="0" step="50" placeholder="Ej: 2000">
+          <small class="campo-ayuda">En miligramos por día, según indicación de tu equipo tratante.</small>
+        </div>
+        <div class="clinical-field">
+          <label for="meta-fosforo">Meta diaria de fósforo</label>
+          <input type="number" id="meta-fosforo" min="0" step="50" placeholder="Ej: 800">
+          <small class="campo-ayuda">En miligramos por día, según indicación de tu equipo tratante.</small>
+        </div>
+      </div>
+    </section>
+
     <section id="plan-upsell" class="card plan-upsell-card" hidden>
       <span class="plan-upsell-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="4.2"/></svg>
