@@ -91,6 +91,33 @@
       <div id="results-list"></div>
     </section>
 
+    <section class="card calculadora-card">
+      <h2>Tu día de hoy</h2>
+      <div id="calculadora"></div>
+
+      <div id="registro-liquidos" class="liquidos-box" hidden>
+        <div class="liquidos-head">
+          <span class="liquidos-titulo">Registrar líquidos</span>
+          <button id="liquidos-deshacer" class="btn btn-ghost">Deshacer</button>
+        </div>
+        <div class="liquidos-botones">
+          <button class="btn-liquido" data-ml="150">Taza<small>150 ml</small></button>
+          <button class="btn-liquido" data-ml="200">Vaso<small>200 ml</small></button>
+          <button class="btn-liquido" data-ml="330">Lata<small>330 ml</small></button>
+          <button class="btn-liquido" data-ml="500">Botella<small>500 ml</small></button>
+        </div>
+        <div class="liquidos-manual">
+          <input type="number" id="liquido-manual" min="1" max="2000" step="10" placeholder="Otra cantidad (ml)">
+          <button id="liquido-agregar" class="btn btn-secondary">Agregar</button>
+        </div>
+      </div>
+
+      <p class="summary-caption">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><path d="M12 8v5"/><circle cx="12" cy="16.2" r="0.4" fill="currentColor"/></svg>
+        Valores estimados. Son una guía, no un cálculo exacto.
+      </p>
+    </section>
+
     <section class="card history-card">
       <div class="history-header">
         <h2>Historial de hoy</h2>
@@ -99,11 +126,6 @@
           Borrar historial
         </button>
       </div>
-      <div id="daily-summary" class="daily-summary"></div>
-      <p class="summary-caption">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><path d="M12 8v5"/><circle cx="12" cy="16.2" r="0.4" fill="currentColor"/></svg>
-        Valores estimados por porción analizada
-      </p>
       <div id="history-list" class="history-list"></div>
     </section>
 
@@ -111,13 +133,20 @@
       <h2>Tus datos clínicos</h2>
       <p class="clinical-note">Ayudan a tu equipo tratante a ajustar tu Plan Clínico. Se guardan solo en este dispositivo.</p>
       <div class="clinical-field">
-        <label for="etapa-erc">Etapa de enfermedad renal crónica (ERC)</label>
+        <label for="etapa-erc">Tu situación renal</label>
         <select id="etapa-erc">
           <option value="">Prefiero no decirlo</option>
-          <option value="3">Etapa 3</option>
-          <option value="4">Etapa 4</option>
-          <option value="5">Etapa 5</option>
+          <option value="3">ERC etapa 3</option>
+          <option value="4">ERC etapa 4</option>
+          <option value="5">ERC etapa 5 (sin diálisis)</option>
+          <option value="hemodialisis">En hemodiálisis</option>
+          <option value="peritoneal">En diálisis peritoneal</option>
         </select>
+      </div>
+      <div class="clinical-field" id="campo-diuresis" hidden>
+        <label for="dato-diuresis">¿Cuánto orinas al día, aproximadamente?</label>
+        <input type="number" id="dato-diuresis" min="0" max="4000" step="50" placeholder="Ej: 800">
+        <small class="campo-ayuda">En mililitros. De aquí sale tu límite de líquidos: lo que orinas más 500 ml. Si no lo sabes, pregúntale a tu equipo tratante.</small>
       </div>
       <div class="clinical-checks">
         <label class="clinical-check"><input type="checkbox" id="dato-diabetes"> Diabetes</label>

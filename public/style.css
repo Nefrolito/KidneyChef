@@ -520,6 +520,85 @@ h1, h2, h3 {
 .clinical-checks { display: flex; gap: 1.2rem; flex-wrap: wrap; }
 .clinical-check { display: flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; font-weight: 500; }
 .clinical-check input { width: 17px; height: 17px; accent-color: var(--brand); }
+.clinical-field input[type="number"] {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-family: inherit;
+}
+.campo-ayuda { display: block; margin-top: 0.4rem; font-size: 0.76rem; color: var(--muted); line-height: 1.4; }
+
+/* --- Calculadora de consumo diario --- */
+.calculadora-card h2 { margin: 0 0 0.9rem; font-size: 1.1rem; font-weight: 700; }
+.calc-fila { margin-bottom: 1.1rem; }
+.calc-fila:last-child { margin-bottom: 0; }
+.calc-fila-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+.calc-icon { display: flex; color: var(--brand-dark); flex-shrink: 0; }
+.calc-label { font-size: 0.88rem; font-weight: 700; flex: 1; }
+.calc-total { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+.calc-barra {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.calc-barra-relleno { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
+.calc-barra-relleno.nivel-verde { background: var(--verde); }
+.calc-barra-relleno.nivel-amarillo { background: var(--amarillo); }
+.calc-barra-relleno.nivel-rojo { background: var(--rojo); }
+.calc-exceso { margin: 0.35rem 0 0; font-size: 0.78rem; font-weight: 700; color: var(--rojo); }
+.calc-advertencia {
+  margin: 0.45rem 0 0;
+  font-size: 0.76rem;
+  color: var(--muted);
+  line-height: 1.45;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+}
+.calc-sin-meta .calc-fila-head { margin-bottom: 0; }
+
+/* --- Registro de líquidos --- */
+.liquidos-box {
+  margin-top: 1.2rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border);
+}
+.liquidos-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.7rem; }
+.liquidos-titulo { font-size: 0.88rem; font-weight: 700; }
+.liquidos-botones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.6rem; }
+.btn-liquido {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.55rem 0.3rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-liquido:hover { background: var(--brand-50); border-color: var(--brand-100); }
+.btn-liquido small { font-size: 0.7rem; font-weight: 500; color: var(--muted); }
+.liquidos-manual { display: flex; gap: 0.5rem; }
+.liquidos-manual input {
+  flex: 1;
+  padding: 0.6rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: inherit;
+}
 
 .plan-upsell-card {
   display: flex;

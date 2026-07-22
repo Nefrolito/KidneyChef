@@ -44,6 +44,8 @@ const NUTRIENTE_ICON = {
   carbohidratos_g: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3 0-5 2-5 4.5S9 12 12 12s5-2 5-4.5S15 3 12 3Z"/><path d="M5 14c2.5-1 4.5-1 7-1s4.5 0 7 1"/><path d="M6 18c2-.8 4-1 6-1s4 .2 6 1"/></svg>`,
 };
 
+const ICONO_LIQUIDO = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4 7 8.2 7 12a7 7 0 0 1-14 0c0-3.8 3.5-8 7-12Z"/></svg>`;
+
 // Estructura de planes: hoy solo existe el plan básico (gratuito). Los planes
 // pagados se agregarán aquí más adelante, cada uno con su propio set de
 // umbrales/features habilitados según lo que indique el nefrólogo(a) del
@@ -80,7 +82,7 @@ const PLANS = {
   },
 };
 
-const ETAPAS_ERC = ["3", "4", "5"];
+const ETAPAS_ERC = ["3", "4", "5", "hemodialisis", "peritoneal"];
 
 const PERFIL_STORAGE_KEY = "kidneyChefPerfil";
 
@@ -95,12 +97,13 @@ function ensurePerfil() {
     perfil = {
       planId: "basico",
       creadoEn: new Date().toISOString(),
-      datosClinicos: { etapaERC: null, diabetes: false, hipertension: false },
+      datosClinicos: { etapaERC: null, diabetes: false, hipertension: false, diuresisMl: null },
       umbralesPersonalizados: null,
     };
     localStorage.setItem(PERFIL_STORAGE_KEY, JSON.stringify(perfil));
   }
-  if (!perfil.datosClinicos) perfil.datosClinicos = { etapaERC: null, diabetes: false, hipertension: false };
+  if (!perfil.datosClinicos) perfil.datosClinicos = { etapaERC: null, diabetes: false, hipertension: false, diuresisMl: null };
+  if (perfil.datosClinicos.diuresisMl === undefined) perfil.datosClinicos.diuresisMl = null;
   if (perfil.umbralesPersonalizados === undefined) perfil.umbralesPersonalizados = null;
   return perfil;
 }
@@ -152,6 +155,33 @@ function metaDiaria(nutriente) {
       : null;
   }
   return null; // potasio y fósforo: sin cifra universal
+}
+
+// "3" | "4" | "5" | "hemodialisis" | "peritoneal" | null (no declarada)
+function situacionActual() {
+  return ensurePerfil().datosClinicos.etapaERC || null;
+}
+
+// Solo hemodiálisis y diálisis peritoneal activan el registro de líquidos:
+// son las situaciones donde la restricción depende de la diuresis residual.
+function requiereDiuresis() {
+  if (!LIMITES) return false;
+  const s = situacionActual();
+  const cfg = s && LIMITES.situaciones[s];
+  return !!(cfg && cfg.requiere_diuresis);
+}
+
+// Meta de líquidos del día, o null si la situación no la activa.
+// Fórmula clínica: diuresis residual + margen fijo (LIMITES.liquidos.margen_ml).
+// Si el paciente no registró su diuresis, se asume anúrico (0 ml) por ser el
+// supuesto más restrictivo — pero se marca como provisional en la UI, porque
+// restringir de más a alguien que sí orina también hace daño.
+function metaLiquidos() {
+  if (!LIMITES || !requiereDiuresis()) return null;
+  const raw = ensurePerfil().datosClinicos.diuresisMl;
+  const esSupuesto = raw === null || raw === undefined || raw === "";
+  const diuresis = esSupuesto ? LIMITES.liquidos.sin_dato.asumir_diuresis_ml : Number(raw);
+  return { ml: diuresis + LIMITES.liquidos.margen_ml, esSupuesto };
 }
 
 // Umbral por porción derivado de la meta diaria: el día se reparte en varias
@@ -207,19 +237,29 @@ function renderDatosClinicos() {
   els.diabetes.checked = !!perfil.datosClinicos.diabetes;
   els.hipertension.checked = !!perfil.datosClinicos.hipertension;
   els.farmacosK.checked = !!perfil.datosClinicos.farmacosRetenedoresK;
+  els.datoDiuresis.value = perfil.datosClinicos.diuresisMl ?? "";
+  actualizarVisibilidadDiuresis();
   renderPlanUpsell();
+}
+
+function actualizarVisibilidadDiuresis() {
+  els.campoDiuresis.hidden = !requiereDiuresis();
 }
 
 function guardarDatosClinicos() {
   const perfil = ensurePerfil();
+  const diuresisRaw = els.datoDiuresis.value;
   perfil.datosClinicos = {
     etapaERC: els.etapaERC.value || null,
     diabetes: els.diabetes.checked,
     hipertension: els.hipertension.checked,
     farmacosRetenedoresK: els.farmacosK.checked,
+    diuresisMl: diuresisRaw === "" ? null : Number(diuresisRaw),
   };
   guardarPerfil(perfil);
+  actualizarVisibilidadDiuresis();
   renderPlanUpsell();
+  renderCalculadora();
 }
 
 function renderPlanUpsell() {
@@ -263,7 +303,13 @@ const els = {
   status: document.getElementById("status"),
   results: document.getElementById("results"),
   resultsList: document.getElementById("results-list"),
-  dailySummary: document.getElementById("daily-summary"),
+  calculadora: document.getElementById("calculadora"),
+  registroLiquidos: document.getElementById("registro-liquidos"),
+  liquidoManual: document.getElementById("liquido-manual"),
+  liquidoAgregarBtn: document.getElementById("liquido-agregar"),
+  liquidosDeshacerBtn: document.getElementById("liquidos-deshacer"),
+  campoDiuresis: document.getElementById("campo-diuresis"),
+  datoDiuresis: document.getElementById("dato-diuresis"),
   historyList: document.getElementById("history-list"),
   clearHistoryBtn: document.getElementById("clear-history"),
   modal: document.getElementById("manual-select-modal"),
@@ -315,6 +361,20 @@ async function init() {
   els.diabetes.addEventListener("change", guardarDatosClinicos);
   els.hipertension.addEventListener("change", guardarDatosClinicos);
   els.farmacosK.addEventListener("change", guardarDatosClinicos);
+  els.datoDiuresis.addEventListener("change", guardarDatosClinicos);
+
+  document.querySelectorAll(".btn-liquido").forEach((btn) => {
+    btn.addEventListener("click", () => registrarLiquido(Number(btn.dataset.ml)));
+  });
+  els.liquidoAgregarBtn.addEventListener("click", () => {
+    const ml = Number(els.liquidoManual.value);
+    if (!ml || ml <= 0) return;
+    registrarLiquido(ml);
+    els.liquidoManual.value = "";
+  });
+  els.liquidosDeshacerBtn.addEventListener("click", deshacerUltimoLiquido);
+
+  renderCalculadora();
 }
 
 function renderTipOfDay() {
@@ -573,28 +633,142 @@ function badge(nutriente, valorPorcion, densidad100g) {
     </div>`;
 }
 
+// --- Calculadora de consumo diario (K, P, Na, carbohidratos, líquidos) ---
 // El total acumulado del día se compara contra la meta DIARIA completa, no
-// contra el umbral de una porción (ese era el error anterior: con dos o tres
-// comidas el resumen siempre marcaba rojo).
-// Si el nutriente no tiene meta, se muestra el total sin semáforo: la app no
-// conoce el límite personal del paciente y no debe inventarlo.
-function badgeDiario(nutriente, total) {
-  const unidad = nutriente === "carbohidratos_g" ? "g" : "mg";
+// contra el umbral de una porción (con dos o tres comidas eso siempre
+// marcaba rojo). Barra verde hasta 80% de la meta, ámbar de 80% a 100%,
+// roja al superarla. Potasio y fósforo solo muestran barra cuando el equipo
+// tratante fijó una meta personal (Plan Clínico); si no, se muestra el
+// total sin inventar un límite que la app no conoce.
+function nivelPorMeta(total, meta) {
+  if (total > meta) return "rojo";
+  if (total >= meta * 0.8) return "amarillo";
+  return "verde";
+}
+
+function filaCalculadora(nutriente, total, unidad) {
   const meta = metaDiaria(nutriente);
-  let nivel = null;
-  if (meta != null) {
-    nivel = total <= meta * 0.5 ? "verde" : total <= meta ? "amarillo" : "rojo";
+  const label = NUTRIENTE_LABEL[nutriente];
+  const icon = NUTRIENTE_ICON[nutriente];
+  const totalFmt = unidad === "g" ? Math.round(total * 10) / 10 : Math.round(total);
+
+  if (meta == null) {
+    return `
+      <div class="calc-fila calc-sin-meta">
+        <div class="calc-fila-head">
+          <span class="calc-icon">${icon}</span>
+          <span class="calc-label">${label}</span>
+          <span class="calc-total">${totalFmt} ${unidad}</span>
+          <span class="tag-neutro">sin meta fijada</span>
+        </div>
+      </div>`;
   }
-  const pie = meta != null
-    ? `<span class="tag-pill">${nivelTag(nivel)}</span>`
-    : `<span class="tag-neutro">sin meta fijada</span>`;
+
+  const pct = Math.min(100, Math.round((total / meta) * 100));
+  const nivel = nivelPorMeta(total, meta);
+  const exceso = total > meta
+    ? `<p class="calc-exceso">Superaste tu meta por ${Math.round(total - meta)} ${unidad}.</p>` : "";
   return `
-    <div class="semaforo-badge ${nivel ? "nivel-" + nivel : "nivel-neutro"}">
-      <span class="label">${NUTRIENTE_LABEL[nutriente]}</span>
-      <span class="badge-icon-circle">${NUTRIENTE_ICON[nutriente]}</span>
-      <span class="value">${total} ${unidad}</span>
-      ${pie}
+    <div class="calc-fila">
+      <div class="calc-fila-head">
+        <span class="calc-icon">${icon}</span>
+        <span class="calc-label">${label}</span>
+        <span class="calc-total">${totalFmt} / ${Math.round(meta)} ${unidad}</span>
+      </div>
+      <div class="calc-barra"><div class="calc-barra-relleno nivel-${nivel}" style="width:${pct}%"></div></div>
+      ${exceso}
     </div>`;
+}
+
+function filaLiquidos(total, metaLiq) {
+  const meta = metaLiq.ml;
+  const pct = Math.min(100, Math.round((total / meta) * 100));
+  const nivel = nivelPorMeta(total, meta);
+  const exceso = total > meta
+    ? `<p class="calc-exceso">Superaste tu meta por ${Math.round(total - meta)} ml.</p>` : "";
+  const advertencia = metaLiq.esSupuesto
+    ? `<p class="calc-advertencia">No registraste tu diuresis: se asume 0 ml/día por seguridad, el supuesto más restrictivo. Esta cifra es provisional — confírmala con tu equipo tratante, porque restringir de más también puede hacerte daño.</p>`
+    : "";
+  return `
+    <div class="calc-fila">
+      <div class="calc-fila-head">
+        <span class="calc-icon">${ICONO_LIQUIDO}</span>
+        <span class="calc-label">Líquidos</span>
+        <span class="calc-total">${Math.round(total)} / ${Math.round(meta)} ml</span>
+      </div>
+      <div class="calc-barra"><div class="calc-barra-relleno nivel-${nivel}" style="width:${pct}%"></div></div>
+      ${exceso}
+      ${advertencia}
+    </div>`;
+}
+
+function totalesNutrientesHoy() {
+  const history = loadHistory().filter((h) => isToday(h.fecha));
+  return history.reduce(
+    (acc, h) => {
+      acc.potasio_mg += h.potasio_mg || 0;
+      acc.fosforo_mg += h.fosforo_mg || 0;
+      acc.sodio_mg += h.sodio_mg || 0;
+      acc.carbohidratos_g += h.carbohidratos_g || 0;
+      return acc;
+    },
+    { potasio_mg: 0, fosforo_mg: 0, sodio_mg: 0, carbohidratos_g: 0 }
+  );
+}
+
+function renderCalculadora() {
+  if (!els.calculadora) return;
+  const totals = totalesNutrientesHoy();
+  const filas = [
+    filaCalculadora("sodio_mg", totals.sodio_mg, "mg"),
+    filaCalculadora("potasio_mg", totals.potasio_mg, "mg"),
+    filaCalculadora("fosforo_mg", totals.fosforo_mg, "mg"),
+  ];
+  if (nutrientesVisibles().includes("carbohidratos_g")) {
+    filas.push(filaCalculadora("carbohidratos_g", totals.carbohidratos_g, "g"));
+  }
+
+  const metaLiq = metaLiquidos();
+  if (metaLiq) {
+    filas.push(filaLiquidos(totalLiquidosHoy(), metaLiq));
+    els.registroLiquidos.hidden = false;
+  } else {
+    els.registroLiquidos.hidden = true;
+  }
+
+  els.calculadora.innerHTML = filas.join("");
+}
+
+const LIQUIDOS_STORAGE_KEY = "kidneyChefLiquidos";
+
+function loadLiquidos() {
+  try {
+    return JSON.parse(localStorage.getItem(LIQUIDOS_STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function totalLiquidosHoy() {
+  return loadLiquidos().filter((x) => isToday(x.fecha)).reduce((s, x) => s + x.ml, 0);
+}
+
+function registrarLiquido(ml) {
+  const arr = loadLiquidos();
+  arr.unshift({ ml, fecha: new Date().toISOString() });
+  localStorage.setItem(LIQUIDOS_STORAGE_KEY, JSON.stringify(arr));
+  renderCalculadora();
+  setStatus(`${ml} ml registrados.`);
+}
+
+// Quita el registro de líquido más reciente de HOY (no de cualquier día).
+function deshacerUltimoLiquido() {
+  const arr = loadLiquidos();
+  const idx = arr.findIndex((x) => isToday(x.fecha));
+  if (idx === -1) return;
+  arr.splice(idx, 1);
+  localStorage.setItem(LIQUIDOS_STORAGE_KEY, JSON.stringify(arr));
+  renderCalculadora();
 }
 
 function openModal(itemIndex) {
@@ -669,22 +843,7 @@ function isToday(isoDate) {
 
 function renderHistory() {
   const history = loadHistory();
-  const today = history.filter((h) => isToday(h.fecha));
-
-  const totals = today.reduce(
-    (acc, h) => {
-      acc.potasio_mg += h.potasio_mg || 0;
-      acc.fosforo_mg += h.fosforo_mg || 0;
-      acc.sodio_mg += h.sodio_mg || 0;
-      acc.carbohidratos_g += h.carbohidratos_g || 0;
-      return acc;
-    },
-    { potasio_mg: 0, fosforo_mg: 0, sodio_mg: 0, carbohidratos_g: 0 }
-  );
-
-  els.dailySummary.innerHTML = nutrientesVisibles()
-    .map((k) => badgeDiario(k, totals[k]))
-    .join("");
+  renderCalculadora();
 
   if (history.length === 0) {
     els.historyList.innerHTML = `<p class="history-empty">Aún no has guardado ningún alimento.</p>`;
@@ -717,8 +876,9 @@ function renderHistory() {
 }
 
 function clearHistory() {
-  if (!confirm("¿Borrar todo el historial guardado en este dispositivo?")) return;
+  if (!confirm("¿Borrar todo el historial guardado en este dispositivo, incluido el registro de líquidos de hoy?")) return;
   localStorage.removeItem("dietaRenalHistorial");
+  localStorage.removeItem(LIQUIDOS_STORAGE_KEY);
   renderHistory();
 }
 
