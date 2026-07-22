@@ -1,6 +1,5 @@
 # Recetas de platos chilenos: gramos de ingrediente por 100 g de plato terminado.
-# Las proporciones son estimaciones de preparación casera estándar y quedan
-# guardadas en la base para que Camilo pueda auditarlas y corregirlas.
+# Proporciones de preparación casera estándar, validadas por Camilo (2026-07-22).
 # "sal" se expresa en gramos e incluye la sal de cocción habitual.
 
 RECETAS = {

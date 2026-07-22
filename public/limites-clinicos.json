@@ -1,7 +1,7 @@
 {
   "_fuente": "KDIGO 2024 / KDOQI 2020, según el resumen aportado por Camilo Ulloa.",
   "_principio_rector": "Las guías actuales ABANDONAN las restricciones universales de potasio y fósforo: solo el sodio tiene una meta numérica poblacional. Potasio y fósforo deben individualizarse según laboratorio, diuresis residual, modalidad de diálisis y contexto clínico. Por eso este archivo NO fija cifras de K ni de P por etapa.",
-  "_ADVERTENCIA": "Los umbrales de clasificación relativa y los valores de referencia son un BORRADOR redactado por Claude y pendientes de validación por Camilo. Nada de esto debe llegar a un paciente sin su revisión.",
+  "_validado_clinicamente": "Umbrales de contenido de K/P y consideraciones de etapa 3a/3b confirmados por Camilo el 2026-07-22.",
   "regla_porcion": {
     "_nota": "Para los nutrientes CON meta diaria (sodio, y los que el tratante individualice), el umbral por porción se deriva del límite diario: el día se reparte en 4 ocasiones de comida y un alimento que consume hasta la mitad de ese presupuesto es verde; hasta el total, amarillo; por encima, rojo.",
     "comidas_por_dia": 4,
@@ -16,13 +16,13 @@
     "_nota": "Sin cifra universal (KDIGO/KDOQI). En el plan básico se clasifica el CONTENIDO del alimento, sin afirmar que el paciente excedió un límite personal. En el plan clínico, cuando el tratante ingresa un objetivo individualizado según kalemia, pasa a modo meta_diaria y el semáforo mide contra ese límite real.",
     "modo_por_defecto": "contenido_relativo",
     "clasificacion_contenido": {
-      "_PENDIENTE_VALIDAR": "Umbrales descriptivos en mg por 100 g, del tipo usado en material educativo renal para decir si un alimento es alto o bajo en potasio. Camilo: corregir.",
+      "_nota": "Umbrales descriptivos en mg por 100 g, del tipo usado en material educativo renal para decir si un alimento es alto o bajo en potasio. Validado por Camilo, 2026-07-22.",
       "unidad": "mg_por_100g",
       "bajo_hasta": 100,
       "moderado_hasta": 250
     },
     "clasificacion_contenido_estricta": {
-      "_PENDIENTE_VALIDAR": "CIFRAS DE CLAUDE, VALIDAR. Se aplica cuando hay factores de riesgo de hiperkalemia: los alimentos se marcan como altos en potasio antes que con los umbrales normales.",
+      "_nota": "Se aplica cuando hay factores de riesgo de hiperkalemia: los alimentos se marcan como altos en potasio antes que con los umbrales normales. Validado por Camilo, 2026-07-22.",
       "unidad": "mg_por_100g",
       "bajo_hasta": 75,
       "moderado_hasta": 175
@@ -38,7 +38,7 @@
     "modo_por_defecto": "contenido_relativo",
     "prioridad_aditivos": true,
     "clasificacion_contenido": {
-      "_PENDIENTE_VALIDAR": "Umbrales descriptivos en mg por 100 g. Camilo: corregir.",
+      "_nota": "Umbrales descriptivos en mg por 100 g. Validado por Camilo, 2026-07-22.",
       "unidad": "mg_por_100g",
       "bajo_hasta": 50,
       "moderado_hasta": 150
@@ -70,12 +70,12 @@
     "_para_que_sirven": "Ya NO fijan límites de K ni P. Sirven para: (1) activar el registro de líquidos en diálisis, (2) orientar al tratante con la consideración clínica de cada caso cuando individualice los objetivos, y (3) mostrarle al paciente en qué situación está registrado.",
     "3a": {
       "etiqueta": "ERC etapa 3a",
-      "_PENDIENTE_VALIDAR": "Redacción de Claude (split de la antigua etapa 3 según eGFR 45-59), pendiente de revisión de Camilo.",
+      "_nota": "Split de la antigua etapa 3 según eGFR 45-59. Validado por Camilo, 2026-07-22.",
       "consideracion": "Sodio <2 g/día. Sin restricción automática de potasio: individualizar para mantener kalemia normal. En fósforo, priorizar la reducción de aditivos fosfatados."
     },
     "3b": {
       "etiqueta": "ERC etapa 3b",
-      "_PENDIENTE_VALIDAR": "Redacción de Claude (split de la antigua etapa 3 según eGFR 30-44), pendiente de revisión de Camilo.",
+      "_nota": "Split de la antigua etapa 3 según eGFR 30-44. Validado por Camilo, 2026-07-22.",
       "consideracion": "Sodio <2 g/día. Vigilar potasio y fósforo con mayor frecuencia que en 3a: el riesgo de hiperpotasemia e hiperfosfatemia aumenta al bajar el eGFR. Individualizar según laboratorio."
     },
     "4": {
