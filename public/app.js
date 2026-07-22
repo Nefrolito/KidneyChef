@@ -82,7 +82,7 @@ const PLANS = {
   },
 };
 
-const ETAPAS_ERC = ["3", "4", "5", "hemodialisis", "peritoneal"];
+const ETAPAS_ERC = ["3a", "3b", "4", "5", "hemodialisis", "peritoneal"];
 
 const PERFIL_STORAGE_KEY = "kidneyChefPerfil";
 
@@ -97,16 +97,38 @@ function ensurePerfil() {
     perfil = {
       planId: "basico",
       creadoEn: new Date().toISOString(),
-      datosClinicos: { etapaERC: null, diabetes: false, hipertension: false, diuresisMl: null },
+      datosClinicos: datosClinicosPorDefecto(),
       umbralesPersonalizados: null,
     };
     localStorage.setItem(PERFIL_STORAGE_KEY, JSON.stringify(perfil));
   }
-  if (!perfil.datosClinicos) perfil.datosClinicos = { etapaERC: null, diabetes: false, hipertension: false, diuresisMl: null };
-  if (perfil.datosClinicos.diuresisMl === undefined) perfil.datosClinicos.diuresisMl = null;
+  if (!perfil.datosClinicos) perfil.datosClinicos = datosClinicosPorDefecto();
+  const d = perfil.datosClinicos;
+  if (d.diuresisMl === undefined) d.diuresisMl = null;
+  if (d.enDialisis === undefined) d.enDialisis = null;
+  if (d.modoEtapa === undefined) d.modoEtapa = "calculada";
+  if (d.edad === undefined) d.edad = null;
+  if (d.sexoBiologico === undefined) d.sexoBiologico = null;
+  if (d.creatininaMgDl === undefined) d.creatininaMgDl = null;
+  if (d.cistatinaMgL === undefined) d.cistatinaMgL = null;
   if (perfil.umbralesPersonalizados === undefined) perfil.umbralesPersonalizados = null;
   if (perfil.metasDiarias === undefined) perfil.metasDiarias = null;
   return perfil;
+}
+
+function datosClinicosPorDefecto() {
+  return {
+    etapaERC: null,
+    diabetes: false,
+    hipertension: false,
+    diuresisMl: null,
+    enDialisis: null,
+    modoEtapa: "calculada",
+    edad: null,
+    sexoBiologico: null,
+    creatininaMgDl: null,
+    cistatinaMgL: null,
+  };
 }
 
 function guardarPerfil(perfil) {
@@ -124,6 +146,76 @@ function umbralesActivos() {
     return perfil.umbralesPersonalizados;
   }
   return UMBRALES;
+}
+
+// --- Calculadora de eGFR (CKD-EPI 2021, sin coeficiente racial) ---------
+// Fuente: National Kidney Foundation — ecuaciones de creatinina (2021) y
+// creatinina-cistatina combinada (2021) en kidney.org/ckd-epi-creatinine-equation-2021
+// y kidney.org/ckd-epi-creatinine-cystatin-equation-2021; la de cistatina
+// sola es la de 2012 (kidney.org/ckd-epi-cystatin-c-equation-2012), que esa
+// revisión no modificó. Coeficientes kappa/alfa varían por sexo biológico
+// porque así se define la ecuación original, no por identidad de género.
+function egfrCreatinina(edad, esMujer, scrMgDl) {
+  const kappa = esMujer ? 0.7 : 0.9;
+  const alfa = esMujer ? -0.241 : -0.302;
+  const ratio = scrMgDl / kappa;
+  return 142
+    * Math.pow(Math.min(ratio, 1), alfa)
+    * Math.pow(Math.max(ratio, 1), -1.2)
+    * Math.pow(0.9938, edad)
+    * (esMujer ? 1.012 : 1);
+}
+
+function egfrCistatina(edad, esMujer, scysMgL) {
+  const ratio = scysMgL / 0.8;
+  return 133
+    * Math.pow(Math.min(ratio, 1), -0.499)
+    * Math.pow(Math.max(ratio, 1), -1.328)
+    * Math.pow(0.996, edad)
+    * (esMujer ? 0.932 : 1);
+}
+
+function egfrCombinada(edad, esMujer, scrMgDl, scysMgL) {
+  const kappa = esMujer ? 0.7 : 0.9;
+  const alfa = esMujer ? -0.219 : -0.144;
+  const ratioCr = scrMgDl / kappa;
+  const ratioCys = scysMgL / 0.8;
+  return 135
+    * Math.pow(Math.min(ratioCr, 1), alfa)
+    * Math.pow(Math.max(ratioCr, 1), -0.544)
+    * Math.pow(Math.min(ratioCys, 1), -0.323)
+    * Math.pow(Math.max(ratioCys, 1), -0.778)
+    * Math.pow(0.9961, edad)
+    * (esMujer ? 0.963 : 1);
+}
+
+// Elige la ecuación más precisa según los datos disponibles: NKF/ASN
+// recomiendan la combinada cuando hay creatinina y cistatina, porque reduce
+// el error de cada marcador por separado; si falta uno, se usa la ecuación
+// de ese único marcador.
+function calcularEgfr({ edad, sexoBiologico, creatininaMgDl, cistatinaMgL }) {
+  if (edad == null || !sexoBiologico) return null;
+  const esMujer = sexoBiologico === "F";
+  const tieneCr = creatininaMgDl != null && creatininaMgDl > 0;
+  const tieneCys = cistatinaMgL != null && cistatinaMgL > 0;
+  if (tieneCr && tieneCys) return egfrCombinada(edad, esMujer, creatininaMgDl, cistatinaMgL);
+  if (tieneCr) return egfrCreatinina(edad, esMujer, creatininaMgDl);
+  if (tieneCys) return egfrCistatina(edad, esMujer, cistatinaMgL);
+  return null;
+}
+
+// Categorías KDIGO por eGFR. G1/G2 (eGFR >= 60) devuelven key null porque
+// limites-clinicos.json solo modela desde la etapa 3: esta app está pensada
+// para ERC ya diagnosticada, y unas cifras de filtración conservada no
+// bastan para decidir un plan alimentario (podría haber ERC por albuminuria
+// con eGFR normal, que esta calculadora no evalúa).
+function etapaPorEgfr(egfr) {
+  if (egfr >= 90) return { key: null, etiqueta: "categoría G1 (función renal normal o alta)" };
+  if (egfr >= 60) return { key: null, etiqueta: "categoría G2 (levemente disminuida)" };
+  if (egfr >= 45) return { key: "3a", etiqueta: "ERC etapa 3a" };
+  if (egfr >= 30) return { key: "3b", etiqueta: "ERC etapa 3b" };
+  if (egfr >= 15) return { key: "4", etiqueta: "ERC etapa 4" };
+  return { key: "5", etiqueta: "ERC etapa 5 (sin diálisis)" };
 }
 
 // --- Modelo clínico (KDIGO/KDOQI) ---------------------------------------
@@ -234,13 +326,54 @@ function renderPlan() {
 
 function renderDatosClinicos() {
   const perfil = ensurePerfil();
-  els.etapaERC.value = perfil.datosClinicos.etapaERC || "";
-  els.diabetes.checked = !!perfil.datosClinicos.diabetes;
-  els.hipertension.checked = !!perfil.datosClinicos.hipertension;
-  els.farmacosK.checked = !!perfil.datosClinicos.farmacosRetenedoresK;
-  els.datoDiuresis.value = perfil.datosClinicos.diuresisMl ?? "";
+  const d = perfil.datosClinicos;
+  els.enDialisis.value = d.enDialisis || "";
+  els.diabetes.checked = !!d.diabetes;
+  els.hipertension.checked = !!d.hipertension;
+  els.farmacosK.checked = !!d.farmacosRetenedoresK;
+  els.datoDiuresis.value = d.diuresisMl ?? "";
+  els.modoEtapaCalculada.checked = d.modoEtapa !== "manual";
+  els.modoEtapaManual.checked = d.modoEtapa === "manual";
+  els.egfrEdad.value = d.edad ?? "";
+  els.egfrSexo.value = d.sexoBiologico || "";
+  els.egfrCreatinina.value = d.creatininaMgDl ?? "";
+  els.egfrCistatina.value = d.cistatinaMgL ?? "";
+  els.etapaERC.value = ["3a", "3b", "4", "5"].includes(d.etapaERC) ? d.etapaERC : "";
+  actualizarVisibilidadEtapa();
+  renderResultadoEgfr();
   actualizarVisibilidadDiuresis();
   renderPlanUpsell();
+}
+
+// Diálisis oculta todo el bloque de etapa (la modalidad la define
+// directamente); si no hay diálisis, se alterna entre la calculadora de
+// eGFR y la declaración manual según lo que eligió el paciente.
+function actualizarVisibilidadEtapa() {
+  const d = ensurePerfil().datosClinicos;
+  const enDialisis = !!d.enDialisis;
+  els.bloqueEtapa.hidden = enDialisis;
+  if (enDialisis) return;
+  const manual = d.modoEtapa === "manual";
+  els.calculadoraEgfr.hidden = manual;
+  els.etapaManualCampo.hidden = !manual;
+}
+
+function renderResultadoEgfr() {
+  const d = ensurePerfil().datosClinicos;
+  if (d.enDialisis || d.modoEtapa === "manual") {
+    els.egfrResultado.textContent = "";
+    return;
+  }
+  const egfr = calcularEgfr(d);
+  if (egfr == null) {
+    els.egfrResultado.textContent = "Ingresa edad, sexo biológico y al menos un valor (creatinina o cistatina C) para calcular tu eGFR.";
+    return;
+  }
+  const { key, etiqueta } = etapaPorEgfr(egfr);
+  const extra = key
+    ? ""
+    : " Esta app está pensada para ERC etapa 3 en adelante; conversa con tu equipo tratante sobre cómo interpretar este resultado.";
+  els.egfrResultado.innerHTML = `Tu eGFR estimado es <strong>${Math.round(egfr)} mL/min/1.73&nbsp;m²</strong> — ${etiqueta}.${extra}`;
 }
 
 function actualizarVisibilidadDiuresis() {
@@ -250,14 +383,32 @@ function actualizarVisibilidadDiuresis() {
 function guardarDatosClinicos() {
   const perfil = ensurePerfil();
   const diuresisRaw = els.datoDiuresis.value;
-  perfil.datosClinicos = {
-    etapaERC: els.etapaERC.value || null,
+  const d = {
     diabetes: els.diabetes.checked,
     hipertension: els.hipertension.checked,
     farmacosRetenedoresK: els.farmacosK.checked,
     diuresisMl: diuresisRaw === "" ? null : Number(diuresisRaw),
+    enDialisis: els.enDialisis.value || null,
+    modoEtapa: els.modoEtapaManual.checked ? "manual" : "calculada",
+    edad: els.egfrEdad.value === "" ? null : Number(els.egfrEdad.value),
+    sexoBiologico: els.egfrSexo.value || null,
+    creatininaMgDl: els.egfrCreatinina.value === "" ? null : Number(els.egfrCreatinina.value),
+    cistatinaMgL: els.egfrCistatina.value === "" ? null : Number(els.egfrCistatina.value),
   };
+
+  if (d.enDialisis) {
+    d.etapaERC = d.enDialisis;
+  } else if (d.modoEtapa === "manual") {
+    d.etapaERC = els.etapaERC.value || null;
+  } else {
+    const egfr = calcularEgfr(d);
+    d.etapaERC = egfr != null ? etapaPorEgfr(egfr).key : null;
+  }
+
+  perfil.datosClinicos = d;
   guardarPerfil(perfil);
+  actualizarVisibilidadEtapa();
+  renderResultadoEgfr();
   actualizarVisibilidadDiuresis();
   renderPlanUpsell();
   renderCalculadora();
@@ -362,6 +513,17 @@ const els = {
   tipText: document.getElementById("tip-text"),
   planBadge: document.getElementById("plan-badge"),
   aboutPlan: document.getElementById("about-plan"),
+  enDialisis: document.getElementById("en-dialisis"),
+  bloqueEtapa: document.getElementById("bloque-etapa"),
+  modoEtapaCalculada: document.getElementById("modo-etapa-calculada"),
+  modoEtapaManual: document.getElementById("modo-etapa-manual"),
+  calculadoraEgfr: document.getElementById("calculadora-egfr"),
+  egfrEdad: document.getElementById("egfr-edad"),
+  egfrSexo: document.getElementById("egfr-sexo"),
+  egfrCreatinina: document.getElementById("egfr-creatinina"),
+  egfrCistatina: document.getElementById("egfr-cistatina"),
+  egfrResultado: document.getElementById("egfr-resultado"),
+  etapaManualCampo: document.getElementById("etapa-manual-campo"),
   etapaERC: document.getElementById("etapa-erc"),
   diabetes: document.getElementById("dato-diabetes"),
   hipertension: document.getElementById("dato-hipertension"),
@@ -406,6 +568,13 @@ async function init() {
   els.hipertension.addEventListener("change", guardarDatosClinicos);
   els.farmacosK.addEventListener("change", guardarDatosClinicos);
   els.datoDiuresis.addEventListener("change", guardarDatosClinicos);
+  els.enDialisis.addEventListener("change", guardarDatosClinicos);
+  els.modoEtapaCalculada.addEventListener("change", guardarDatosClinicos);
+  els.modoEtapaManual.addEventListener("change", guardarDatosClinicos);
+  els.egfrEdad.addEventListener("input", guardarDatosClinicos);
+  els.egfrSexo.addEventListener("change", guardarDatosClinicos);
+  els.egfrCreatinina.addEventListener("input", guardarDatosClinicos);
+  els.egfrCistatina.addEventListener("input", guardarDatosClinicos);
   els.activarPlanClinico.addEventListener("change", togglePlanClinico);
   els.metaPotasio.addEventListener("change", guardarMetasTratante);
   els.metaFosforo.addEventListener("change", guardarMetasTratante);

@@ -133,16 +133,66 @@
       <h2>Tus datos clínicos</h2>
       <p class="clinical-note">Ayudan a tu equipo tratante a ajustar tu Plan Clínico. Se guardan solo en este dispositivo.</p>
       <div class="clinical-field">
-        <label for="etapa-erc">Tu situación renal</label>
-        <select id="etapa-erc">
-          <option value="">Prefiero no decirlo</option>
-          <option value="3">ERC etapa 3</option>
-          <option value="4">ERC etapa 4</option>
-          <option value="5">ERC etapa 5 (sin diálisis)</option>
-          <option value="hemodialisis">En hemodiálisis</option>
-          <option value="peritoneal">En diálisis peritoneal</option>
+        <label for="en-dialisis">¿Estás en diálisis?</label>
+        <select id="en-dialisis">
+          <option value="">No</option>
+          <option value="hemodialisis">Sí, hemodiálisis</option>
+          <option value="peritoneal">Sí, diálisis peritoneal</option>
         </select>
       </div>
+
+      <div id="bloque-etapa">
+        <div class="clinical-field">
+          <label>¿Cómo quieres registrar tu etapa?</label>
+          <div class="clinical-checks">
+            <label class="clinical-check"><input type="radio" name="modo-etapa" id="modo-etapa-calculada" value="calculada"> Calcular con mis exámenes</label>
+            <label class="clinical-check"><input type="radio" name="modo-etapa" id="modo-etapa-manual" value="manual"> Declararla directamente</label>
+          </div>
+        </div>
+
+        <div id="calculadora-egfr">
+          <p class="clinical-note">
+            Calcula tu tasa de filtración glomerular estimada (eGFR) con la ecuación
+            CKD-EPI 2021. Usa tu creatinina, tu cistatina C, o ambas (más precisa si
+            tienes las dos). Es una estimación: la confirmación diagnóstica la hace
+            tu equipo tratante.
+          </p>
+          <div class="clinical-field">
+            <label for="egfr-edad">Edad</label>
+            <input type="number" id="egfr-edad" min="1" max="120" step="1" placeholder="Años">
+          </div>
+          <div class="clinical-field">
+            <label for="egfr-sexo">Sexo biológico</label>
+            <select id="egfr-sexo">
+              <option value="">Selecciona</option>
+              <option value="F">Femenino</option>
+              <option value="M">Masculino</option>
+            </select>
+            <small class="campo-ayuda">La ecuación CKD-EPI usa el sexo biológico como variable de cálculo, no la identidad de género.</small>
+          </div>
+          <div class="clinical-field">
+            <label for="egfr-creatinina">Creatinina plasmática (mg/dL)</label>
+            <input type="number" id="egfr-creatinina" min="0" step="0.01" placeholder="Ej: 2.1">
+          </div>
+          <div class="clinical-field">
+            <label for="egfr-cistatina">Cistatina C (mg/L)</label>
+            <input type="number" id="egfr-cistatina" min="0" step="0.01" placeholder="Ej: 1.8 (opcional)">
+          </div>
+          <p id="egfr-resultado" class="egfr-resultado"></p>
+        </div>
+
+        <div class="clinical-field" id="etapa-manual-campo">
+          <label for="etapa-erc">Tu etapa ERC</label>
+          <select id="etapa-erc">
+            <option value="">Prefiero no decirlo</option>
+            <option value="3a">ERC etapa 3a</option>
+            <option value="3b">ERC etapa 3b</option>
+            <option value="4">ERC etapa 4</option>
+            <option value="5">ERC etapa 5 (sin diálisis)</option>
+          </select>
+        </div>
+      </div>
+
       <div class="clinical-field" id="campo-diuresis" hidden>
         <label for="dato-diuresis">¿Cuánto orinas al día, aproximadamente?</label>
         <input type="number" id="dato-diuresis" min="0" max="4000" step="50" placeholder="Ej: 800">

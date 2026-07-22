@@ -68,9 +68,15 @@
   },
   "situaciones": {
     "_para_que_sirven": "Ya NO fijan límites de K ni P. Sirven para: (1) activar el registro de líquidos en diálisis, (2) orientar al tratante con la consideración clínica de cada caso cuando individualice los objetivos, y (3) mostrarle al paciente en qué situación está registrado.",
-    "3": {
-      "etiqueta": "ERC etapa 3",
+    "3a": {
+      "etiqueta": "ERC etapa 3a",
+      "_PENDIENTE_VALIDAR": "Redacción de Claude (split de la antigua etapa 3 según eGFR 45-59), pendiente de revisión de Camilo.",
       "consideracion": "Sodio <2 g/día. Sin restricción automática de potasio: individualizar para mantener kalemia normal. En fósforo, priorizar la reducción de aditivos fosfatados."
+    },
+    "3b": {
+      "etiqueta": "ERC etapa 3b",
+      "_PENDIENTE_VALIDAR": "Redacción de Claude (split de la antigua etapa 3 según eGFR 30-44), pendiente de revisión de Camilo.",
+      "consideracion": "Sodio <2 g/día. Vigilar potasio y fósforo con mayor frecuencia que en 3a: el riesgo de hiperpotasemia e hiperfosfatemia aumenta al bajar el eGFR. Individualizar según laboratorio."
     },
     "4": {
       "etiqueta": "ERC etapa 4",
