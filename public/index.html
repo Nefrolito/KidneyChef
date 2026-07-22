@@ -132,6 +132,7 @@
     <section class="card clinical-card">
       <h2>Tus datos clínicos</h2>
       <p class="clinical-note">Ayudan a tu equipo tratante a ajustar tu Plan Clínico. Se guardan solo en este dispositivo.</p>
+
       <div class="clinical-field">
         <label for="en-dialisis">¿Estás en diálisis?</label>
         <select id="en-dialisis">
@@ -191,6 +192,14 @@
             <option value="5">ERC etapa 5 (sin diálisis)</option>
           </select>
         </div>
+      </div>
+
+      <div id="etapa-sello" class="etapa-sello etapa-sello-vacio">
+        <div class="etapa-circulo">
+          <span class="etapa-circulo-superior" id="etapa-circulo-superior"></span>
+          <span class="etapa-circulo-valor" id="etapa-circulo-valor">—</span>
+        </div>
+        <span class="etapa-sello-label" id="etapa-sello-label">Sin etapa registrada</span>
       </div>
 
       <div class="clinical-field" id="campo-diuresis" hidden>

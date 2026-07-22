@@ -210,12 +210,12 @@ function calcularEgfr({ edad, sexoBiologico, creatininaMgDl, cistatinaMgL }) {
 // bastan para decidir un plan alimentario (podría haber ERC por albuminuria
 // con eGFR normal, que esta calculadora no evalúa).
 function etapaPorEgfr(egfr) {
-  if (egfr >= 90) return { key: null, etiqueta: "categoría G1 (función renal normal o alta)" };
-  if (egfr >= 60) return { key: null, etiqueta: "categoría G2 (levemente disminuida)" };
-  if (egfr >= 45) return { key: "3a", etiqueta: "ERC etapa 3a" };
-  if (egfr >= 30) return { key: "3b", etiqueta: "ERC etapa 3b" };
-  if (egfr >= 15) return { key: "4", etiqueta: "ERC etapa 4" };
-  return { key: "5", etiqueta: "ERC etapa 5 (sin diálisis)" };
+  if (egfr >= 90) return { key: null, etiqueta: "categoría G1 (función renal normal o alta)", selloCorto: "G1 · función normal" };
+  if (egfr >= 60) return { key: null, etiqueta: "categoría G2 (levemente disminuida)", selloCorto: "G2 · función levemente disminuida" };
+  if (egfr >= 45) return { key: "3a", etiqueta: "ERC etapa 3a", selloCorto: "ERC etapa 3a" };
+  if (egfr >= 30) return { key: "3b", etiqueta: "ERC etapa 3b", selloCorto: "ERC etapa 3b" };
+  if (egfr >= 15) return { key: "4", etiqueta: "ERC etapa 4", selloCorto: "ERC etapa 4" };
+  return { key: "5", etiqueta: "ERC etapa 5 (sin diálisis)", selloCorto: "ERC etapa 5" };
 }
 
 // --- Modelo clínico (KDIGO/KDOQI) ---------------------------------------
@@ -341,6 +341,7 @@ function renderDatosClinicos() {
   els.etapaERC.value = ["3a", "3b", "4", "5"].includes(d.etapaERC) ? d.etapaERC : "";
   actualizarVisibilidadEtapa();
   renderResultadoEgfr();
+  renderEtapaSello();
   actualizarVisibilidadDiuresis();
   renderPlanUpsell();
 }
@@ -360,8 +361,9 @@ function actualizarVisibilidadEtapa() {
 
 function renderResultadoEgfr() {
   const d = ensurePerfil().datosClinicos;
+  els.egfrResultado.classList.remove("egfr-resultado-listo");
   if (d.enDialisis || d.modoEtapa === "manual") {
-    els.egfrResultado.textContent = "";
+    els.egfrResultado.innerHTML = "";
     return;
   }
   const egfr = calcularEgfr(d);
@@ -373,7 +375,43 @@ function renderResultadoEgfr() {
   const extra = key
     ? ""
     : " Esta app está pensada para ERC etapa 3 en adelante; conversa con tu equipo tratante sobre cómo interpretar este resultado.";
-  els.egfrResultado.innerHTML = `Tu eGFR estimado es <strong>${Math.round(egfr)} mL/min/1.73&nbsp;m²</strong> — ${etiqueta}.${extra}`;
+  els.egfrResultado.classList.add("egfr-resultado-listo");
+  els.egfrResultado.innerHTML = `
+    <div class="egfr-valor-grande">${Math.round(egfr)}<span class="egfr-unidad">mL/min/1.73&nbsp;m²</span></div>
+    <p class="egfr-detalle">${etiqueta}.${extra}</p>`;
+}
+
+// Datos del círculo de etapa: un valor corto (cabe en el círculo, ej. "3B",
+// "HD") más la etiqueta completa que se lee debajo. Prioriza la modalidad de
+// diálisis, luego la etapa manual, luego la calculada. Usa las etiquetas de
+// limites-clinicos.json cuando está cargado, para no duplicar el texto.
+function datosSelloEtapa() {
+  const d = ensurePerfil().datosClinicos;
+  if (d.enDialisis === "hemodialisis") {
+    return { superior: "EN", valor: "HD", label: (LIMITES && LIMITES.situaciones.hemodialisis.etiqueta) || "En hemodiálisis" };
+  }
+  if (d.enDialisis === "peritoneal") {
+    return { superior: "EN", valor: "DP", label: (LIMITES && LIMITES.situaciones.peritoneal.etiqueta) || "En diálisis peritoneal" };
+  }
+  if (d.modoEtapa === "manual") {
+    if (!d.etapaERC) return null;
+    const label = LIMITES && LIMITES.situaciones[d.etapaERC] && LIMITES.situaciones[d.etapaERC].etiqueta;
+    return label ? { superior: "ERC", valor: d.etapaERC.toUpperCase(), label } : null;
+  }
+  const egfr = calcularEgfr(d);
+  if (egfr == null) return null;
+  const { key, selloCorto, etiqueta } = etapaPorEgfr(egfr);
+  if (!key) return { superior: "eGFR", valor: egfr >= 90 ? "G1" : "G2", label: etiqueta };
+  const label = (LIMITES && LIMITES.situaciones[key] && LIMITES.situaciones[key].etiqueta) || selloCorto;
+  return { superior: "ERC", valor: key.toUpperCase(), label };
+}
+
+function renderEtapaSello() {
+  const datos = datosSelloEtapa();
+  els.etapaSello.classList.toggle("etapa-sello-vacio", !datos);
+  els.etapaCirculoSuperior.textContent = datos ? datos.superior : "";
+  els.etapaCirculoValor.textContent = datos ? datos.valor : "—";
+  els.etapaSelloLabel.textContent = datos ? datos.label : "Sin etapa registrada";
 }
 
 function actualizarVisibilidadDiuresis() {
@@ -409,6 +447,7 @@ function guardarDatosClinicos() {
   guardarPerfil(perfil);
   actualizarVisibilidadEtapa();
   renderResultadoEgfr();
+  renderEtapaSello();
   actualizarVisibilidadDiuresis();
   renderPlanUpsell();
   renderCalculadora();
@@ -513,6 +552,10 @@ const els = {
   tipText: document.getElementById("tip-text"),
   planBadge: document.getElementById("plan-badge"),
   aboutPlan: document.getElementById("about-plan"),
+  etapaSello: document.getElementById("etapa-sello"),
+  etapaCirculoSuperior: document.getElementById("etapa-circulo-superior"),
+  etapaCirculoValor: document.getElementById("etapa-circulo-valor"),
+  etapaSelloLabel: document.getElementById("etapa-sello-label"),
   enDialisis: document.getElementById("en-dialisis"),
   bloqueEtapa: document.getElementById("bloque-etapa"),
   modoEtapaCalculada: document.getElementById("modo-etapa-calculada"),

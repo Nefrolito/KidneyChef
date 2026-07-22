@@ -506,6 +506,47 @@ h1, h2, h3 {
 .clinical-card h2, .tratante-card h2 { margin: 0 0 0.3rem; font-size: 1.1rem; font-weight: 700; }
 #metas-tratante { margin-top: 1rem; }
 .clinical-note { margin: 0 0 1rem; font-size: 0.8rem; color: var(--muted); }
+
+.etapa-sello {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0 auto 1.3rem;
+}
+.etapa-circulo {
+  width: 108px;
+  height: 108px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 5px solid var(--brand);
+  background: var(--brand-50);
+  color: var(--brand-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.etapa-circulo-superior {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.etapa-circulo-valor {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+.etapa-sello-label { font-size: 0.85rem; font-weight: 600; color: var(--text); text-align: center; }
+.etapa-sello.etapa-sello-vacio .etapa-circulo {
+  border-color: var(--border);
+  background: var(--surface-alt);
+  color: var(--muted);
+}
+.etapa-sello.etapa-sello-vacio .etapa-sello-label { color: var(--muted); font-weight: 500; }
 .clinical-field { margin-bottom: 0.9rem; }
 .clinical-field label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; }
 .clinical-field select {
@@ -542,6 +583,26 @@ h1, h2, h3 {
   line-height: 1.45;
 }
 .egfr-resultado:empty { display: none; }
+.egfr-resultado.egfr-resultado-listo {
+  padding: 1.1rem 1rem;
+  background: var(--brand-50);
+  border: 1px solid var(--brand-100);
+  text-align: center;
+}
+.egfr-valor-grande {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: var(--brand-dark);
+  line-height: 1.1;
+}
+.egfr-unidad {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+.egfr-detalle { margin: 0.55rem 0 0; font-size: 0.85rem; color: var(--text); line-height: 1.45; }
 
 /* --- Calculadora de consumo diario --- */
 .calculadora-card h2 { margin: 0 0 0.9rem; font-size: 1.1rem; font-weight: 700; }
