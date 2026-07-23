@@ -7,6 +7,6 @@
 // Completar estos tres valores cuando esté creado el proyecto de Supabase
 // (ver checklist de la Fase 0 en el plan) y, si el backend no vive en el
 // mismo origen que este portal, la URL donde corre server.py.
-const SUPABASE_URL = "";
-const SUPABASE_ANON_KEY = "";
+const SUPABASE_URL = "https://jpdtippsosdfwlpyuaaj.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwZHRpcHBzb3NkZndscHl1YWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NjU2MTcsImV4cCI6MjEwMDM0MTYxN30.1AWg-BdTV3n_fKUxdEDDxbVhlxxYEEFgjkU1N7_GiXw";
 const API_BASE = "";

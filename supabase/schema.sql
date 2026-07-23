@@ -60,3 +60,13 @@ alter table consumos_diarios enable row level security;
 -- Sin políticas: todo acceso pasa por server.py con la key service_role
 -- (bypasea RLS). Esto deja RLS solo como defensa en profundidad si la key
 -- anon se filtrara alguna vez.
+
+-- service_role bypasea RLS, pero igual necesita los privilegios de tabla
+-- de Postgres — Supabase solo los otorga automáticamente a tablas nuevas si
+-- los privilegios por defecto ya estaban configurados antes de crearlas.
+-- Sin este bloque, el backend recibe "permission denied for table ...".
+grant usage on schema public to service_role;
+grant select, insert, update, delete on pacientes to service_role;
+grant select, insert, update, delete on perfiles_tratante to service_role;
+grant select, insert, update, delete on vinculos to service_role;
+grant select, insert, update, delete on consumos_diarios to service_role;
