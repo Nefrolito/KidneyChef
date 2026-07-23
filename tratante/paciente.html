@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KidneyChef — Paciente</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-row">
+      <div>
+        <h1 id="paciente-titulo">Paciente</h1>
+        <p class="subtitulo" id="paciente-codigo"></p>
+      </div>
+      <div class="top-actions">
+        <a class="btn btn-ghost" href="index.html">Volver</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <p class="error-msg" id="carga-error"></p>
+
+    <section class="card" id="metas-card" hidden>
+      <h2>Metas diarias</h2>
+      <p class="hint-msg" id="metas-actualizado"></p>
+      <form id="form-metas">
+        <div class="campo">
+          <label for="meta-potasio">Potasio (mg/día)</label>
+          <input type="number" id="meta-potasio" min="0" step="50" placeholder="Sin fijar">
+        </div>
+        <div class="campo">
+          <label for="meta-fosforo">Fósforo (mg/día)</label>
+          <input type="number" id="meta-fosforo" min="0" step="50" placeholder="Sin fijar">
+        </div>
+        <button type="submit" class="btn btn-primary" id="metas-btn">Guardar metas</button>
+        <p class="error-msg" id="metas-error"></p>
+        <p class="hint-msg" id="metas-hint"></p>
+      </form>
+    </section>
+
+    <section class="card" id="consumo-card" hidden>
+      <h2>Consumo — últimos 30 días</h2>
+      <p class="hint-msg" id="consumo-hint"></p>
+      <h3 style="font-size:0.9rem;margin:0.8rem 0 0.4rem;">Potasio</h3>
+      <div id="chart-potasio"></div>
+      <h3 style="font-size:0.9rem;margin:1.1rem 0 0.4rem;">Fósforo</h3>
+      <div id="chart-fosforo"></div>
+    </section>
+
+    <section class="card" id="vinculo-card" hidden>
+      <h2>Vínculo</h2>
+      <p class="hint-msg">Termina el seguimiento de este paciente de tu lado.</p>
+      <button class="btn btn-ghost" id="revocar-btn">Revocar vínculo</button>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script src="api.js"></script>
+  <script src="chart.js"></script>
+  <script>
+    const els = {
+      pacienteTitulo: document.getElementById("paciente-titulo"),
+      pacienteCodigo: document.getElementById("paciente-codigo"),
+      cargaError: document.getElementById("carga-error"),
+      metasCard: document.getElementById("metas-card"),
+      metasActualizado: document.getElementById("metas-actualizado"),
+      formMetas: document.getElementById("form-metas"),
+      metaPotasio: document.getElementById("meta-potasio"),
+      metaFosforo: document.getElementById("meta-fosforo"),
+      metasBtn: document.getElementById("metas-btn"),
+      metasError: document.getElementById("metas-error"),
+      metasHint: document.getElementById("metas-hint"),
+      vinculoCard: document.getElementById("vinculo-card"),
+      revocarBtn: document.getElementById("revocar-btn"),
+      consumoCard: document.getElementById("consumo-card"),
+      consumoHint: document.getElementById("consumo-hint"),
+      chartPotasio: document.getElementById("chart-potasio"),
+      chartFosforo: document.getElementById("chart-fosforo"),
+    };
+
+    const pacienteId = new URLSearchParams(location.search).get("id");
+    let vinculoActual = null;
+
+    function formatFecha(iso) {
+      if (!iso) return "";
+      return new Date(iso).toLocaleString("es-CL", { dateStyle: "medium", timeStyle: "short" });
+    }
+
+    async function init() {
+      if (!tokenActual()) {
+        location.href = "login.html";
+        return;
+      }
+      if (!pacienteId) {
+        location.href = "index.html";
+        return;
+      }
+      try {
+        const data = await listarVinculos();
+        vinculoActual = (data.vinculos || []).find(
+          (v) => v.paciente_id === pacienteId && v.estado === "activo"
+        );
+        if (!vinculoActual) {
+          els.cargaError.textContent = "No tienes un vínculo activo con este paciente.";
+          return;
+        }
+        els.pacienteTitulo.textContent = vinculoActual.alias || vinculoActual.codigo_cliente;
+        els.pacienteCodigo.textContent = `Código ${vinculoActual.codigo_cliente}`;
+
+        const metas = await getMetasPaciente(pacienteId);
+        els.metaPotasio.value = metas.potasio_mg ?? "";
+        els.metaFosforo.value = metas.fosforo_mg ?? "";
+        els.metasActualizado.textContent = metas.actualizado_at
+          ? `Último ajuste: ${formatFecha(metas.actualizado_at)}`
+          : "Todavía no se ha fijado ninguna meta.";
+
+        els.metasCard.hidden = false;
+        els.vinculoCard.hidden = false;
+
+        await cargarConsumo(metas.potasio_mg, metas.fosforo_mg);
+      } catch (err) {
+        els.cargaError.textContent = err.message;
+      }
+    }
+
+    function fechaISO(date) {
+      return date.toISOString().slice(0, 10);
+    }
+
+    async function cargarConsumo(metaPotasio, metaFosforo) {
+      const hoy = new Date();
+      const hace30 = new Date(hoy);
+      hace30.setDate(hace30.getDate() - 30);
+      try {
+        const data = await getConsumoPaciente(pacienteId, fechaISO(hace30), fechaISO(hoy));
+        const consumos = data.consumos || [];
+        els.consumoCard.hidden = false;
+        if (!consumos.length) {
+          els.consumoHint.textContent = "Todavía no hay registros de consumo sincronizados.";
+        }
+        renderLineChart(els.chartPotasio, {
+          puntos: consumos.map((c) => ({ fecha: c.fecha, valor: c.potasio_mg || 0 })),
+          metaValue: metaPotasio,
+          unidad: "mg",
+          color: "#0e7490",
+        });
+        renderLineChart(els.chartFosforo, {
+          puntos: consumos.map((c) => ({ fecha: c.fecha, valor: c.fosforo_mg || 0 })),
+          metaValue: metaFosforo,
+          unidad: "mg",
+          color: "#0e7490",
+        });
+      } catch (err) {
+        els.consumoCard.hidden = false;
+        els.consumoHint.textContent = err.message;
+      }
+    }
+
+    els.formMetas.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      els.metasError.textContent = "";
+      els.metasHint.textContent = "";
+      els.metasBtn.disabled = true;
+      try {
+        const potasio = els.metaPotasio.value === "" ? null : Number(els.metaPotasio.value);
+        const fosforo = els.metaFosforo.value === "" ? null : Number(els.metaFosforo.value);
+        await guardarMetasPaciente(pacienteId, potasio, fosforo);
+        els.metasHint.textContent = "Metas guardadas.";
+      } catch (err) {
+        els.metasError.textContent = err.message;
+      } finally {
+        els.metasBtn.disabled = false;
+      }
+    });
+
+    els.revocarBtn.addEventListener("click", async () => {
+      if (!vinculoActual) return;
+      if (!confirm("¿Revocar el vínculo con este paciente?")) return;
+      try {
+        await revocarVinculo(vinculoActual.id);
+        location.href = "index.html";
+      } catch (err) {
+        els.cargaError.textContent = err.message;
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>

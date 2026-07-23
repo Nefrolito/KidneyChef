@@ -573,6 +573,35 @@ h1, h2, h3 {
   font-family: inherit;
 }
 .campo-ayuda { display: block; margin-top: 0.4rem; font-size: 0.76rem; color: var(--muted); line-height: 1.4; }
+.codigo-cliente-fila { display: flex; align-items: center; gap: 0.6rem; }
+.codigo-cliente-valor {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+}
+.vinculos-lista { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.9rem; }
+.vinculos-lista:empty { display: none; }
+.vinculo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.vinculo-item-texto { display: flex; flex-direction: column; gap: 0.15rem; }
+.vinculo-item-texto small { color: var(--muted); font-size: 0.76rem; }
+.vinculo-item-acciones { display: flex; gap: 0.4rem; flex-shrink: 0; }
+.vinculo-item-acciones .btn { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+.metas-sincronizadas-fila { margin: 0 0 0.3rem; font-size: 0.9rem; }
 .egfr-resultado {
   margin: 0.6rem 0 1rem;
   padding: 0.65rem 0.75rem;

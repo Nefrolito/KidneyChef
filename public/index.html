@@ -221,28 +221,38 @@
     </section>
 
     <section class="card tratante-card">
-      <h2>Equipo tratante (prueba local)</h2>
+      <h2>Equipo tratante</h2>
       <p class="clinical-note">
-        Formulario temporal para probar el Plan Clínico en este dispositivo,
-        mientras no existe un panel remoto para el equipo tratante. Actívalo
-        y registra las metas de potasio y fósforo que indicó tu nefrólogo(a)
-        o nutricionista.
+        Vincula tu celular con tu nefrólogo(a) o nutricionista para que ajuste
+        tus metas de potasio y fósforo a distancia. No ve ningún dato tuyo
+        hasta que tú aceptas la solicitud de vínculo, acá mismo.
       </p>
+
       <label class="clinical-check clinical-check-ancho">
         <input type="checkbox" id="activar-plan-clinico">
-        <span>Activar Plan Clínico en este dispositivo (prueba)</span>
+        <span>Activar Plan Clínico</span>
       </label>
-      <div id="metas-tratante" hidden>
-        <div class="clinical-field">
-          <label for="meta-potasio">Meta diaria de potasio</label>
-          <input type="number" id="meta-potasio" min="0" step="50" placeholder="Ej: 2000">
-          <small class="campo-ayuda">En miligramos por día, según indicación de tu equipo tratante.</small>
+
+      <div id="codigo-cliente-bloque" class="clinical-field" hidden>
+        <label>Tu código de cliente</label>
+        <div class="codigo-cliente-fila">
+          <span id="codigo-cliente-valor" class="codigo-cliente-valor">—</span>
+          <button type="button" id="copiar-codigo-btn" class="btn btn-ghost">Copiar</button>
         </div>
-        <div class="clinical-field">
-          <label for="meta-fosforo">Meta diaria de fósforo</label>
-          <input type="number" id="meta-fosforo" min="0" step="50" placeholder="Ej: 800">
-          <small class="campo-ayuda">En miligramos por día, según indicación de tu equipo tratante.</small>
-        </div>
+        <small class="campo-ayuda">Compártelo con tu equipo tratante para que se vincule contigo.</small>
+      </div>
+
+      <div id="vinculos-pendientes" class="vinculos-lista"></div>
+      <div id="vinculos-activos" class="vinculos-lista"></div>
+
+      <div id="metas-sincronizadas" class="clinical-field" hidden>
+        <label>Metas fijadas por tu equipo tratante</label>
+        <p class="metas-sincronizadas-fila">
+          Potasio: <strong id="meta-potasio-valor">—</strong>
+        </p>
+        <p class="metas-sincronizadas-fila">
+          Fósforo: <strong id="meta-fosforo-valor">—</strong>
+        </p>
       </div>
     </section>
 

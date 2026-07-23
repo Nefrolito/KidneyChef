@@ -30,6 +30,22 @@ cp .env.example .env
 # ANTHROPIC_API_KEY=sk-ant-...
 ```
 
+Para el portal del equipo tratante (`/tratante/`, ver más abajo) hace falta además
+un proyecto de [Supabase](https://supabase.com/dashboard) (Postgres + Auth):
+
+1. Crear el proyecto en supabase.com/dashboard.
+2. Correr `supabase/schema.sql` en su SQL Editor (crea las 4 tablas y deja RLS
+   encendido sin políticas permisivas — el acceso real lo controla `server.py`).
+3. Copiar de **Project Settings → API**: `Project URL`, la key `service_role` y
+   la key `anon`, y completar `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` y
+   `SUPABASE_ANON_KEY` en `.env` (ver comentarios en `.env.example`).
+4. Completar `SUPABASE_URL`/`SUPABASE_ANON_KEY` (los mismos valores públicos,
+   nunca la `service_role`) en `tratante/config.js`.
+
+Sin esto, la app del paciente funciona igual que siempre (semáforo, historial
+local); solo la sección "Equipo tratante" y el portal quedan sin poder
+vincularse.
+
 ## Ejecutar
 
 ```bash
@@ -54,6 +70,8 @@ teléfono, así que necesita un backend accesible por internet. Pasos:
    `ANTHROPIC_API_KEY` con tu key real (nunca la subas al repo).
 5. Agrega también `APP_KEY` con **el mismo valor** que tiene la constante
    `APP_KEY` en `public/app.js` (ver "Protección del backend" abajo).
+5.1. Si vas a usar el portal del tratante, agrega también `SUPABASE_URL`,
+   `SUPABASE_SERVICE_KEY` y `SUPABASE_ANON_KEY` (ver "Equipo tratante" abajo).
 6. Cuando termine el deploy, Render te da una URL tipo
    `https://kidneychef-api.onrender.com`. Actualiza esa URL en
    `public/app.js` (constante `API_BASE`) para que coincida con la tuya.
@@ -89,6 +107,29 @@ siguiente paso sería un store persistente (Redis o una tabla en base de datos).
 El plan gratuito de Render "duerme" el servicio tras ~15 minutos sin uso; la
 primera petición después de eso tarda unos segundos extra en responder
 mientras despierta.
+
+## Equipo tratante (portal en `/tratante/`)
+
+Además de la app del paciente (`public/`), el repo incluye un portal web
+separado para el nefrólogo(a)/nutricionista, servido por el mismo `server.py`
+en `/tratante/` (sin build ni framework, igual que `public/`).
+
+- El paciente activa "Plan Clínico" en su celular y recibe un **código de
+  cliente** que comparte con su tratante.
+- El tratante crea su cuenta en `/tratante/login.html` (usa Supabase Auth
+  directamente) e ingresa ese código en su dashboard para pedir el vínculo.
+- El vínculo queda `pendiente` hasta que **el propio paciente lo acepta desde
+  su celular** — es un paso de confirmación obligatorio (no solo de UX):
+  sin él, el tratante nunca llega a ver datos clínicos del paciente.
+- Una vez aceptado, el tratante puede ajustar las metas de potasio/fósforo y
+  ver un gráfico del consumo diario del paciente (solo se sincroniza consumo
+  al servidor si existe al menos un vínculo activo).
+
+Requiere el proyecto de Supabase de la sección "Configuración" de más arriba.
+Localmente, con `server.py` corriendo, el portal está en
+`http://localhost:8000/tratante/`. `tratante/config.js` necesita
+`SUPABASE_URL`/`SUPABASE_ANON_KEY` (los mismos valores del `.env`, son
+públicos por diseño — no la `service_role` key, esa es solo del servidor).
 
 ## Limitaciones importantes
 

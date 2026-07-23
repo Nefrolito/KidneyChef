@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KidneyChef — Portal del tratante</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-row">
+      <div>
+        <h1>KidneyChef</h1>
+        <p class="subtitulo" id="perfil-subtitulo">Portal del equipo tratante</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn btn-ghost" id="cerrar-sesion-btn">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" id="completar-perfil-card" hidden>
+      <h2>Completa tu perfil</h2>
+      <p class="hint-msg">Un solo paso, antes de vincular pacientes.</p>
+      <form id="form-perfil">
+        <div class="campo">
+          <label for="perfil-nombre">Tu nombre</label>
+          <input type="text" id="perfil-nombre" required>
+        </div>
+        <div class="campo">
+          <label for="perfil-tipo">Tipo de profesional</label>
+          <select id="perfil-tipo" required>
+            <option value="">Selecciona</option>
+            <option value="nefrologo">Nefrólogo(a)</option>
+            <option value="nutricionista">Nutricionista</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Guardar</button>
+        <p class="error-msg" id="perfil-error"></p>
+      </form>
+    </section>
+
+    <section class="card" id="dashboard-card" hidden>
+      <h2>Vincular un paciente nuevo</h2>
+      <form id="form-vincular">
+        <div class="campo">
+          <label for="vincular-codigo">Código de cliente</label>
+          <input type="text" id="vincular-codigo" required placeholder="Ej: LS9AHULR" style="text-transform:uppercase">
+          <small class="campo-ayuda">El código que te comparte tu paciente desde su celular.</small>
+        </div>
+        <div class="campo">
+          <label for="vincular-alias">Tu propia nota (solo la ves tú)</label>
+          <input type="text" id="vincular-alias" placeholder="Ej: Juan P. — control lunes">
+        </div>
+        <button type="submit" class="btn btn-primary" id="vincular-btn">Enviar solicitud</button>
+        <p class="error-msg" id="vincular-error"></p>
+        <p class="hint-msg" id="vincular-hint"></p>
+      </form>
+    </section>
+
+    <section class="card" id="pendientes-card" hidden>
+      <h2>Solicitudes pendientes</h2>
+      <p class="hint-msg">Esperando que el paciente las acepte desde su celular.</p>
+      <div id="lista-pendientes"></div>
+    </section>
+
+    <section class="card" id="activos-card" hidden>
+      <h2>Tus pacientes</h2>
+      <div id="lista-activos"></div>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script src="api.js"></script>
+  <script>
+    const els = {
+      perfilSubtitulo: document.getElementById("perfil-subtitulo"),
+      completarPerfilCard: document.getElementById("completar-perfil-card"),
+      formPerfil: document.getElementById("form-perfil"),
+      perfilNombre: document.getElementById("perfil-nombre"),
+      perfilTipo: document.getElementById("perfil-tipo"),
+      perfilError: document.getElementById("perfil-error"),
+      dashboardCard: document.getElementById("dashboard-card"),
+      formVincular: document.getElementById("form-vincular"),
+      vincularCodigo: document.getElementById("vincular-codigo"),
+      vincularAlias: document.getElementById("vincular-alias"),
+      vincularBtn: document.getElementById("vincular-btn"),
+      vincularError: document.getElementById("vincular-error"),
+      vincularHint: document.getElementById("vincular-hint"),
+      pendientesCard: document.getElementById("pendientes-card"),
+      listaPendientes: document.getElementById("lista-pendientes"),
+      activosCard: document.getElementById("activos-card"),
+      listaActivos: document.getElementById("lista-activos"),
+      cerrarSesionBtn: document.getElementById("cerrar-sesion-btn"),
+    };
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+      }[c]));
+    }
+
+    async function init() {
+      if (!tokenActual()) {
+        location.href = "login.html";
+        return;
+      }
+      try {
+        const perfil = await getPerfilPropio();
+        els.perfilSubtitulo.textContent = `${perfil.nombre} — ${perfil.tipo === "nefrologo" ? "Nefrólogo(a)" : "Nutricionista"}`;
+        els.dashboardCard.hidden = false;
+        els.pendientesCard.hidden = false;
+        els.activosCard.hidden = false;
+        await refrescarVinculos();
+      } catch (err) {
+        // 404 = falta completar perfil; cualquier otro error también cae acá
+        // porque sin perfil no tiene sentido mostrar el resto del dashboard.
+        els.completarPerfilCard.hidden = false;
+      }
+    }
+
+    els.formPerfil.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      els.perfilError.textContent = "";
+      try {
+        await guardarPerfilPropio(els.perfilNombre.value.trim(), els.perfilTipo.value);
+        els.completarPerfilCard.hidden = true;
+        await init();
+      } catch (err) {
+        els.perfilError.textContent = err.message;
+      }
+    });
+
+    els.formVincular.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      els.vincularError.textContent = "";
+      els.vincularHint.textContent = "";
+      els.vincularBtn.disabled = true;
+      try {
+        await crearVinculo(els.vincularCodigo.value.trim().toUpperCase(), els.vincularAlias.value.trim());
+        els.vincularCodigo.value = "";
+        els.vincularAlias.value = "";
+        els.vincularHint.textContent = "Solicitud enviada. Queda pendiente hasta que el paciente la acepte.";
+        await refrescarVinculos();
+      } catch (err) {
+        els.vincularError.textContent = err.message;
+      } finally {
+        els.vincularBtn.disabled = false;
+      }
+    });
+
+    async function refrescarVinculos() {
+      const data = await listarVinculos();
+      const vinculos = data.vinculos || [];
+
+      const pendientes = vinculos.filter((v) => v.estado === "pendiente");
+      els.listaPendientes.innerHTML = pendientes.length
+        ? pendientes.map((v) => `
+          <div class="vinculo-item">
+            <div class="vinculo-item-texto">
+              <strong>${escapeHtml(v.alias || v.codigo_cliente)}</strong>
+              <small>Código ${escapeHtml(v.codigo_cliente)} — esperando aceptación</small>
+            </div>
+            <div class="vinculo-item-acciones">
+              <button class="btn btn-ghost" data-cancelar="${v.id}">Cancelar</button>
+            </div>
+          </div>`).join("")
+        : `<p class="lista-vacia">No tienes solicitudes pendientes.</p>`;
+
+      const activos = vinculos.filter((v) => v.estado === "activo");
+      els.listaActivos.innerHTML = activos.length
+        ? activos.map((v) => `
+          <div class="paciente-item">
+            <div class="paciente-item-texto">
+              <a href="paciente.html?id=${encodeURIComponent(v.paciente_id)}">${escapeHtml(v.alias || v.codigo_cliente)}</a>
+              <small>Código ${escapeHtml(v.codigo_cliente)}</small>
+            </div>
+            <div class="paciente-item-acciones">
+              <button class="btn btn-ghost" data-revocar="${v.id}">Revocar</button>
+            </div>
+          </div>`).join("")
+        : `<p class="lista-vacia">Todavía no tienes pacientes vinculados.</p>`;
+
+      els.listaPendientes.querySelectorAll("[data-cancelar]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          await cancelarVinculo(btn.dataset.cancelar);
+          refrescarVinculos();
+        });
+      });
+      els.listaActivos.querySelectorAll("[data-revocar]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          if (!confirm("¿Revocar el vínculo con este paciente?")) return;
+          await revocarVinculo(btn.dataset.revocar);
+          refrescarVinculos();
+        });
+      });
+    }
+
+    els.cerrarSesionBtn.addEventListener("click", () => {
+      cerrarSesion();
+      location.href = "login.html";
+    });
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+/* Mismos tokens de color que public/style.css (paleta de marca de
+   KidneyChef), para que el portal se sienta parte de la misma app aunque
+   viva en un directorio aparte y sin build. */
+:root {
+  --brand: #0e7490;
+  --brand-dark: #0b5a70;
+  --brand-light: #14b8c4;
+  --brand-50: #eafbfc;
+  --brand-100: #d3f3f6;
+
+  --bg: #f4f8fa;
+  --surface: #ffffff;
+  --surface-alt: #f0f5f7;
+  --text: #10222c;
+  --muted: #5b7280;
+  --border: #dfe7eb;
+  --shadow-sm: 0 1px 2px rgba(16, 34, 44, 0.06);
+  --shadow-md: 0 8px 24px rgba(16, 34, 44, 0.08);
+
+  --verde: #16a34a;
+  --verde-bg: #eafbf1;
+  --verde-border: #bfead0;
+  --amarillo: #b45309;
+  --amarillo-bg: #fff6e5;
+  --amarillo-border: #f3dba8;
+  --rojo: #dc2626;
+  --rojo-bg: #fdecec;
+  --rojo-border: #f4c6c6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1418;
+    --surface: #121d23;
+    --surface-alt: #16232a;
+    --text: #e8f1f4;
+    --muted: #93a5ae;
+    --border: #223038;
+    --brand-50: #0f2a2e;
+    --brand-100: #123a40;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.35);
+    --verde-bg: #10281a;
+    --verde-border: #1e4a2c;
+    --amarillo-bg: #2e2409;
+    --amarillo-border: #55420f;
+    --rojo-bg: #301313;
+    --rojo-border: #5a2222;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.topbar {
+  padding: 1.5rem 1rem 1.25rem;
+  background: linear-gradient(180deg, var(--brand-50) 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-row {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.topbar h1 { margin: 0; font-size: 1.3rem; }
+.topbar .subtitulo { margin: 0.15rem 0 0; font-size: 0.82rem; color: var(--muted); }
+
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 3rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.card h2 { margin: 0 0 0.9rem; font-size: 1.05rem; }
+
+.campo { margin-bottom: 0.9rem; }
+.campo label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; }
+.campo input, .campo select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-family: inherit;
+}
+.campo-ayuda { display: block; margin-top: 0.35rem; font-size: 0.76rem; color: var(--muted); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.btn-primary { background: var(--brand); color: white; }
+.btn-primary:hover { background: var(--brand-dark); }
+.btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface-alt); }
+.btn-full { width: 100%; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.error-msg { color: var(--rojo); font-size: 0.85rem; margin: 0.6rem 0 0; min-height: 1.1em; }
+.hint-msg { color: var(--muted); font-size: 0.85rem; margin: 0.6rem 0 0; }
+
+.paciente-item, .vinculo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  margin-bottom: 0.6rem;
+}
+.paciente-item-texto, .vinculo-item-texto { display: flex; flex-direction: column; gap: 0.15rem; }
+.paciente-item-texto small, .vinculo-item-texto small { color: var(--muted); font-size: 0.76rem; }
+.paciente-item-acciones, .vinculo-item-acciones { display: flex; gap: 0.4rem; flex-shrink: 0; }
+.paciente-item-acciones .btn, .vinculo-item-acciones .btn { padding: 0.45rem 0.8rem; font-size: 0.8rem; }
+.paciente-item a { color: var(--brand); text-decoration: none; font-weight: 700; }
+.paciente-item a:hover { text-decoration: underline; }
+
+.lista-vacia { color: var(--muted); font-size: 0.85rem; }
+
+.top-actions { display: flex; gap: 0.6rem; align-items: center; }

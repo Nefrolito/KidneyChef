@@ -113,6 +113,9 @@ function ensurePerfil() {
   if (d.cistatinaMgL === undefined) d.cistatinaMgL = null;
   if (perfil.umbralesPersonalizados === undefined) perfil.umbralesPersonalizados = null;
   if (perfil.metasDiarias === undefined) perfil.metasDiarias = null;
+  if (perfil.vinculacion === undefined) {
+    perfil.vinculacion = { codigoCliente: null, deviceSecret: null };
+  }
   return perfil;
 }
 
@@ -472,42 +475,185 @@ function renderPlanUpsell() {
   els.planUpsell.hidden = false;
 }
 
-// --- Equipo tratante (formulario local de prueba) -----------------------
-// Sustituto temporal mientras no exista un panel remoto para el equipo
-// tratante: activa el Plan Clínico en este mismo dispositivo y deja fijar
-// perfil.metasDiarias a mano, para poder probar la barra real de K/P.
-function renderMetasTratante() {
+// --- Equipo tratante: vínculo real con el backend -----------------------
+// El paciente no tiene login: se identifica con un código de cliente y un
+// secreto de dispositivo que el backend genera al activar el Plan Clínico
+// (guardados en perfil.vinculacion). Un vínculo con un tratante queda
+// 'pendiente' hasta que el propio paciente lo acepta ACÁ — es el paso de
+// confirmación legal (Ley 20.584): sin esto, el tratante nunca ve datos
+// clínicos de este paciente.
+
+function authHeadersPaciente() {
   const perfil = ensurePerfil();
-  const plan = getPlanActual();
-  els.activarPlanClinico.checked = perfil.planId === "clinico";
-  els.metasTratante.hidden = !plan.features.umbralesPersonalizados;
-  const metas = perfil.metasDiarias || {};
-  els.metaPotasio.value = metas.potasio_mg ?? "";
-  els.metaFosforo.value = metas.fosforo_mg ?? "";
+  const v = perfil.vinculacion || {};
+  return {
+    "X-App-Key": APP_KEY,
+    "X-Codigo-Cliente": v.codigoCliente || "",
+    "X-Device-Secret": v.deviceSecret || "",
+  };
 }
 
-function togglePlanClinico() {
+function renderVinculacion() {
+  const perfil = ensurePerfil();
+  els.activarPlanClinico.checked = perfil.planId === "clinico";
+  const codigo = perfil.vinculacion && perfil.vinculacion.codigoCliente;
+  els.codigoClienteBloque.hidden = !codigo;
+  els.codigoClienteValor.textContent = codigo || "—";
+}
+
+async function activarPlanClinico() {
   const perfil = ensurePerfil();
   perfil.planId = els.activarPlanClinico.checked ? "clinico" : "basico";
   guardarPerfil(perfil);
   renderPlan();
   renderPlanUpsell();
-  renderMetasTratante();
   renderCalculadora();
   if (!els.results.hidden) renderResults();
+
+  if (perfil.planId === "clinico" && !perfil.vinculacion.codigoCliente) {
+    try {
+      const res = await fetch(`${API_BASE}/api/pacientes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo activar el Plan Clínico");
+      perfil.vinculacion = { codigoCliente: data.codigo_cliente, deviceSecret: data.device_secret };
+      guardarPerfil(perfil);
+    } catch (err) {
+      setStatus(err.message, true);
+    }
+  }
+  renderVinculacion();
+  refrescarVinculos();
+  refrescarMetasSincronizadas();
 }
 
-function guardarMetasTratante() {
+function tipoTratanteLabel(tipo) {
+  if (tipo === "nefrologo") return "Tu nefrólogo(a)";
+  if (tipo === "nutricionista") return "Tu nutricionista";
+  return "Tu equipo tratante";
+}
+
+function formatFecha(iso) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("es-CL", { day: "numeric", month: "short", year: "numeric" });
+}
+
+async function refrescarVinculos() {
   const perfil = ensurePerfil();
-  const potasioRaw = els.metaPotasio.value;
-  const fosforoRaw = els.metaFosforo.value;
-  perfil.metasDiarias = {
-    potasio_mg: potasioRaw === "" ? null : Number(potasioRaw),
-    fosforo_mg: fosforoRaw === "" ? null : Number(fosforoRaw),
-  };
-  guardarPerfil(perfil);
-  renderCalculadora();
-  if (!els.results.hidden) renderResults();
+  if (!perfil.vinculacion.codigoCliente) {
+    els.vinculosPendientes.innerHTML = "";
+    els.vinculosActivos.innerHTML = "";
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/api/pacientes/me/vinculos`, {
+      headers: authHeadersPaciente(),
+    });
+    if (!res.ok) return; // credenciales inválidas o sin conexión: no rompe la app local
+    const data = await res.json();
+    const vinculos = data.vinculos || [];
+
+    els.vinculosPendientes.innerHTML = vinculos
+      .filter((v) => v.estado === "pendiente")
+      .map((v) => `
+        <div class="vinculo-item">
+          <div class="vinculo-item-texto">
+            <strong>${escapeHtml(v.tratante_nombre || "Equipo tratante")}</strong>
+            <small>${escapeHtml(tipoTratanteLabel(v.tratante_tipo))} quiere vincularse contigo</small>
+          </div>
+          <div class="vinculo-item-acciones">
+            <button class="btn btn-primary" data-vinculo-aceptar="${v.id}">Aceptar</button>
+            <button class="btn btn-ghost" data-vinculo-rechazar="${v.id}">Rechazar</button>
+          </div>
+        </div>`)
+      .join("");
+
+    els.vinculosActivos.innerHTML = vinculos
+      .filter((v) => v.estado === "activo")
+      .map((v) => `
+        <div class="vinculo-item">
+          <div class="vinculo-item-texto">
+            <strong>${escapeHtml(v.tratante_nombre || "Equipo tratante vinculado")}</strong>
+            <small>Vinculado desde ${formatFecha(v.creado_at)}</small>
+          </div>
+          <div class="vinculo-item-acciones">
+            <button class="btn btn-ghost" data-vinculo-revocar="${v.id}">Revocar</button>
+          </div>
+        </div>`)
+      .join("");
+
+    wireVinculoBotones();
+  } catch {
+    // sin conexión: se reintenta en el próximo refresco
+  }
+}
+
+function wireVinculoBotones() {
+  els.vinculosPendientes.querySelectorAll("[data-vinculo-aceptar]").forEach((btn) => {
+    btn.addEventListener("click", () => actualizarVinculo(btn.dataset.vinculoAceptar, "activo"));
+  });
+  els.vinculosPendientes.querySelectorAll("[data-vinculo-rechazar]").forEach((btn) => {
+    btn.addEventListener("click", () => actualizarVinculo(btn.dataset.vinculoRechazar, "rechazado"));
+  });
+  els.vinculosActivos.querySelectorAll("[data-vinculo-revocar]").forEach((btn) => {
+    btn.addEventListener("click", () => actualizarVinculo(btn.dataset.vinculoRevocar, "revocado"));
+  });
+}
+
+async function actualizarVinculo(id, estado) {
+  try {
+    const res = await fetch(`${API_BASE}/api/pacientes/me/vinculos/${id}`, {
+      method: "PATCH",
+      headers: { ...authHeadersPaciente(), "Content-Type": "application/json" },
+      body: JSON.stringify({ estado }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "No se pudo actualizar el vínculo");
+    await refrescarVinculos();
+    await refrescarMetasSincronizadas();
+  } catch (err) {
+    setStatus(err.message, true);
+  }
+}
+
+async function refrescarMetasSincronizadas() {
+  const perfil = ensurePerfil();
+  if (!perfil.vinculacion.codigoCliente) {
+    els.metasSincronizadas.hidden = true;
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/api/pacientes/me`, {
+      headers: authHeadersPaciente(),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    perfil.metasDiarias = data.metasDiarias || null;
+    guardarPerfil(perfil);
+
+    const metas = perfil.metasDiarias || {};
+    const hayMetas = metas.potasio_mg != null || metas.fosforo_mg != null;
+    els.metasSincronizadas.hidden = !hayMetas;
+    els.metaPotasioValor.textContent = metas.potasio_mg != null ? `${metas.potasio_mg} mg/día` : "sin fijar";
+    els.metaFosforoValor.textContent = metas.fosforo_mg != null ? `${metas.fosforo_mg} mg/día` : "sin fijar";
+
+    renderCalculadora();
+    if (!els.results.hidden) renderResults();
+  } catch {
+    // offline: se reintenta en el próximo refresco
+  }
+}
+
+function copiarCodigoCliente() {
+  const perfil = ensurePerfil();
+  const codigo = perfil.vinculacion.codigoCliente;
+  if (!codigo) return;
+  navigator.clipboard?.writeText(codigo).then(
+    () => setStatus("Código copiado."),
+    () => setStatus("No se pudo copiar el código.", true)
+  );
 }
 
 const TIPS_DEL_DIA = [
@@ -574,10 +720,20 @@ const els = {
   planUpsell: document.getElementById("plan-upsell"),
   planUpsellText: document.getElementById("plan-upsell-text"),
   activarPlanClinico: document.getElementById("activar-plan-clinico"),
-  metasTratante: document.getElementById("metas-tratante"),
-  metaPotasio: document.getElementById("meta-potasio"),
-  metaFosforo: document.getElementById("meta-fosforo"),
+  codigoClienteBloque: document.getElementById("codigo-cliente-bloque"),
+  codigoClienteValor: document.getElementById("codigo-cliente-valor"),
+  copiarCodigoBtn: document.getElementById("copiar-codigo-btn"),
+  vinculosPendientes: document.getElementById("vinculos-pendientes"),
+  vinculosActivos: document.getElementById("vinculos-activos"),
+  metasSincronizadas: document.getElementById("metas-sincronizadas"),
+  metaPotasioValor: document.getElementById("meta-potasio-valor"),
+  metaFosforoValor: document.getElementById("meta-fosforo-valor"),
 };
+
+// Sin infraestructura de push, se refresca por polling mientras la app está
+// abierta — así una solicitud de vínculo nueva aparece sin que el paciente
+// tenga que cerrar y volver a abrir la app.
+const VINCULOS_POLL_MS = 60000;
 
 let lastAnalysis = []; // current analysis results, mutable for manual correction
 
@@ -597,7 +753,10 @@ async function init() {
   renderTipOfDay();
   renderPlan();
   renderDatosClinicos();
-  renderMetasTratante();
+  renderVinculacion();
+  refrescarVinculos();
+  refrescarMetasSincronizadas();
+  setInterval(refrescarVinculos, VINCULOS_POLL_MS);
 
   els.cameraInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
   els.analyzeBtn.addEventListener("click", analyzeImage);
@@ -618,9 +777,8 @@ async function init() {
   els.egfrSexo.addEventListener("change", guardarDatosClinicos);
   els.egfrCreatinina.addEventListener("input", guardarDatosClinicos);
   els.egfrCistatina.addEventListener("input", guardarDatosClinicos);
-  els.activarPlanClinico.addEventListener("change", togglePlanClinico);
-  els.metaPotasio.addEventListener("change", guardarMetasTratante);
-  els.metaFosforo.addEventListener("change", guardarMetasTratante);
+  els.activarPlanClinico.addEventListener("change", activarPlanClinico);
+  els.copiarCodigoBtn.addEventListener("click", copiarCodigoCliente);
 
   document.querySelectorAll(".btn-liquido").forEach((btn) => {
     btn.addEventListener("click", () => registrarLiquido(Number(btn.dataset.ml)));
@@ -1084,6 +1242,30 @@ function saveToHistory(idx) {
   localStorage.setItem("dietaRenalHistorial", JSON.stringify(history));
   renderHistory();
   setStatus("Guardado en el historial de hoy.");
+  sincronizarConsumoHoy();
+}
+
+// Sube el total de HOY (potasio/fósforo) para que el tratante lo vea en su
+// gráfico. El backend rechaza esto si el paciente no tiene ningún vínculo
+// activo (ver handle_upsert_consumo en server.py) — antes de eso el consumo
+// se queda solo en este celular, como siempre.
+async function sincronizarConsumoHoy() {
+  const perfil = ensurePerfil();
+  if (!perfil.vinculacion.codigoCliente) return;
+  const totals = totalesNutrientesHoy();
+  const fecha = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  try {
+    await fetch(`${API_BASE}/api/pacientes/me/consumo/${fecha}`, {
+      method: "PUT",
+      headers: { ...authHeadersPaciente(), "Content-Type": "application/json" },
+      body: JSON.stringify({
+        potasio_mg: Math.round(totals.potasio_mg),
+        fosforo_mg: Math.round(totals.fosforo_mg),
+      }),
+    });
+  } catch {
+    // sin conexión, o sin vínculo activo todavía: no rompe el guardado local
+  }
 }
 
 function loadHistory() {
