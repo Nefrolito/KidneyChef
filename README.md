@@ -131,6 +131,35 @@ Localmente, con `server.py` corriendo, el portal está en
 `SUPABASE_URL`/`SUPABASE_ANON_KEY` (los mismos valores del `.env`, son
 públicos por diseño — no la `service_role` key, esa es solo del servidor).
 
+## Suscripción
+
+La app es gratis un mes desde la primera vez que se abre (`perfil.creadoEn`
+en `localStorage`, ver `estadoSuscripcion()`/`renderSuscripcion()` en
+`public/app.js`). Pasado ese mes, toda la app queda bloqueada por una
+pantalla de pago hasta que exista una suscripción activa. El precio de esa
+suscripción sube con el tiempo a medida que se agregan features grandes
+(hoy $9.990 CLP/mes; sin precio legado — cuando sube, sube para todos los
+suscriptores).
+
+La compra real se integra con **RevenueCat** (`@revenuecat/purchases-capacitor`,
+ya instalado y sincronizado en `ios/`/`android/` vía `npx cap sync`), llamado
+directo por `window.Capacitor.Plugins.Purchases` sin bundler. Falta, y es
+trabajo que solo puede hacer Camilo (no se pueden crear cuentas de
+terceros):
+
+1. Crear las cuentas de Apple Developer y Google Play Developer.
+2. Crear el proyecto en RevenueCat y vincularlo a ambas tiendas.
+3. Crear el producto de suscripción única en cada tienda y su entitlement en
+   RevenueCat (el código espera el identificador `"premium"`, constante
+   `REVENUECAT_ENTITLEMENT_ID` en `public/app.js`).
+4. Completar `REVENUECAT_API_KEY_IOS`/`REVENUECAT_API_KEY_ANDROID` en
+   `public/app.js` (son públicas, igual que `APP_KEY` o las keys de Supabase
+   en `tratante/config.js`).
+
+Mientras esas keys estén vacías, `initRevenueCat()` no hace nada y el botón
+"Suscribirme" del paywall solo muestra un mensaje de "disponible muy
+pronto" — la app sigue funcionando normalmente con el trial local.
+
 ## Limitaciones importantes
 
 - Los valores nutricionales son de referencia general por 100 g (no

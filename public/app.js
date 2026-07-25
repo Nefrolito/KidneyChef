@@ -16,6 +16,82 @@ function esAppNativa() {
 
 const API_BASE = esAppNativa() ? "https://kidneychef-api.onrender.com" : "";
 
+// --- Suscripción vía RevenueCat (@revenuecat/purchases-capacitor) ----------
+// El proyecto no usa bundler (app.js se sirve tal cual con <script>), así que
+// en vez de `import { Purchases } from "@revenuecat/purchases-capacitor"` se
+// llama al plugin directo por su nombre de registro ("Purchases") en
+// window.Capacitor.Plugins — así es como Capacitor expone cualquier plugin
+// nativo en el WebView, con o sin el wrapper JS del paquete npm. Ese wrapper
+// solo aporta tipos; no hace falta para que el plugin funcione.
+//
+// Pendiente de Camilo antes de que esto sirva de algo (no se puede crear
+// cuentas de terceros): crear el proyecto en RevenueCat, vincularlo a las
+// cuentas de App Store Connect / Google Play Console (aún no creadas),
+// definir el producto de suscripción única ($9.990/mes) en cada tienda, y
+// completar las dos API keys públicas de RevenueCat de abajo (una por
+// plataforma — son públicas, igual que APP_KEY o las keys de Supabase en
+// tratante/config.js). Mientras estén vacías, initRevenueCat() no hace nada
+// y la app sigue funcionando solo con el trial local ya implementado.
+const REVENUECAT_API_KEY_IOS = "";
+const REVENUECAT_API_KEY_ANDROID = "";
+const REVENUECAT_ENTITLEMENT_ID = "premium"; // debe coincidir con el entitlement creado en RevenueCat
+
+async function initRevenueCat() {
+  if (!esAppNativa()) return;
+  const platform = window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : null;
+  const apiKey = platform === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
+  if (!apiKey) return;
+  try {
+    const Purchases = window.Capacitor.Plugins.Purchases;
+    await Purchases.configure({ apiKey });
+    await sincronizarSuscripcionRevenueCat();
+  } catch (e) {
+    console.warn("No se pudo inicializar RevenueCat", e);
+  }
+}
+
+// Dispara la compra real si RevenueCat ya está configurado (requiere las API
+// keys de arriba y el producto ya creado en las tiendas); si no, deja un
+// mensaje de que todavía no está disponible en vez de romper la app.
+async function comprarSuscripcion() {
+  const platform = esAppNativa() && window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : null;
+  const apiKey = platform === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
+  if (apiKey) {
+    try {
+      const Purchases = window.Capacitor.Plugins.Purchases;
+      const { current } = await Purchases.getOfferings();
+      const paquete = current?.availablePackages?.[0];
+      if (paquete) {
+        await Purchases.purchasePackage({ aPackage: paquete });
+        await sincronizarSuscripcionRevenueCat();
+        return;
+      }
+    } catch (e) {
+      console.warn("No se pudo completar la compra de la suscripción", e);
+    }
+  }
+  els.paywallMsg.hidden = false;
+  els.paywallMsg.textContent = "La suscripción estará disponible muy pronto en esta app.";
+}
+
+// Refleja en perfil.suscripcion.activa el entitlement real de RevenueCat. Se
+// guarda en localStorage (no solo en memoria) para que el paywall pueda
+// evaluarse en el siguiente arranque sin depender de que la llamada a
+// RevenueCat ya haya vuelto.
+async function sincronizarSuscripcionRevenueCat() {
+  try {
+    const Purchases = window.Capacitor.Plugins.Purchases;
+    const { customerInfo } = await Purchases.getCustomerInfo();
+    const activa = Boolean(customerInfo?.entitlements?.active?.[REVENUECAT_ENTITLEMENT_ID]);
+    const perfil = ensurePerfil();
+    perfil.suscripcion.activa = activa;
+    guardarPerfil(perfil);
+    renderSuscripcion();
+  } catch (e) {
+    console.warn("No se pudo sincronizar el estado de suscripción de RevenueCat", e);
+  }
+}
+
 // Clave compartida con el backend, enviada en cada análisis. No es un secreto:
 // viaja en el código del cliente y alguien técnico puede extraerla. Sirve para
 // que quien descubra la URL del backend no pueda usarlo directamente. Debe
@@ -145,6 +221,7 @@ function renderSuscripcion() {
   const { diasRestantes, enTrial, bloqueado } = estadoSuscripcion();
 
   els.paywallOverlay.hidden = !bloqueado;
+  els.paywallPrecio.textContent = `$${PRECIO_SUSCRIPCION_CLP.toLocaleString("es-CL")} CLP / mes`;
 
   els.trialBanner.hidden = !enTrial || bloqueado;
   if (enTrial) {
@@ -767,6 +844,7 @@ const els = {
   trialBanner: document.getElementById("trial-banner"),
   trialBannerText: document.getElementById("trial-banner-text"),
   paywallOverlay: document.getElementById("paywall-overlay"),
+  paywallPrecio: document.getElementById("paywall-precio"),
   paywallSuscribirBtn: document.getElementById("paywall-suscribir-btn"),
   paywallMsg: document.getElementById("paywall-msg"),
 };
@@ -798,6 +876,7 @@ async function init() {
   refrescarVinculos();
   refrescarMetasSincronizadas();
   renderSuscripcion();
+  initRevenueCat();
   setInterval(refrescarVinculos, VINCULOS_POLL_MS);
 
   els.cameraInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
@@ -821,6 +900,7 @@ async function init() {
   els.egfrCistatina.addEventListener("input", guardarDatosClinicos);
   els.activarPlanClinico.addEventListener("change", activarPlanClinico);
   els.copiarCodigoBtn.addEventListener("click", copiarCodigoCliente);
+  els.paywallSuscribirBtn.addEventListener("click", comprarSuscripcion);
 
   document.querySelectorAll(".btn-liquido").forEach((btn) => {
     btn.addEventListener("click", () => registrarLiquido(Number(btn.dataset.ml)));
