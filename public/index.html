@@ -95,6 +95,41 @@
       <div id="results-list"></div>
     </section>
 
+    <section class="card refrigerador-card">
+      <h2>¿Qué tienes en el refrigerador?</h2>
+      <p class="clinical-note">
+        Fotografía los ingredientes que tienes y te armamos una receta pensada
+        para lo que te queda disponible hoy de potasio, fósforo y sodio.
+      </p>
+
+      <div id="refrigerador-preview-wrap" class="preview-wrap preview-wrap-chica" hidden>
+        <img id="refrigerador-preview" alt="Vista previa de tus ingredientes">
+      </div>
+      <div class="capture-actions">
+        <label class="btn btn-secondary btn-stacked">
+          <svg class="btn-icon-bare" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h2.5l1.2-2h8.6l1.2 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.6"/></svg>
+          <span class="btn-text"><strong>Fotografiar ingredientes</strong><small>Usar cámara</small></span>
+          <input id="refrigerador-camera-input" type="file" accept="image/*" capture="environment" hidden>
+        </label>
+      </div>
+      <button id="refrigerador-identificar-btn" class="btn btn-secondary" style="width:100%;margin-top:0.6rem;" disabled>Identificar ingredientes</button>
+      <p id="refrigerador-ia-status" class="status" role="status" aria-live="polite"></p>
+      <div id="refrigerador-identificados" class="alternatives-row"></div>
+
+      <details class="refrigerador-manual">
+        <summary>O márcalos a mano</summary>
+        <div id="refrigerador-checklist"></div>
+      </details>
+
+      <div class="refrigerador-acciones">
+        <button id="refrigerador-buscar-btn" class="btn btn-secondary">Buscar entre recetas conocidas</button>
+        <button id="refrigerador-generar-btn" class="btn btn-primary">Generar receta a mi medida</button>
+      </div>
+
+      <div id="refrigerador-resultados" hidden></div>
+      <div id="refrigerador-receta-ia" hidden></div>
+    </section>
+
     <section class="card calculadora-card">
       <h2>Tu día de hoy</h2>
       <div id="calculadora"></div>

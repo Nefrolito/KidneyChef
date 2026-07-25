@@ -1,0 +1,345 @@
+[
+  {
+    "id": "marraqueta",
+    "nombre": "Marraqueta / pan batido",
+    "ingredientes": [
+      "harina"
+    ],
+    "armable": true
+  },
+  {
+    "id": "hallulla",
+    "nombre": "Hallulla",
+    "ingredientes": [
+      "harina",
+      "manteca"
+    ],
+    "armable": true
+  },
+  {
+    "id": "sopaipilla",
+    "nombre": "Sopaipilla",
+    "ingredientes": [
+      "harina",
+      "zapallo",
+      "manteca"
+    ],
+    "armable": true
+  },
+  {
+    "id": "empanada_pino",
+    "nombre": "Empanada de pino",
+    "ingredientes": [
+      "harina",
+      "vacuno",
+      "cebolla",
+      "huevo",
+      "manteca"
+    ],
+    "armable": true
+  },
+  {
+    "id": "empanada_queso",
+    "nombre": "Empanada de queso",
+    "ingredientes": [
+      "harina",
+      "queso_gauda"
+    ],
+    "armable": true
+  },
+  {
+    "id": "completo",
+    "nombre": "Completo",
+    "ingredientes": [
+      "pan_blanco",
+      "vienesa",
+      "palta",
+      "tomate"
+    ],
+    "armable": true
+  },
+  {
+    "id": "churrasco",
+    "nombre": "Churrasco / sándwich de carne",
+    "ingredientes": [
+      "pan_blanco",
+      "vacuno",
+      "queso_gauda"
+    ],
+    "armable": true
+  },
+  {
+    "id": "cazuela_vacuno",
+    "nombre": "Cazuela de vacuno",
+    "ingredientes": [
+      "vacuno",
+      "papa",
+      "zapallo",
+      "choclo",
+      "cebolla",
+      "arroz"
+    ],
+    "armable": true
+  },
+  {
+    "id": "cazuela_ave",
+    "nombre": "Cazuela de ave",
+    "ingredientes": [
+      "pollo",
+      "papa",
+      "zapallo",
+      "choclo",
+      "cebolla",
+      "arroz"
+    ],
+    "armable": true
+  },
+  {
+    "id": "charquican",
+    "nombre": "Charquicán",
+    "ingredientes": [
+      "papa",
+      "zapallo",
+      "vacuno",
+      "choclo",
+      "cebolla"
+    ],
+    "armable": true
+  },
+  {
+    "id": "porotos_granados",
+    "nombre": "Porotos granados",
+    "ingredientes": [
+      "porotos_negros",
+      "zapallo",
+      "choclo",
+      "cebolla"
+    ],
+    "armable": true
+  },
+  {
+    "id": "pastel_choclo",
+    "nombre": "Pastel de choclo",
+    "ingredientes": [
+      "choclo",
+      "vacuno",
+      "cebolla",
+      "leche",
+      "huevo"
+    ],
+    "armable": true
+  },
+  {
+    "id": "humita",
+    "nombre": "Humita",
+    "ingredientes": [
+      "choclo",
+      "cebolla",
+      "leche",
+      "manteca"
+    ],
+    "armable": true
+  },
+  {
+    "id": "carbonada",
+    "nombre": "Carbonada",
+    "ingredientes": [
+      "vacuno",
+      "papa",
+      "zapallo",
+      "zanahoria",
+      "choclo",
+      "fideo",
+      "cebolla"
+    ],
+    "armable": true
+  },
+  {
+    "id": "lentejas_guisadas",
+    "nombre": "Lentejas guisadas",
+    "ingredientes": [
+      "lenteja",
+      "cebolla",
+      "zanahoria"
+    ],
+    "armable": true
+  },
+  {
+    "id": "arroz_pollo",
+    "nombre": "Arroz con pollo",
+    "ingredientes": [
+      "arroz",
+      "pollo",
+      "cebolla",
+      "zanahoria"
+    ],
+    "armable": true
+  },
+  {
+    "id": "tallarines_salsa",
+    "nombre": "Tallarines con salsa de tomate",
+    "ingredientes": [
+      "fideo",
+      "tomate",
+      "cebolla"
+    ],
+    "armable": true
+  },
+  {
+    "id": "pure_papas",
+    "nombre": "Puré de papas",
+    "ingredientes": [
+      "papa",
+      "leche",
+      "mantequilla"
+    ],
+    "armable": true
+  },
+  {
+    "id": "ensalada_chilena",
+    "nombre": "Ensalada chilena",
+    "ingredientes": [
+      "tomate",
+      "cebolla"
+    ],
+    "armable": true
+  },
+  {
+    "id": "pebre",
+    "nombre": "Pebre",
+    "ingredientes": [
+      "tomate",
+      "cebolla",
+      "cilantro"
+    ],
+    "armable": true
+  },
+  {
+    "id": "papas_cocidas",
+    "nombre": "Papas cocidas",
+    "ingredientes": [
+      "papa"
+    ],
+    "armable": true
+  },
+  {
+    "id": "papas_duquesa",
+    "nombre": "Papas doradas al horno",
+    "ingredientes": [
+      "papa"
+    ],
+    "armable": true
+  },
+  {
+    "id": "pollo_asado",
+    "nombre": "Pollo asado",
+    "ingredientes": [
+      "pollo"
+    ],
+    "armable": true
+  },
+  {
+    "id": "costillar_cerdo",
+    "nombre": "Costillar de cerdo",
+    "ingredientes": [
+      "cerdo"
+    ],
+    "armable": true
+  },
+  {
+    "id": "merluza_frita",
+    "nombre": "Merluza frita",
+    "ingredientes": [
+      "merluza",
+      "harina"
+    ],
+    "armable": true
+  },
+  {
+    "id": "merluza_vapor",
+    "nombre": "Merluza al vapor",
+    "ingredientes": [
+      "merluza"
+    ],
+    "armable": true
+  },
+  {
+    "id": "chorrillana",
+    "nombre": "Chorrillana",
+    "ingredientes": [
+      "papa",
+      "vacuno",
+      "cebolla",
+      "huevo"
+    ],
+    "armable": true
+  },
+  {
+    "id": "arroz_leche",
+    "nombre": "Arroz con leche",
+    "ingredientes": [
+      "arroz",
+      "leche"
+    ],
+    "armable": true
+  },
+  {
+    "id": "leche_asada",
+    "nombre": "Leche asada",
+    "ingredientes": [
+      "leche",
+      "huevo"
+    ],
+    "armable": true
+  },
+  {
+    "id": "mote_huesillo",
+    "nombre": "Mote con huesillo",
+    "ingredientes": [
+      "trigo_mote",
+      "durazno_conserva"
+    ],
+    "armable": true
+  },
+  {
+    "id": "acelga_cocida",
+    "nombre": "Acelga cocida",
+    "ingredientes": [
+      "acelga"
+    ],
+    "armable": true
+  },
+  {
+    "id": "longaniza",
+    "nombre": "Longaniza",
+    "ingredientes": [
+      "cerdo",
+      "manteca"
+    ],
+    "armable": false
+  },
+  {
+    "id": "queso_chanco",
+    "nombre": "Queso chanco",
+    "ingredientes": [
+      "queso_gauda"
+    ],
+    "armable": false
+  },
+  {
+    "id": "palta_molida",
+    "nombre": "Palta molida",
+    "ingredientes": [
+      "palta"
+    ],
+    "armable": true
+  },
+  {
+    "id": "te_con_leche",
+    "nombre": "Té con leche",
+    "ingredientes": [
+      "leche"
+    ],
+    "armable": true
+  }
+]

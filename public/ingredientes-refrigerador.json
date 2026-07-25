@@ -1,0 +1,164 @@
+[
+  {
+    "id": "vacuno",
+    "nombre": "Carne de vacuno",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "res"
+  },
+  {
+    "id": "cerdo",
+    "nombre": "Cerdo",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "cerdo"
+  },
+  {
+    "id": "merluza",
+    "nombre": "Merluza (o pescado blanco similar)",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": null
+  },
+  {
+    "id": "pollo",
+    "nombre": "Pollo",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "pollo"
+  },
+  {
+    "id": "vienesa",
+    "nombre": "Vienesa",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "salchicha"
+  },
+  {
+    "id": "acelga",
+    "nombre": "Acelga",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "acelga"
+  },
+  {
+    "id": "cebolla",
+    "nombre": "Cebolla",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "cebolla"
+  },
+  {
+    "id": "choclo",
+    "nombre": "Choclo",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "maiz"
+  },
+  {
+    "id": "cilantro",
+    "nombre": "Cilantro",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": null
+  },
+  {
+    "id": "lenteja",
+    "nombre": "Lentejas",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "lenteja"
+  },
+  {
+    "id": "palta",
+    "nombre": "Palta",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "aguacate"
+  },
+  {
+    "id": "papa",
+    "nombre": "Papa",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "papa"
+  },
+  {
+    "id": "porotos_negros",
+    "nombre": "Porotos negros",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "frijol_negro"
+  },
+  {
+    "id": "tomate",
+    "nombre": "Tomate",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "tomate"
+  },
+  {
+    "id": "zanahoria",
+    "nombre": "Zanahoria",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "zanahoria"
+  },
+  {
+    "id": "zapallo",
+    "nombre": "Zapallo",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "calabaza"
+  },
+  {
+    "id": "huevo",
+    "nombre": "Huevo",
+    "categoria": "Lácteos y huevos",
+    "nutrientes_id": "huevo"
+  },
+  {
+    "id": "leche",
+    "nombre": "Leche",
+    "categoria": "Lácteos y huevos",
+    "nutrientes_id": "leche_entera"
+  },
+  {
+    "id": "mantequilla",
+    "nombre": "Mantequilla",
+    "categoria": "Lácteos y huevos",
+    "nutrientes_id": "mantequilla"
+  },
+  {
+    "id": "queso_gauda",
+    "nombre": "Queso gauda o mantecoso",
+    "categoria": "Lácteos y huevos",
+    "nutrientes_id": null
+  },
+  {
+    "id": "arroz",
+    "nombre": "Arroz",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "arroz_blanco"
+  },
+  {
+    "id": "fideo",
+    "nombre": "Fideos",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "pasta"
+  },
+  {
+    "id": "harina",
+    "nombre": "Harina",
+    "categoria": "Abarrotes",
+    "nutrientes_id": null
+  },
+  {
+    "id": "manteca",
+    "nombre": "Manteca",
+    "categoria": "Abarrotes",
+    "nutrientes_id": null
+  },
+  {
+    "id": "trigo_mote",
+    "nombre": "Mote de trigo",
+    "categoria": "Abarrotes",
+    "nutrientes_id": null
+  },
+  {
+    "id": "pan_blanco",
+    "nombre": "Pan blanco (marraqueta, hallulla)",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "pan_blanco"
+  },
+  {
+    "id": "durazno_conserva",
+    "nombre": "Durazno en conserva",
+    "categoria": "Otros",
+    "nutrientes_id": null
+  }
+]

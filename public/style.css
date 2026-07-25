@@ -562,6 +562,18 @@ h1, h2, h3 {
 .clinical-checks { display: flex; gap: 1.2rem; flex-wrap: wrap; }
 .clinical-check { display: flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; font-weight: 500; }
 .clinical-check input { width: 17px; height: 17px; accent-color: var(--brand); }
+.refrigerador-categoria { margin-bottom: 1rem; }
+.refrigerador-categoria h4 { margin: 0 0 0.5rem; font-size: 0.82rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; }
+#refrigerador-resultados h3, #refrigerador-receta-ia h3 { margin: 1.1rem 0 0.6rem; font-size: 0.95rem; }
+.preview-wrap-chica { height: 150px; margin-bottom: 0.75rem; }
+.preview-wrap-chica img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.refrigerador-manual { margin: 0.85rem 0; }
+.refrigerador-manual summary { cursor: pointer; font-weight: 600; font-size: 0.88rem; color: var(--brand); padding: 0.3rem 0; }
+.refrigerador-manual[open] summary { margin-bottom: 0.6rem; }
+.refrigerador-acciones { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
+.alt-chip-removable { display: inline-flex; align-items: center; gap: 0.4rem; }
+.refrigerador-receta-lista { margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.88rem; }
+.refrigerador-receta-lista li { margin-bottom: 0.25rem; }
 .clinical-field input[type="number"] {
   width: 100%;
   padding: 0.65rem 0.75rem;

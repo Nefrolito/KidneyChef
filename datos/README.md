@@ -16,9 +16,17 @@
   positivos graves (naranja → sherbet, salmón → aceite de salmón, manzana →
   custard apple). No reemplazar por búsqueda difusa.
 - `recetas_chilenas.py` — gramos de cada ingrediente por 100 g de plato terminado,
-  para los platos que USDA no tiene. Las proporciones son estimaciones de
-  preparación casera y están PENDIENTES de validación clínica.
+  para los platos que USDA no tiene. Proporciones validadas clínicamente por
+  Camilo (2026-07-22).
 - `gi_busquedas.py` — términos usados para ubicar cada alimento en la base de IG.
+- `generar_recetas_json.py` — construye `public/recetas.json` y
+  `public/ingredientes-refrigerador.json` a partir de `recetas_chilenas.py`,
+  para la feature "recetas con lo que tienes en el refrigerador". Traduce las
+  claves de ingrediente de las recetas a un vocabulario más chico que el
+  paciente marca en un checklist, y excluye condimentos de despensa (sal,
+  aceite, azúcar, polvo de hornear, color de ají) del checklist. Se corre a
+  mano cuando cambia `recetas_chilenas.py`:
+  `python3 datos/generar_recetas_json.py`.
 
 ## Criterios aplicados
 

@@ -74,6 +74,9 @@ MAX_BODY_BYTES = int(os.environ.get("MAX_BODY_BYTES", 8 * 1024 * 1024))
 
 KNOWN_FOODS = json.loads((PUBLIC_DIR / "nutrientes.json").read_text())
 KNOWN_FOODS_LIST = ", ".join(f["nombre"] for f in KNOWN_FOODS)
+KNOWN_FOODS_BY_ID = {f["id"]: f for f in KNOWN_FOODS}
+
+NUTRIENTES_RECETA = ["potasio_mg", "fosforo_mg", "sodio_mg", "carbohidratos_g"]
 
 PROMPT = f"""Eres un asistente que identifica alimentos en fotografías para una app de \
 nutrición renal usada por pacientes con enfermedad renal crónica. La precisión importa: \
@@ -242,6 +245,142 @@ def call_claude_vision(data_url):
     return items
 
 
+NUTRIENTE_UNIDAD = {"potasio_mg": "mg", "fosforo_mg": "mg", "sodio_mg": "mg", "carbohidratos_g": "g"}
+NUTRIENTE_NOMBRE = {"potasio_mg": "potasio", "fosforo_mg": "fósforo", "sodio_mg": "sodio", "carbohidratos_g": "carbohidratos"}
+
+
+def _build_prompt_receta(foods, presupuesto):
+    lineas_ingredientes = []
+    for f in foods:
+        aportes = ", ".join(
+            f"{NUTRIENTE_NOMBRE[n]} {f.get(n) or 0}{NUTRIENTE_UNIDAD[n]}" for n in NUTRIENTES_RECETA
+        )
+        lineas_ingredientes.append(f'- id "{f["id"]}" ({f["nombre"]}): por 100 g tiene {aportes}.')
+
+    if presupuesto:
+        lineas_presupuesto = [
+            f"- {NUTRIENTE_NOMBRE[n]}: no más de {v}{NUTRIENTE_UNIDAD[n]} en total"
+            for n, v in presupuesto.items()
+            if n in NUTRIENTES_RECETA
+        ]
+    else:
+        lineas_presupuesto = []
+    if not lineas_presupuesto:
+        lineas_presupuesto = ["- sin límite numérico fijado: igual arma una porción moderada de una comida, no una olla familiar"]
+
+    return f"""Eres un asistente que arma una receta casera chilena para un paciente con \
+enfermedad renal crónica, usando SOLO los ingredientes que tiene disponibles. La precisión \
+de las cantidades importa para su salud: si te pasas del presupuesto de un nutriente, el \
+paciente puede terminar con niveles peligrosos de potasio o fósforo en la sangre.
+
+Ingredientes disponibles, con su aporte por 100 g:
+{chr(10).join(lineas_ingredientes)}
+
+Presupuesto que le queda disponible al paciente hoy (no lo superes):
+{chr(10).join(lineas_presupuesto)}
+
+Responde EXCLUSIVAMENTE con un JSON válido (sin texto adicional, sin bloques de código \
+markdown), con esta forma:
+
+{{"nombre": "nombre del plato", "pasos": ["paso 1", "paso 2"], \
+"ingredientes": [{{"id": "id_exacto_de_la_lista", "gramos": numero}}]}}
+
+Reglas:
+- Usa solo ids exactos de la lista de ingredientes disponibles — no inventes otros ni \
+cambies el texto del id.
+- No es obligatorio usar todos los ingredientes: elige los que tengan sentido para un plato \
+coherente.
+- Antes de responder, suma tú mismo el aporte de los gramos que elegiste para cada \
+nutriente con presupuesto fijado, y ajusta las cantidades hasta quedar dentro del límite.
+- Pasos de preparación breves (máximo 5), en español, para una preparación casera simple."""
+
+
+def call_claude_receta(ingrediente_ids, presupuesto):
+    foods = []
+    for fid in ingrediente_ids:
+        food = KNOWN_FOODS_BY_ID.get(fid)
+        if food is None:
+            raise ValueError(f"Ingrediente desconocido: {fid}")
+        foods.append(food)
+    if not foods:
+        raise ValueError("No se recibió ningún ingrediente")
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "Falta ANTHROPIC_API_KEY. Crea un archivo .env en la raíz del proyecto "
+            "con la línea: ANTHROPIC_API_KEY=tu_api_key"
+        )
+
+    prompt = _build_prompt_receta(foods, presupuesto)
+    body = json.dumps({
+        "model": ANTHROPIC_MODEL,
+        "max_tokens": 1024,
+        "messages": [{"role": "user", "content": prompt}],
+    }).encode("utf-8")
+
+    req = urllib.request.Request(ANTHROPIC_URL, data=body, method="POST", headers={
+        "x-api-key": api_key,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+    })
+
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Error de la API de Claude ({e.code}): {detail}") from e
+
+    text = "".join(
+        block.get("text", "") for block in payload.get("content", []) if block.get("type") == "text"
+    ).strip()
+    text = re.sub(r"^```(?:json)?|```$", "", text.strip(), flags=re.MULTILINE).strip()
+
+    try:
+        receta = json.loads(text)
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"No se pudo interpretar la respuesta de la IA: {text[:300]}") from e
+
+    if not isinstance(receta, dict) or not isinstance(receta.get("ingredientes"), list):
+        raise RuntimeError("La IA no devolvió una receta con el formato esperado")
+
+    # El total que ve el paciente SIEMPRE sale de sumar los valores reales de
+    # nutrientes.json por los gramos que propuso la IA — nunca de un número
+    # que la IA haya calculado o afirmado por su cuenta. Cualquier id que la
+    # IA haya inventado (fuera de los ingredientes que le pasamos) se descarta.
+    ingredientes_out = []
+    totales = {n: 0.0 for n in NUTRIENTES_RECETA}
+    total_gramos = 0.0
+    for item in receta["ingredientes"]:
+        fid = item.get("id")
+        food = KNOWN_FOODS_BY_ID.get(fid)
+        if food is None or fid not in ingrediente_ids:
+            continue
+        try:
+            gramos = float(item.get("gramos"))
+        except (TypeError, ValueError):
+            continue
+        if gramos <= 0:
+            continue
+        factor = gramos / 100
+        for n in NUTRIENTES_RECETA:
+            totales[n] += (food.get(n) or 0) * factor
+        total_gramos += gramos
+        ingredientes_out.append({"id": fid, "nombre": food["nombre"], "gramos": round(gramos)})
+
+    if not ingredientes_out:
+        raise RuntimeError("La IA no propuso cantidades utilizables para los ingredientes recibidos")
+
+    return {
+        "nombre": str(receta.get("nombre") or "Receta"),
+        "pasos": [str(p) for p in receta.get("pasos", []) if isinstance(p, (str, int, float))][:8],
+        "ingredientes": ingredientes_out,
+        "totales": {n: round(v, 1) for n, v in totales.items()},
+        "total_gramos": round(total_gramos),
+    }
+
+
 # --- Identidad del paciente (código de cliente + secreto de dispositivo) ---
 # El paciente no tiene login tradicional: se identifica con un código corto
 # que comparte con su tratante, y el celular guarda un secreto de alta
@@ -383,6 +522,53 @@ def handle_analyze(handler):
 
         items = call_claude_vision(image)
         handler._send_json(200, {"items": items})
+    except RuntimeError as e:
+        handler._send_json(500, {"error": str(e)})
+    except Exception as e:
+        handler._send_json(500, {"error": f"Error inesperado: {e}"})
+
+
+def handle_generar_receta(handler):
+    """POST /api/generar-receta — arma una receta con los ingredientes que el
+    paciente tiene, ajustada al presupuesto de nutrientes que le queda en el
+    día. Comparte guardas con /api/analyze porque también llama a la API de
+    Claude y cuesta dinero: misma clave de app y mismo cupo de uso."""
+    if APP_KEY:
+        provided = handler.headers.get("X-App-Key", "")
+        if not hmac.compare_digest(provided, APP_KEY):
+            print(f"[auth] rechazado ip={handler._client_ip()}", flush=True)
+            handler._send_json(401, {"error": "Acceso no autorizado a la API."})
+            return
+
+    body = _leer_body_json(handler)
+    if body is None:
+        return
+
+    ingredientes = body.get("ingredientes")
+    if not isinstance(ingredientes, list) or not ingredientes:
+        handler._send_json(400, {"error": "Falta la lista de ingredientes"})
+        return
+    presupuesto = body.get("presupuesto") if isinstance(body.get("presupuesto"), dict) else {}
+
+    ip = handler._client_ip()
+    permitido, retry_after, motivo = RATE_LIMITER.check(ip)
+    if not permitido:
+        print(f"[rate-limit] bloqueado ip={ip} motivo={motivo} retry_after={retry_after}s", flush=True)
+        espera = format_espera(retry_after)
+        mensaje = (
+            "La app alcanzó su límite de generación de recetas por hoy. "
+            f"Vuelve a intentarlo en {espera}."
+            if motivo == "global" else
+            f"Hiciste muchas solicitudes en poco tiempo. Vuelve a intentarlo en {espera}."
+        )
+        handler._send_json(429, {"error": mensaje}, {"Retry-After": str(retry_after)})
+        return
+
+    try:
+        receta = call_claude_receta(ingredientes, presupuesto)
+        handler._send_json(200, receta)
+    except ValueError as e:
+        handler._send_json(400, {"error": str(e)})
     except RuntimeError as e:
         handler._send_json(500, {"error": str(e)})
     except Exception as e:
@@ -763,6 +949,7 @@ def handle_get_consumo_paciente(handler, id):
 # do_GET/do_POST/do_PATCH/do_DELETE, que quedan como despachadores genéricos.
 ROUTES = [
     ("POST", re.compile(r"^/api/analyze$"), handle_analyze),
+    ("POST", re.compile(r"^/api/generar-receta$"), handle_generar_receta),
     ("POST", re.compile(r"^/api/pacientes$"), handle_crear_paciente),
     ("GET", re.compile(r"^/api/pacientes/me$"), handle_get_paciente_me),
     ("GET", re.compile(r"^/api/pacientes/me/vinculos$"), handle_get_vinculos_paciente),

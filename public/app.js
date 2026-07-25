@@ -847,6 +847,17 @@ const els = {
   paywallPrecio: document.getElementById("paywall-precio"),
   paywallSuscribirBtn: document.getElementById("paywall-suscribir-btn"),
   paywallMsg: document.getElementById("paywall-msg"),
+  refrigeradorChecklist: document.getElementById("refrigerador-checklist"),
+  refrigeradorBuscarBtn: document.getElementById("refrigerador-buscar-btn"),
+  refrigeradorResultados: document.getElementById("refrigerador-resultados"),
+  refrigeradorPreviewWrap: document.getElementById("refrigerador-preview-wrap"),
+  refrigeradorPreview: document.getElementById("refrigerador-preview"),
+  refrigeradorCameraInput: document.getElementById("refrigerador-camera-input"),
+  refrigeradorIdentificarBtn: document.getElementById("refrigerador-identificar-btn"),
+  refrigeradorIaStatus: document.getElementById("refrigerador-ia-status"),
+  refrigeradorIdentificados: document.getElementById("refrigerador-identificados"),
+  refrigeradorGenerarBtn: document.getElementById("refrigerador-generar-btn"),
+  refrigeradorRecetaIa: document.getElementById("refrigerador-receta-ia"),
 };
 
 // Sin infraestructura de push, se refresca por polling mientras la app está
@@ -860,6 +871,13 @@ init();
 
 async function init() {
   FOODS = await fetch("nutrientes.json").then((r) => r.json());
+  try {
+    RECETAS_DATA = await fetch("recetas.json").then((r) => r.json());
+    INGREDIENTES_REFRIGERADOR = await fetch("ingredientes-refrigerador.json").then((r) => r.json());
+    renderRefrigeradorChecklist();
+  } catch (e) {
+    console.warn("No se pudo cargar recetas.json / ingredientes-refrigerador.json", e);
+  }
   // Si el modelo clínico no carga, la app sigue funcionando con los umbrales
   // fijos de UMBRALES en vez de quedarse sin semáforo.
   try {
@@ -901,6 +919,10 @@ async function init() {
   els.activarPlanClinico.addEventListener("change", activarPlanClinico);
   els.copiarCodigoBtn.addEventListener("click", copiarCodigoCliente);
   els.paywallSuscribirBtn.addEventListener("click", comprarSuscripcion);
+  els.refrigeradorBuscarBtn.addEventListener("click", buscarRecetasRefrigerador);
+  els.refrigeradorCameraInput.addEventListener("change", (e) => handleRefrigeradorFileSelected(e.target.files[0]));
+  els.refrigeradorIdentificarBtn.addEventListener("click", identificarIngredientesRefrigerador);
+  els.refrigeradorGenerarBtn.addEventListener("click", generarRecetaIA);
 
   document.querySelectorAll(".btn-liquido").forEach((btn) => {
     btn.addEventListener("click", () => registrarLiquido(Number(btn.dataset.ml)));
@@ -1169,6 +1191,267 @@ function badge(nutriente, valorPorcion, densidad100g) {
       <span class="badge-icon-circle">${NUTRIENTE_ICON[nutriente]}</span>
       <span class="value">${valorPorcion} ${unidad}</span>
       <span class="tag-pill">${etiqueta}</span>
+    </div>`;
+}
+
+// --- Recetas con lo que tienes en el refrigerador ---
+let RECETAS_DATA = [];
+let INGREDIENTES_REFRIGERADOR = [];
+const MAX_INGREDIENTES_FALTANTES = 2; // "casi listas": les falta esto o menos
+// Sin foto no hay gramos reales de porción: se asume un plato individual
+// estándar para poder mostrar el mismo semáforo verde/ámbar/rojo que el resto
+// de la app, y se avisa en la UI que hay que ajustar según cuánto se sirva.
+const PORCION_REFERENCIA_RECETA_G = 300;
+
+function renderRefrigeradorChecklist() {
+  const porCategoria = new Map();
+  for (const ing of INGREDIENTES_REFRIGERADOR) {
+    if (!porCategoria.has(ing.categoria)) porCategoria.set(ing.categoria, []);
+    porCategoria.get(ing.categoria).push(ing);
+  }
+
+  els.refrigeradorChecklist.innerHTML = [...porCategoria.entries()]
+    .map(([categoria, ingredientes]) => `
+      <div class="refrigerador-categoria">
+        <h4>${escapeHtml(categoria)}</h4>
+        <div class="clinical-checks">
+          ${ingredientes
+            .map((ing) => `
+              <label class="clinical-check">
+                <input type="checkbox" class="refrigerador-ingrediente" value="${ing.id}">
+                ${escapeHtml(ing.nombre)}
+              </label>`)
+            .join("")}
+        </div>
+      </div>`)
+    .join("");
+}
+
+function ingredientesSeleccionados() {
+  return new Set(
+    [...document.querySelectorAll(".refrigerador-ingrediente:checked")].map((el) => el.value)
+  );
+}
+
+function buscarRecetasRefrigerador() {
+  const tiene = ingredientesSeleccionados();
+  const completas = [];
+  const casiListas = [];
+
+  for (const receta of RECETAS_DATA) {
+    if (!receta.armable) continue;
+    const faltantes = receta.ingredientes.filter((id) => !tiene.has(id));
+    if (faltantes.length === 0) completas.push(receta);
+    else if (faltantes.length <= MAX_INGREDIENTES_FALTANTES) casiListas.push({ receta, faltantes });
+  }
+
+  renderRefrigeradorResultados(completas, casiListas);
+}
+
+function nombreIngrediente(id) {
+  const ing = INGREDIENTES_REFRIGERADOR.find((i) => i.id === id);
+  return ing ? ing.nombre : id;
+}
+
+function renderRefrigeradorResultados(completas, casiListas) {
+  els.refrigeradorResultados.hidden = false;
+
+  if (completas.length === 0 && casiListas.length === 0) {
+    els.refrigeradorResultados.innerHTML = `
+      <p class="no-match">No encontramos recetas con esos ingredientes. Marca más ingredientes e intenta de nuevo.</p>`;
+    return;
+  }
+
+  const nota = `
+    <p class="summary-caption">
+      Semáforo calculado para una porción de referencia de ${PORCION_REFERENCIA_RECETA_G} g.
+      Ajusta según cuánto te sirvas.
+    </p>`;
+  const seccionCompletas = completas.length
+    ? `<h3>Puedes prepararlas ahora</h3>${completas.map((r) => tarjetaReceta(r)).join("")}`
+    : "";
+  const seccionCasi = casiListas.length
+    ? `<h3>Te falta poco</h3>${casiListas.map(({ receta, faltantes }) => tarjetaReceta(receta, faltantes)).join("")}`
+    : "";
+
+  els.refrigeradorResultados.innerHTML = nota + seccionCompletas + seccionCasi;
+}
+
+function tarjetaReceta(receta, faltantes) {
+  const match = FOODS.find((f) => f.id === receta.id);
+  const factor = PORCION_REFERENCIA_RECETA_G / 100;
+  const semaforo = match
+    ? `<div class="semaforo-row">
+        ${nutrientesVisibles()
+          .filter((k) => match[k] != null)
+          .map((k) => badge(k, Math.round(match[k] * factor), match[k]))
+          .join("")}
+      </div>${notaSinMeta()}`
+    : `<p class="no-match">Sin datos nutricionales cargados para esta receta.</p>`;
+
+  const faltantesHtml = faltantes && faltantes.length
+    ? `<p class="portion-note">Te falta: ${faltantes.map((id) => escapeHtml(nombreIngrediente(id))).join(", ")}</p>`
+    : "";
+
+  return `
+    <div class="food-result">
+      <div class="food-result-header"><h3>${escapeHtml(receta.nombre)}</h3></div>
+      ${faltantesHtml}
+      ${semaforo}
+    </div>`;
+}
+
+// --- Identificar ingredientes por foto y generar una receta a medida con IA ---
+let refrigeradorImagenDataUrl = null;
+let ingredientesIdentificados = []; // [{ alimentoIA, match }], match siempre resuelto en FOODS
+
+function handleRefrigeradorFileSelected(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    refrigeradorImagenDataUrl = reader.result;
+    els.refrigeradorPreview.src = refrigeradorImagenDataUrl;
+    els.refrigeradorPreviewWrap.hidden = false;
+    els.refrigeradorIdentificarBtn.disabled = false;
+    setRefrigeradorStatus("");
+  };
+  reader.readAsDataURL(file);
+}
+
+function setRefrigeradorStatus(msg, isError = false) {
+  els.refrigeradorIaStatus.textContent = msg;
+  els.refrigeradorIaStatus.classList.toggle("error", isError);
+}
+
+async function identificarIngredientesRefrigerador() {
+  if (!refrigeradorImagenDataUrl) return;
+  els.refrigeradorIdentificarBtn.disabled = true;
+  setRefrigeradorStatus("Identificando ingredientes con IA…");
+
+  try {
+    const res = await fetch(`${API_BASE}/api/analyze`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      body: JSON.stringify({ image: refrigeradorImagenDataUrl }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Error desconocido");
+
+    const nuevos = (data.items || [])
+      .map((item) => ({ alimentoIA: item.alimento, match: matchFood(item.alimento) }))
+      .filter((item) => item.match);
+
+    if (nuevos.length === 0) {
+      setRefrigeradorStatus("No identificamos ningún ingrediente conocido en la foto. Intenta con otra imagen o márcalos a mano.", true);
+      return;
+    }
+    for (const nuevo of nuevos) {
+      if (!ingredientesIdentificados.some((x) => x.match.id === nuevo.match.id)) {
+        ingredientesIdentificados.push(nuevo);
+      }
+    }
+    setRefrigeradorStatus("");
+    renderIngredientesIdentificados();
+  } catch (err) {
+    setRefrigeradorStatus(err.message, true);
+  } finally {
+    els.refrigeradorIdentificarBtn.disabled = false;
+  }
+}
+
+function renderIngredientesIdentificados() {
+  els.refrigeradorIdentificados.innerHTML = ingredientesIdentificados
+    .map((item, idx) => `<button class="alt-chip alt-chip-removable" id="refrigerador-quitar-${idx}">${escapeHtml(item.match.nombre)} ✕</button>`)
+    .join("");
+  ingredientesIdentificados.forEach((_, idx) => {
+    const btn = document.getElementById(`refrigerador-quitar-${idx}`);
+    if (btn) btn.addEventListener("click", () => {
+      ingredientesIdentificados.splice(idx, 1);
+      renderIngredientesIdentificados();
+    });
+  });
+}
+
+// Ingredientes candidatos para la receta generada: los identificados por foto
+// (ya resueltos contra nutrientes.json) más los marcados a mano en el
+// checklist que tengan un equivalente confiable en nutrientes.json — no todo
+// ingrediente del checklist lo tiene (ver generar_recetas_json.py), y sin un
+// valor auditado no se puede ofrecer como candidato a la IA.
+function candidatosParaIA() {
+  const ids = new Set(ingredientesIdentificados.map((item) => item.match.id));
+  for (const el of document.querySelectorAll(".refrigerador-ingrediente:checked")) {
+    const ing = INGREDIENTES_REFRIGERADOR.find((i) => i.id === el.value);
+    if (ing && ing.nutrientes_id) ids.add(ing.nutrientes_id);
+  }
+  return [...ids];
+}
+
+// Lo que le queda disponible hoy: meta diaria menos lo ya registrado en el
+// historial. Solo se incluyen nutrientes con meta conocida (sodio siempre,
+// potasio/fósforo con Plan Clínico, carbohidratos si es diabético) — igual
+// que el resto de la app, no se inventa un límite que no existe.
+function presupuestoRestanteHoy() {
+  const totals = totalesNutrientesHoy();
+  const out = {};
+  for (const n of ["sodio_mg", "potasio_mg", "fosforo_mg", "carbohidratos_g"]) {
+    const meta = metaDiaria(n);
+    if (meta == null) continue;
+    out[n] = Math.max(0, Math.round(meta - (totals[n] || 0)));
+  }
+  return out;
+}
+
+async function generarRecetaIA() {
+  const ingredientes = candidatosParaIA();
+  if (ingredientes.length === 0) {
+    setRefrigeradorStatus("Identifica o marca al menos un ingrediente antes de generar una receta.", true);
+    return;
+  }
+
+  els.refrigeradorGenerarBtn.disabled = true;
+  els.refrigeradorRecetaIa.hidden = true;
+  setRefrigeradorStatus("Generando una receta a tu medida…");
+
+  try {
+    const res = await fetch(`${API_BASE}/api/generar-receta`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      body: JSON.stringify({ ingredientes, presupuesto: presupuestoRestanteHoy() }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Error desconocido");
+    setRefrigeradorStatus("");
+    renderRecetaIA(data);
+  } catch (err) {
+    setRefrigeradorStatus(err.message, true);
+  } finally {
+    els.refrigeradorGenerarBtn.disabled = false;
+  }
+}
+
+// El semáforo de la receta generada usa SIEMPRE los totales que devolvió el
+// backend (sumados desde nutrientes.json), nunca un número que la IA haya
+// calculado por su cuenta — mismo criterio que el resto de la app.
+function renderRecetaIA(receta) {
+  els.refrigeradorRecetaIa.hidden = false;
+  const densidad100g = (n) => (receta.total_gramos > 0 ? (receta.totales[n] / receta.total_gramos) * 100 : 0);
+  const semaforo = nutrientesVisibles()
+    .map((n) => badge(n, Math.round(receta.totales[n] || 0), densidad100g(n)))
+    .join("");
+
+  const pasos = (receta.pasos || []).map((p) => `<li>${escapeHtml(p)}</li>`).join("");
+  const ingredientesHtml = (receta.ingredientes || [])
+    .map((i) => `<li>${escapeHtml(i.nombre)} — ${i.gramos} g</li>`)
+    .join("");
+
+  els.refrigeradorRecetaIa.innerHTML = `
+    <div class="food-result">
+      <div class="food-result-header"><h3>${escapeHtml(receta.nombre)}</h3></div>
+      <p class="portion-note">Porción total: ${receta.total_gramos} g</p>
+      <ul class="refrigerador-receta-lista">${ingredientesHtml}</ul>
+      <div class="semaforo-row">${semaforo}</div>
+      ${notaSinMeta()}
+      <ol class="refrigerador-receta-lista">${pasos}</ol>
     </div>`;
 }
 
