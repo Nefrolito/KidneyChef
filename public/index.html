@@ -44,6 +44,10 @@
     </div>
   </header>
 
+  <div id="trial-banner" class="trial-banner" hidden>
+    <span id="trial-banner-text"></span>
+  </div>
+
   <main class="container">
     <section class="card capture-card">
       <div id="preview-wrap" class="preview-wrap">
@@ -323,6 +327,22 @@
       <div class="modal-actions">
         <button id="about-close" class="btn btn-primary">Entendido</button>
       </div>
+    </div>
+  </div>
+
+  <div id="paywall-overlay" class="paywall-overlay" hidden>
+    <div class="paywall-card">
+      <span class="paywall-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      </span>
+      <h2>Tu mes de prueba terminó</h2>
+      <p>
+        Para seguir usando el semáforo nutricional y el Plan Clínico necesitas
+        suscribirte a KidneyChef.
+      </p>
+      <p class="paywall-precio" id="paywall-precio">$9.990 CLP / mes</p>
+      <button id="paywall-suscribir-btn" class="btn btn-primary paywall-btn">Suscribirme</button>
+      <p class="paywall-msg" id="paywall-msg" hidden></p>
     </div>
   </div>
 

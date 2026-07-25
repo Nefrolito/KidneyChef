@@ -116,7 +116,43 @@ function ensurePerfil() {
   if (perfil.vinculacion === undefined) {
     perfil.vinculacion = { codigoCliente: null, deviceSecret: null };
   }
+  if (perfil.suscripcion === undefined) {
+    perfil.suscripcion = { activa: false };
+  }
   return perfil;
+}
+
+// Suscripción: toda la app es gratis por TRIAL_DIAS desde la primera vez que
+// se abre (perfil.creadoEn), y de ahí en adelante requiere perfil.suscripcion.activa
+// (hoy siempre false — se pondrá en true cuando se conecte el SDK de compras real).
+// El precio sube con el tiempo a medida que se agregan features grandes (recetas del
+// refrigerador, Cookidoo); no hay precio legado para quien ya estaba suscrito.
+const TRIAL_DIAS = 30;
+const PRECIO_SUSCRIPCION_CLP = 9990;
+
+function estadoSuscripcion() {
+  const perfil = ensurePerfil();
+  const diasTranscurridos = Math.floor(
+    (Date.now() - new Date(perfil.creadoEn).getTime()) / 86400000
+  );
+  const diasRestantes = Math.max(0, TRIAL_DIAS - diasTranscurridos);
+  const enTrial = diasRestantes > 0;
+  const bloqueado = !enTrial && !perfil.suscripcion.activa;
+  return { diasRestantes, enTrial, bloqueado };
+}
+
+function renderSuscripcion() {
+  const { diasRestantes, enTrial, bloqueado } = estadoSuscripcion();
+
+  els.paywallOverlay.hidden = !bloqueado;
+
+  els.trialBanner.hidden = !enTrial || bloqueado;
+  if (enTrial) {
+    els.trialBannerText.textContent =
+      diasRestantes === 1
+        ? "Te queda 1 día de prueba gratis"
+        : `Te quedan ${diasRestantes} días de prueba gratis`;
+  }
 }
 
 function datosClinicosPorDefecto() {
@@ -728,6 +764,11 @@ const els = {
   metasSincronizadas: document.getElementById("metas-sincronizadas"),
   metaPotasioValor: document.getElementById("meta-potasio-valor"),
   metaFosforoValor: document.getElementById("meta-fosforo-valor"),
+  trialBanner: document.getElementById("trial-banner"),
+  trialBannerText: document.getElementById("trial-banner-text"),
+  paywallOverlay: document.getElementById("paywall-overlay"),
+  paywallSuscribirBtn: document.getElementById("paywall-suscribir-btn"),
+  paywallMsg: document.getElementById("paywall-msg"),
 };
 
 // Sin infraestructura de push, se refresca por polling mientras la app está
@@ -756,6 +797,7 @@ async function init() {
   renderVinculacion();
   refrescarVinculos();
   refrescarMetasSincronizadas();
+  renderSuscripcion();
   setInterval(refrescarVinculos, VINCULOS_POLL_MS);
 
   els.cameraInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
