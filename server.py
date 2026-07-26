@@ -412,35 +412,13 @@ salteados, cazuelas, revueltos).
 - Pasos de preparación breves (máximo 5), en español, para una preparación casera simple."""
 
 
-def call_claude_receta(ingrediente_ids, presupuesto, densidad_maxima=None, situacion_clinica=None, riesgo_hiperkalemia=False):
-    foods = []
-    for fid in ingrediente_ids:
-        food = KNOWN_FOODS_BY_ID.get(fid)
-        if food is None:
-            raise ValueError(f"Ingrediente desconocido: {fid}")
-        foods.append(food)
-    if not foods:
-        raise ValueError("No se recibió ningún ingrediente")
-
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        raise RuntimeError(
-            "Falta ANTHROPIC_API_KEY. Crea un archivo .env en la raíz del proyecto "
-            "con la línea: ANTHROPIC_API_KEY=tu_api_key"
-        )
-
-    prompt = _build_prompt_receta(foods, presupuesto, densidad_maxima, situacion_clinica, riesgo_hiperkalemia)
+def _intentar_llamada_receta(prompt, api_key):
+    """Un intento de llamada a Claude + parseo del JSON. Lanza RuntimeError en
+    cualquier falla (HTTP, JSON inválido, forma inesperada) para que el
+    llamador pueda reintentar."""
     body = json.dumps({
         "model": ANTHROPIC_MODEL,
         "max_tokens": 3072,
-        # Sonnet 5 piensa por defecto (adaptive thinking) y con varias
-        # restricciones (presupuesto + densidad + consejo) puede gastar todo
-        # max_tokens pensando sin dejar nada para el JSON final. Desactivar
-        # el pensamiento del todo tiene un efecto peor: a veces escribe el
-        # razonamiento como texto plano antes del JSON en vez de pensar
-        # internamente, y eso rompe el parseo igual. Effort bajo + más
-        # max_tokens de margen es la combinación que la documentación de la
-        # API recomienda para este caso.
         "output_config": {"effort": "low"},
         "messages": [{"role": "user", "content": prompt}],
     }).encode("utf-8")
@@ -470,6 +448,45 @@ def call_claude_receta(ingrediente_ids, presupuesto, densidad_maxima=None, situa
 
     if not isinstance(receta, dict) or not isinstance(receta.get("ingredientes"), list):
         raise RuntimeError("La IA no devolvió una receta con el formato esperado")
+
+    return receta
+
+
+def call_claude_receta(ingrediente_ids, presupuesto, densidad_maxima=None, situacion_clinica=None, riesgo_hiperkalemia=False):
+    foods = []
+    for fid in ingrediente_ids:
+        food = KNOWN_FOODS_BY_ID.get(fid)
+        if food is None:
+            raise ValueError(f"Ingrediente desconocido: {fid}")
+        foods.append(food)
+    if not foods:
+        raise ValueError("No se recibió ningún ingrediente")
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "Falta ANTHROPIC_API_KEY. Crea un archivo .env en la raíz del proyecto "
+            "con la línea: ANTHROPIC_API_KEY=tu_api_key"
+        )
+
+    prompt = _build_prompt_receta(foods, presupuesto, densidad_maxima, situacion_clinica, riesgo_hiperkalemia)
+
+    # Sonnet 5 piensa por defecto (adaptive thinking) y con varias
+    # restricciones a la vez (presupuesto + densidad + situación + consejo)
+    # a veces gasta todo max_tokens pensando y devuelve una respuesta vacía o
+    # cortada — "effort": "low" lo hace mucho menos frecuente, pero no lo
+    # elimina del todo (es una llamada a un modelo, no determinista).
+    # Reintentar una vez antes de fallarle al paciente es más barato que
+    # mostrarle un error por algo que la segunda vez sale bien.
+    ultimo_error = None
+    for intento in range(2):
+        try:
+            receta = _intentar_llamada_receta(prompt, api_key)
+            break
+        except RuntimeError as e:
+            ultimo_error = e
+    else:
+        raise ultimo_error
 
     # El total que ve el paciente SIEMPRE sale de sumar los valores reales de
     # nutrientes.json por los gramos que propuso la IA — nunca de un número
