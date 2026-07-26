@@ -3647,5 +3647,48 @@
       "base": "Univ. de Sydney, tablas internacionales de IG (Atkinson 2021)",
       "_nota": "Mediana de las mediciones publicadas; el rango muestra la variación por variedad y preparación."
     }
+  },
+  {
+    "id": "posta_negra_vacuno",
+    "nombre": "Posta negra",
+    "categoria": "Carne",
+    "alias": [
+      "posta",
+      "posta negra de vacuno",
+      "eye of round"
+    ],
+    "potasio_mg": 324,
+    "fosforo_mg": 221,
+    "sodio_mg": 52,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0\" fat, choice, raw",
+      "fdc_id": "173999",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente por grupo muscular (posta negra ~ eye of round), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "asado_tira_vacuno",
+    "nombre": "Asado de tira",
+    "categoria": "Carne",
+    "alias": [
+      "asado de tira",
+      "short ribs"
+    ],
+    "potasio_mg": 282,
+    "fosforo_mg": 167,
+    "sodio_mg": 75,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beef, chuck, short ribs, boneless, separable lean and fat, trimmed to 0\" fat, choice, raw",
+      "fdc_id": "170827",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente por grupo muscular (asado de tira ~ short ribs), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   }
 ]

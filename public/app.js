@@ -1450,6 +1450,7 @@ const CADENAS_SUPER = [
   { id: "jumbo", label: "Jumbo" },
   { id: "lider", label: "Líder" },
   { id: "unimarc", label: "Unimarc" },
+  { id: "tottus", label: "Tottus" },
   { id: "acuenta", label: "Acuenta" },
   { id: "alvi", label: "Alvi" },
 ];
@@ -1463,6 +1464,57 @@ function cadenaMasBarata(item) {
     if (!mejor || precio < mejor.precio) mejor = { cadena: cadena.id, precio };
   }
   return mejor;
+}
+
+const PORCION_REFERENCIA_SUPER_G = 150;
+
+function foodDeCatalogo(catalogoId) {
+  const ing = INGREDIENTES_REFRIGERADOR.find((i) => i.id === catalogoId);
+  const nutrientesId = ing && ing.nutrientes_id;
+  return nutrientesId ? FOODS.find((f) => f.id === nutrientesId) : null;
+}
+
+// Los cortes específicos (y algún ítem de nivel superior, como "vacuno") ya
+// traen su propio nutrientes_id embebido en precios-referencia.json — solo
+// el resto de los productos genéricos depende del reverso vía
+// ingredientes-refrigerador.json.
+function foodDeItem(item) {
+  if (item.nutrientes_id) return FOODS.find((f) => f.id === item.nutrientes_id) || null;
+  return foodDeCatalogo(item.id);
+}
+
+// Todos los productos con precio propio, aplanando los cortes específicos
+// dentro de sus productos padre — así el resto del código (selección,
+// totales) no necesita distinguir entre un producto genérico y un corte.
+function itemsPreciables() {
+  const flat = [];
+  for (const item of PRECIOS_REFERENCIA) {
+    flat.push(item);
+    if (item.cortes) flat.push(...item.cortes);
+  }
+  return flat;
+}
+
+// Los 3 nutrientes por separado (potasio, fósforo, sodio), no solo el peor —
+// un paciente puede necesitar cuidar uno en particular aunque no sea el más
+// alto de los tres. Misma lógica clínica que el resto de la app
+// (clasificar() por contenido, mg/100g, cuando no hay meta personal), no un
+// umbral inventado para esta pantalla.
+function semaforosCompactos(food) {
+  if (!food) return "";
+  const factor = PORCION_REFERENCIA_SUPER_G / 100;
+  const chips = ["potasio_mg", "fosforo_mg", "sodio_mg"]
+    .map((nutriente) => {
+      const densidad100g = food[nutriente];
+      if (densidad100g == null) return "";
+      const valorPorcion = Math.round(densidad100g * factor);
+      const { nivel } = clasificar(nutriente, valorPorcion, densidad100g);
+      if (!nivel) return "";
+      const etiqueta = nivelTagContenido(nivel);
+      return `<span class="super-semaforo nivel-${nivel}">${escapeHtml(NUTRIENTE_LABEL[nutriente])} ${escapeHtml(etiqueta)}</span>`;
+    })
+    .join("");
+  return chips ? `<div class="super-semaforos">${chips}</div>` : "";
 }
 
 function loadSuperSeleccion() {
@@ -1502,20 +1554,49 @@ function renderSuperChecklist() {
     if (!categorias.includes(item.categoria)) categorias.push(item.categoria);
   });
 
-  const filaCatalogo = (item) => {
-    const masBarata = cadenaMasBarata(item);
-    const chips = CADENAS_SUPER.map((cadena) => {
-      const precio = item.precios[cadena.id];
+  const filaPrecios = (preciable) => {
+    const masBarata = cadenaMasBarata(preciable);
+    return CADENAS_SUPER.map((cadena) => {
+      const precio = preciable.precios[cadena.id];
       const esMin = cadena.id === masBarata.cadena;
       return `<span class="super-chip-precio${esMin ? " super-chip-min" : ""}">${escapeHtml(cadena.label)} <strong>${formatoCLP(precio)}</strong></span>`;
     }).join("");
+  };
+
+  const filaCorte = (corte) => `
+    <div class="super-item super-item-corte">
+      <div class="super-item-top">
+        <input type="checkbox" id="super-check-${corte.id}" ${seleccion.has(corte.id) ? "checked" : ""}>
+        <span class="super-item-nombre">${escapeHtml(corte.nombre)}<small>${escapeHtml(corte.presentacion)}</small></span>
+      </div>
+      ${semaforosCompactos(foodDeItem(corte))}
+      <div class="super-item-precios">${filaPrecios(corte)}</div>
+    </div>`;
+
+  // "Carne de vacuno" agrupa cortes con precio y aporte nutricional muy
+  // distintos entre sí (una posta magra no es lo mismo que un asado de tira
+  // con grasa) — ponerle un precio o semáforo único al genérico sería
+  // impreciso a propósito. Queda solo como título de la categoría; los
+  // cortes reales, siempre visibles debajo, son lo que se marca y compra.
+  const filaConCortes = (item) => `
+    <div class="super-item super-item-titulo">
+      <p class="super-item-titulo-nombre">${escapeHtml(item.nombre)}</p>
+      <p class="super-item-titulo-nota">Cada corte tiene su propio precio y aporte nutricional — elige uno abajo.</p>
+      <div class="super-cortes">${item.cortes.map(filaCorte).join("")}</div>
+    </div>`;
+
+  const filaCatalogo = (item) => {
+    if (item.cortes && item.cortes.length) return filaConCortes(item);
     return `
     <div class="super-item">
       <div class="super-item-top">
         <input type="checkbox" id="super-check-${item.id}" ${seleccion.has(item.id) ? "checked" : ""}>
-        <span class="super-item-nombre">${escapeHtml(item.nombre)}<small>${escapeHtml(item.presentacion)}</small></span>
+        <span class="super-item-nombre">
+          ${escapeHtml(item.nombre)}<small>${escapeHtml(item.presentacion)}</small>
+        </span>
       </div>
-      <div class="super-item-precios">${chips}</div>
+      ${semaforosCompactos(foodDeItem(item))}
+      <div class="super-item-precios">${filaPrecios(item)}</div>
     </div>`;
   };
 
@@ -1541,7 +1622,8 @@ function renderSuperChecklist() {
 
   els.superChecklist.innerHTML = html;
 
-  PRECIOS_REFERENCIA.forEach((item) => {
+  itemsPreciables().forEach((item) => {
+    if (item.cortes) return; // "vacuno" y similares son solo título, sin checkbox propio
     document.getElementById(`super-check-${item.id}`).addEventListener("change", (e) => {
       toggleSuperCatalogo(item.id, e.target.checked);
     });
@@ -1601,7 +1683,7 @@ function actualizarResumenSuper() {
   const seleccion = loadSuperSeleccion();
   const custom = loadSuperCustom();
 
-  const itemsCatalogo = PRECIOS_REFERENCIA.filter((i) => seleccion.has(i.id));
+  const itemsCatalogo = itemsPreciables().filter((i) => seleccion.has(i.id));
   const itemsCustom = custom.filter((i) => i.checked);
   const cantidad = itemsCatalogo.length + itemsCustom.length;
   const totalMezclado = itemsCatalogo.reduce((acc, i) => acc + cadenaMasBarata(i).precio, 0)

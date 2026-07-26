@@ -77,6 +77,13 @@ MAPEO = {
     "pollo": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
     "res": "Beef, ground, 85% lean meat / 15% fat, patty, cooked, broiled",
     "carne_molida": "Beef, ground, 85% lean meat / 15% fat, raw (Includes foods for USDA's Food Distribution Program)",
+    # Cortes chilenos de vacuno para la lista de supermercado: sin tabla
+    # nacional digitalizada disponible (la del INTA es un PDF escaneado sin
+    # texto), se usa el corte USDA equivalente por grupo muscular. No es dato
+    # chileno medido, es una aproximación explícita — ver nota_equivalencia
+    # en cada entrada de nutrientes.json.
+    "posta_negra_vacuno": 'Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0" fat, choice, raw',
+    "asado_tira_vacuno": 'Beef, chuck, short ribs, boneless, separable lean and fat, trimmed to 0" fat, choice, raw',
     "cerdo": "Pork, fresh, loin, center loin (chops), bone-in, separable lean only, cooked, broiled",
     "salmon": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
     "atun": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)",

@@ -1066,6 +1066,29 @@ h1, h2, h3 {
 .super-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--brand); flex-shrink: 0; }
 .super-item-nombre { flex: 1; min-width: 0; font-size: 0.88rem; font-weight: 500; }
 .super-item-nombre small { display: block; color: var(--muted); font-size: 0.72rem; font-weight: 500; margin-top: 0.1rem; }
+
+/* Los 3 niveles (potasio, fósforo, sodio) del alimento, mismos colores que el
+   semáforo del resto de la app — en su propia fila, indentada bajo el
+   checkbox, porque 3 chips no caben junto al nombre. */
+.super-semaforos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding-left: 1.9rem;
+  margin-top: -0.15rem;
+}
+.super-semaforo {
+  flex-shrink: 0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.super-semaforo.nivel-verde { background: var(--verde-bg); border-color: var(--verde-border); color: var(--verde); }
+.super-semaforo.nivel-amarillo { background: var(--amarillo-bg); border-color: var(--amarillo-border); color: var(--amarillo); }
+.super-semaforo.nivel-rojo { background: var(--rojo-bg); border-color: var(--rojo-border); color: var(--rojo); }
 .super-item-precio { font-size: 0.88rem; font-weight: 700; color: var(--brand-dark); white-space: nowrap; }
 .super-item-quitar {
   background: none;
@@ -1105,6 +1128,22 @@ h1, h2, h3 {
   color: var(--verde);
 }
 .super-chip-precio.super-chip-min strong { color: var(--verde); }
+
+/* Productos como "Carne de vacuno" son solo el título de la categoría — sin
+   checkbox ni precio propio, porque un solo precio o semáforo para todos sus
+   cortes sería impreciso a propósito. Los cortes reales van debajo,
+   agrupados con un borde para que se note que pertenecen al título. */
+.super-item-titulo-nombre { margin: 0; font-size: 0.95rem; font-weight: 700; }
+.super-item-titulo-nota { margin: 0.15rem 0 0; font-size: 0.76rem; color: var(--muted); font-weight: 500; }
+.super-cortes {
+  margin-top: 0.8rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--brand-100);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.super-item-corte { padding: 0; border-bottom: none; }
 
 .super-agregar {
   display: flex;
