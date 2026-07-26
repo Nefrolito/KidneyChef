@@ -832,15 +832,6 @@ const els = {
   farmacosK: document.getElementById("dato-farmacos-k"),
   planUpsell: document.getElementById("plan-upsell"),
   planUpsellText: document.getElementById("plan-upsell-text"),
-  activarPlanClinico: document.getElementById("activar-plan-clinico"),
-  codigoClienteBloque: document.getElementById("codigo-cliente-bloque"),
-  codigoClienteValor: document.getElementById("codigo-cliente-valor"),
-  copiarCodigoBtn: document.getElementById("copiar-codigo-btn"),
-  vinculosPendientes: document.getElementById("vinculos-pendientes"),
-  vinculosActivos: document.getElementById("vinculos-activos"),
-  metasSincronizadas: document.getElementById("metas-sincronizadas"),
-  metaPotasioValor: document.getElementById("meta-potasio-valor"),
-  metaFosforoValor: document.getElementById("meta-fosforo-valor"),
   trialBanner: document.getElementById("trial-banner"),
   trialBannerText: document.getElementById("trial-banner-text"),
   paywallOverlay: document.getElementById("paywall-overlay"),
@@ -859,12 +850,18 @@ const els = {
   refrigeradorGenerarBtn: document.getElementById("refrigerador-generar-btn"),
   refrigeradorRecetaIa: document.getElementById("refrigerador-receta-ia"),
   refrigeradorLimpiarBtn: document.getElementById("refrigerador-limpiar-btn"),
+  recetasGuardadasWrap: document.getElementById("recetas-guardadas-wrap"),
+  recetasGuardadasList: document.getElementById("recetas-guardadas-list"),
+  tabBar: document.getElementById("tab-bar"),
+  superChecklist: document.getElementById("super-checklist"),
+  superItemNombre: document.getElementById("super-item-nombre"),
+  superItemPrecio: document.getElementById("super-item-precio"),
+  superAgregarBtn: document.getElementById("super-agregar-btn"),
+  superCantidad: document.getElementById("super-cantidad"),
+  superTotal: document.getElementById("super-total"),
+  superProyeccion: document.getElementById("super-proyeccion"),
+  superLimpiarBtn: document.getElementById("super-limpiar-btn"),
 };
-
-// Sin infraestructura de push, se refresca por polling mientras la app está
-// abierta — así una solicitud de vínculo nueva aparece sin que el paciente
-// tenga que cerrar y volver a abrir la app.
-const VINCULOS_POLL_MS = 60000;
 
 let lastAnalysis = []; // current analysis results, mutable for manual correction
 
@@ -879,6 +876,12 @@ async function init() {
   } catch (e) {
     console.warn("No se pudo cargar recetas.json / ingredientes-refrigerador.json", e);
   }
+  try {
+    PRECIOS_REFERENCIA = await fetch("precios-referencia.json").then((r) => r.json());
+    renderSuperChecklist();
+  } catch (e) {
+    console.warn("No se pudo cargar precios-referencia.json", e);
+  }
   // Si el modelo clínico no carga, la app sigue funcionando con los umbrales
   // fijos de UMBRALES en vez de quedarse sin semáforo.
   try {
@@ -891,12 +894,10 @@ async function init() {
   renderTipOfDay();
   renderPlan();
   renderDatosClinicos();
-  renderVinculacion();
-  refrescarVinculos();
-  refrescarMetasSincronizadas();
   renderSuscripcion();
   initRevenueCat();
-  setInterval(refrescarVinculos, VINCULOS_POLL_MS);
+  initTabs();
+  renderRecetasGuardadas();
 
   els.cameraInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
   els.analyzeBtn.addEventListener("click", analyzeImage);
@@ -917,8 +918,6 @@ async function init() {
   els.egfrSexo.addEventListener("change", guardarDatosClinicos);
   els.egfrCreatinina.addEventListener("input", guardarDatosClinicos);
   els.egfrCistatina.addEventListener("input", guardarDatosClinicos);
-  els.activarPlanClinico.addEventListener("change", activarPlanClinico);
-  els.copiarCodigoBtn.addEventListener("click", copiarCodigoCliente);
   els.paywallSuscribirBtn.addEventListener("click", comprarSuscripcion);
   els.refrigeradorBuscarBtn.addEventListener("click", buscarRecetasRefrigerador);
   els.refrigeradorCameraInput.addEventListener("change", (e) => handleRefrigeradorFileSelected(e.target.files[0]));
@@ -937,7 +936,33 @@ async function init() {
   });
   els.liquidosDeshacerBtn.addEventListener("click", deshacerUltimoLiquido);
 
+  els.superAgregarBtn.addEventListener("click", agregarItemPersonalizadoSuper);
+  els.superLimpiarBtn.addEventListener("click", limpiarSeleccionSuper);
+
   renderCalculadora();
+}
+
+// --- Navegación por pestañas ---
+const TAB_STORAGE_KEY = "kidneyChefTabActiva";
+
+function initTabs() {
+  const tabGuardada = localStorage.getItem(TAB_STORAGE_KEY);
+  const tabs = Array.from(els.tabBar.querySelectorAll(".tab-btn")).map((btn) => btn.dataset.tabTarget);
+  irATab(tabGuardada && tabs.includes(tabGuardada) ? tabGuardada : "hoy");
+
+  els.tabBar.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => irATab(btn.dataset.tabTarget));
+  });
+}
+
+function irATab(tab) {
+  document.querySelectorAll("[data-tab]").forEach((el) => {
+    el.classList.toggle("tab-inactive", el.dataset.tab !== tab);
+  });
+  els.tabBar.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.setAttribute("aria-selected", String(btn.dataset.tabTarget === tab));
+  });
+  localStorage.setItem(TAB_STORAGE_KEY, tab);
 }
 
 function renderTipOfDay() {
@@ -1199,6 +1224,8 @@ function badge(nutriente, valorPorcion, densidad100g) {
 // --- Recetas con lo que tienes en el refrigerador ---
 let RECETAS_DATA = [];
 let INGREDIENTES_REFRIGERADOR = [];
+let PRECIOS_REFERENCIA = [];
+let recetaActualIA = null; // última receta generada por IA, pendiente o ya guardada
 const MAX_INGREDIENTES_FALTANTES = 2; // "casi listas": les falta esto o menos
 // Sin foto no hay gramos reales de porción: se asume un plato individual
 // estándar para poder mostrar el mismo semáforo verde/ámbar/rojo que el resto
@@ -1407,6 +1434,148 @@ function limpiarSeleccionRefrigerador() {
   setRefrigeradorStatus("");
 }
 
+// --- Lista de supermercado con precios de referencia ---
+const SUPER_SELECCION_STORAGE_KEY = "kidneyChefSuperSeleccion";
+const SUPER_CUSTOM_STORAGE_KEY = "kidneyChefSuperCustom";
+const SEMANAS_POR_MES = 4.33;
+
+function loadSuperSeleccion() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(SUPER_SELECCION_STORAGE_KEY) || "[]"));
+  } catch {
+    return new Set();
+  }
+}
+
+function saveSuperSeleccion(set) {
+  localStorage.setItem(SUPER_SELECCION_STORAGE_KEY, JSON.stringify([...set]));
+}
+
+function loadSuperCustom() {
+  try {
+    return JSON.parse(localStorage.getItem(SUPER_CUSTOM_STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveSuperCustom(arr) {
+  localStorage.setItem(SUPER_CUSTOM_STORAGE_KEY, JSON.stringify(arr));
+}
+
+function formatoCLP(n) {
+  return `$${Math.round(n).toLocaleString("es-CL")}`;
+}
+
+function renderSuperChecklist() {
+  const seleccion = loadSuperSeleccion();
+  const custom = loadSuperCustom();
+
+  const categorias = [];
+  PRECIOS_REFERENCIA.forEach((item) => {
+    if (!categorias.includes(item.categoria)) categorias.push(item.categoria);
+  });
+
+  const filaCatalogo = (item) => `
+    <div class="super-item">
+      <input type="checkbox" id="super-check-${item.id}" ${seleccion.has(item.id) ? "checked" : ""}>
+      <span class="super-item-nombre">${escapeHtml(item.nombre)}<small>${escapeHtml(item.presentacion)}</small></span>
+      <span class="super-item-precio">${formatoCLP(item.precio_clp)}</span>
+    </div>`;
+
+  let html = categorias
+    .map((categoria) => {
+      const items = PRECIOS_REFERENCIA.filter((i) => i.categoria === categoria);
+      return `<div><p class="super-categoria-titulo">${escapeHtml(categoria)}</p>${items.map(filaCatalogo).join("")}</div>`;
+    })
+    .join("");
+
+  if (custom.length) {
+    const filaCustom = (item) => `
+      <div class="super-item">
+        <input type="checkbox" id="super-check-${item.id}" ${item.checked ? "checked" : ""}>
+        <span class="super-item-nombre">${escapeHtml(item.nombre)}</span>
+        <span class="super-item-precio">${formatoCLP(item.precio_clp)}</span>
+        <button class="super-item-quitar" id="super-quitar-${item.id}" aria-label="Quitar producto">✕</button>
+      </div>`;
+    html += `<div><p class="super-categoria-titulo">Agregados por ti</p>${custom.map(filaCustom).join("")}</div>`;
+  }
+
+  els.superChecklist.innerHTML = html;
+
+  PRECIOS_REFERENCIA.forEach((item) => {
+    document.getElementById(`super-check-${item.id}`).addEventListener("change", (e) => {
+      toggleSuperCatalogo(item.id, e.target.checked);
+    });
+  });
+  custom.forEach((item) => {
+    document.getElementById(`super-check-${item.id}`).addEventListener("change", (e) => {
+      toggleSuperCustom(item.id, e.target.checked);
+    });
+    document.getElementById(`super-quitar-${item.id}`).addEventListener("click", () => quitarItemCustom(item.id));
+  });
+
+  actualizarResumenSuper();
+}
+
+function toggleSuperCatalogo(id, checked) {
+  const seleccion = loadSuperSeleccion();
+  if (checked) seleccion.add(id); else seleccion.delete(id);
+  saveSuperSeleccion(seleccion);
+  actualizarResumenSuper();
+}
+
+function toggleSuperCustom(id, checked) {
+  const arr = loadSuperCustom();
+  const item = arr.find((i) => i.id === id);
+  if (item) item.checked = checked;
+  saveSuperCustom(arr);
+  actualizarResumenSuper();
+}
+
+function quitarItemCustom(id) {
+  const arr = loadSuperCustom().filter((i) => i.id !== id);
+  saveSuperCustom(arr);
+  renderSuperChecklist();
+}
+
+function agregarItemPersonalizadoSuper() {
+  const nombre = els.superItemNombre.value.trim();
+  const precio = Number(els.superItemPrecio.value);
+  if (!nombre || !precio || precio <= 0) return;
+
+  const arr = loadSuperCustom();
+  arr.push({ id: `custom-${Date.now()}`, nombre, precio_clp: precio, checked: true });
+  saveSuperCustom(arr);
+
+  els.superItemNombre.value = "";
+  els.superItemPrecio.value = "";
+  renderSuperChecklist();
+}
+
+function limpiarSeleccionSuper() {
+  saveSuperSeleccion(new Set());
+  saveSuperCustom([]);
+  renderSuperChecklist();
+}
+
+function actualizarResumenSuper() {
+  const seleccion = loadSuperSeleccion();
+  const custom = loadSuperCustom();
+
+  const itemsCatalogo = PRECIOS_REFERENCIA.filter((i) => seleccion.has(i.id));
+  const itemsCustom = custom.filter((i) => i.checked);
+  const cantidad = itemsCatalogo.length + itemsCustom.length;
+  const total = itemsCatalogo.reduce((acc, i) => acc + i.precio_clp, 0)
+    + itemsCustom.reduce((acc, i) => acc + i.precio_clp, 0);
+
+  els.superCantidad.textContent = cantidad;
+  els.superTotal.textContent = formatoCLP(total);
+  els.superProyeccion.textContent = cantidad
+    ? `Si compras esta lista cada semana: ≈ ${formatoCLP(total * SEMANAS_POR_MES)} al mes.`
+    : "";
+}
+
 // Ingredientes candidatos para la receta generada: los identificados por foto
 // (ya resueltos contra nutrientes.json) más los marcados a mano en el
 // checklist que tengan un equivalente confiable en nutrientes.json — no todo
@@ -1512,6 +1681,7 @@ async function generarRecetaIA() {
 // calculado por su cuenta — mismo criterio que el resto de la app.
 function renderRecetaIA(receta) {
   els.refrigeradorRecetaIa.hidden = false;
+  recetaActualIA = receta;
   const densidad100g = (n) => (receta.total_gramos > 0 ? (receta.totales[n] / receta.total_gramos) * 100 : 0);
   const valorPorcion = (n) => Math.round(receta.totales[n] || 0);
   const semaforo = nutrientesVisibles()
@@ -1543,7 +1713,63 @@ function renderRecetaIA(receta) {
       ${notaSinMeta()}
       ${consejoHtml}
       <ol class="refrigerador-receta-lista">${pasos}</ol>
+      <button id="receta-ia-guardar-btn" class="btn btn-secondary btn-guardar-receta">Guardar receta</button>
     </div>`;
+  document.getElementById("receta-ia-guardar-btn").addEventListener("click", guardarRecetaIA);
+}
+
+// --- Recetas guardadas por el paciente (localStorage, solo en este dispositivo) ---
+const RECETAS_GUARDADAS_STORAGE_KEY = "kidneyChefRecetasGuardadas";
+
+function loadRecetasGuardadas() {
+  try {
+    return JSON.parse(localStorage.getItem(RECETAS_GUARDADAS_STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function guardarRecetaIA() {
+  if (!recetaActualIA) return;
+  const arr = loadRecetasGuardadas();
+  arr.unshift({ ...recetaActualIA, guardadaEn: new Date().toISOString() });
+  localStorage.setItem(RECETAS_GUARDADAS_STORAGE_KEY, JSON.stringify(arr));
+  renderRecetasGuardadas();
+
+  const btn = document.getElementById("receta-ia-guardar-btn");
+  if (btn) {
+    btn.textContent = "Receta guardada ✓";
+    btn.classList.add("guardada");
+    btn.disabled = true;
+  }
+}
+
+function eliminarRecetaGuardada(idx) {
+  const arr = loadRecetasGuardadas();
+  arr.splice(idx, 1);
+  localStorage.setItem(RECETAS_GUARDADAS_STORAGE_KEY, JSON.stringify(arr));
+  renderRecetasGuardadas();
+}
+
+function renderRecetasGuardadas() {
+  const arr = loadRecetasGuardadas();
+  els.recetasGuardadasWrap.hidden = arr.length === 0;
+  if (arr.length === 0) return;
+
+  els.recetasGuardadasList.innerHTML = arr
+    .map((r, idx) => {
+      const fecha = new Date(r.guardadaEn).toLocaleDateString("es-CL", { day: "numeric", month: "short" });
+      return `
+        <div class="receta-guardada-item">
+          <span>${escapeHtml(r.nombre)}<span class="receta-guardada-fecha">Guardada el ${fecha}</span></span>
+          <button class="super-item-quitar" id="receta-guardada-quitar-${idx}" aria-label="Eliminar receta guardada">✕</button>
+        </div>`;
+    })
+    .join("");
+
+  arr.forEach((_, idx) => {
+    document.getElementById(`receta-guardada-quitar-${idx}`).addEventListener("click", () => eliminarRecetaGuardada(idx));
+  });
 }
 
 // --- Calculadora de consumo diario (K, P, Na, carbohidratos, líquidos) ---

@@ -49,7 +49,7 @@
   </div>
 
   <main class="container">
-    <section class="card capture-card">
+    <section class="card capture-card" data-tab="hoy">
       <div id="preview-wrap" class="preview-wrap">
         <img id="preview" alt="Vista previa del alimento" hidden>
         <div id="preview-placeholder" class="preview-placeholder">
@@ -90,12 +90,12 @@
       <p id="status" class="status" role="status" aria-live="polite"></p>
     </section>
 
-    <section id="results" class="card results-card" hidden>
+    <section id="results" class="card results-card" data-tab="hoy" hidden>
       <h2>Resultado del análisis</h2>
       <div id="results-list"></div>
     </section>
 
-    <section class="card refrigerador-card">
+    <section class="card refrigerador-card" data-tab="refrigerador">
       <h2>¿Qué tienes en el refrigerador?</h2>
       <p class="clinical-note">
         Fotografía los ingredientes que tienes y te armamos una receta pensada
@@ -129,9 +129,14 @@
 
       <div id="refrigerador-resultados" hidden></div>
       <div id="refrigerador-receta-ia" hidden></div>
+
+      <div id="recetas-guardadas-wrap" class="recetas-guardadas-wrap" hidden>
+        <h3>Recetas guardadas</h3>
+        <div id="recetas-guardadas-list"></div>
+      </div>
     </section>
 
-    <section class="card calculadora-card">
+    <section class="card calculadora-card" data-tab="hoy">
       <h2>Tu día de hoy</h2>
       <div id="calculadora"></div>
 
@@ -158,7 +163,7 @@
       </p>
     </section>
 
-    <section class="card history-card">
+    <section class="card history-card" data-tab="hoy">
       <div class="history-header">
         <h2>Historial de hoy</h2>
         <button id="clear-history" class="btn btn-ghost">
@@ -169,7 +174,7 @@
       <div id="history-list" class="history-list"></div>
     </section>
 
-    <section class="card clinical-card">
+    <section class="card clinical-card" data-tab="clinico">
       <h2>Tus datos clínicos</h2>
       <p class="clinical-note">Ayudan a tu equipo tratante a ajustar tu Plan Clínico. Se guardan solo en este dispositivo.</p>
 
@@ -260,43 +265,7 @@
       </label>
     </section>
 
-    <section class="card tratante-card">
-      <h2>Equipo tratante</h2>
-      <p class="clinical-note">
-        Vincula tu celular con tu nefrólogo(a) o nutricionista para que ajuste
-        tus metas de potasio y fósforo a distancia. No ve ningún dato tuyo
-        hasta que tú aceptas la solicitud de vínculo, acá mismo.
-      </p>
-
-      <label class="clinical-check clinical-check-ancho">
-        <input type="checkbox" id="activar-plan-clinico">
-        <span>Activar Plan Clínico</span>
-      </label>
-
-      <div id="codigo-cliente-bloque" class="clinical-field" hidden>
-        <label>Tu código de cliente</label>
-        <div class="codigo-cliente-fila">
-          <span id="codigo-cliente-valor" class="codigo-cliente-valor">—</span>
-          <button type="button" id="copiar-codigo-btn" class="btn btn-ghost">Copiar</button>
-        </div>
-        <small class="campo-ayuda">Compártelo con tu equipo tratante para que se vincule contigo.</small>
-      </div>
-
-      <div id="vinculos-pendientes" class="vinculos-lista"></div>
-      <div id="vinculos-activos" class="vinculos-lista"></div>
-
-      <div id="metas-sincronizadas" class="clinical-field" hidden>
-        <label>Metas fijadas por tu equipo tratante</label>
-        <p class="metas-sincronizadas-fila">
-          Potasio: <strong id="meta-potasio-valor">—</strong>
-        </p>
-        <p class="metas-sincronizadas-fila">
-          Fósforo: <strong id="meta-fosforo-valor">—</strong>
-        </p>
-      </div>
-    </section>
-
-    <section id="plan-upsell" class="card plan-upsell-card" hidden>
+    <section id="plan-upsell" class="card plan-upsell-card" data-tab="clinico" hidden>
       <span class="plan-upsell-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="4.2"/></svg>
       </span>
@@ -307,7 +276,7 @@
       </div>
     </section>
 
-    <section class="card tip-card">
+    <section class="card tip-card" data-tab="hoy">
       <span class="tip-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .8 1.7v.5h5.6v-.5c0-.7.3-1.3.8-1.7A6 6 0 0 0 12 3Z"/></svg>
       </span>
@@ -325,7 +294,7 @@
       </svg>
     </section>
 
-    <div class="disclaimer">
+    <div class="disclaimer" data-tab="hoy">
       <svg class="disclaimer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><path d="M12 8v5"/><circle cx="12" cy="16.2" r="0.4" fill="currentColor"/></svg>
       <p>
         Esta app es una herramienta educativa de apoyo y usa valores nutricionales
@@ -335,7 +304,56 @@
         verifica siempre el alimento identificado.
       </p>
     </div>
+
+    <section class="card supermercado-card" data-tab="supermercado">
+      <h2>Lista de supermercado</h2>
+      <p class="clinical-note">
+        Marca lo que necesitas comprar. Los precios son una referencia general
+        en CLP y pueden variar según el supermercado y la temporada.
+      </p>
+
+      <div id="super-checklist" class="super-checklist"></div>
+
+      <div class="super-agregar">
+        <input type="text" id="super-item-nombre" placeholder="Otro producto (ej: yogurt bajo en sodio)">
+        <input type="number" id="super-item-precio" min="0" step="50" placeholder="$">
+        <button id="super-agregar-btn" class="btn btn-secondary">Agregar</button>
+      </div>
+
+      <div class="super-resumen">
+        <div class="super-resumen-fila">
+          <span>Productos seleccionados</span>
+          <strong id="super-cantidad">0</strong>
+        </div>
+        <div class="super-resumen-fila super-resumen-total">
+          <span>Total esta compra</span>
+          <strong id="super-total">$0</strong>
+        </div>
+        <p class="super-proyeccion" id="super-proyeccion"></p>
+      </div>
+
+      <button id="super-limpiar-btn" class="btn btn-ghost" style="width:100%;">Limpiar selección</button>
+    </section>
   </main>
+
+  <nav class="tab-bar" id="tab-bar" role="tablist" aria-label="Navegación principal">
+    <button class="tab-btn" data-tab-target="hoy" role="tab" aria-selected="true">
+      <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1V10.5Z"/></svg>
+      <span>Hoy</span>
+    </button>
+    <button class="tab-btn" data-tab-target="clinico" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 8.3C20 5.9 18 4 15.6 4c-1.5 0-2.8.7-3.6 1.9C11.2 4.7 9.9 4 8.4 4 6 4 4 5.9 4 8.3c0 4.6 8 11.2 8 11.2s8-6.6 8-11.2Z"/><path d="M5.5 10h2.3l1.4-2.4 1.8 4.8 1.2-2.4h4.3"/></svg>
+      <span>Clínico</span>
+    </button>
+    <button class="tab-btn" data-tab-target="refrigerador" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="1.6"/><path d="M6 9.5h12"/><path d="M9 5v2.2M9 12v2.2"/></svg>
+      <span>Refrigerador</span>
+    </button>
+    <button class="tab-btn" data-tab-target="supermercado" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="20" r="1"/><circle cx="17.5" cy="20" r="1"/><path d="M3 4h2l2.3 11a1.8 1.8 0 0 0 1.8 1.5h7.6a1.8 1.8 0 0 0 1.8-1.5L20 8H6.2"/></svg>
+      <span>Súper</span>
+    </button>
+  </nav>
 
   <div id="manual-select-modal" class="modal" hidden>
     <div class="modal-content">
