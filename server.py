@@ -300,7 +300,7 @@ NUTRIENTE_UNIDAD = {"potasio_mg": "mg", "fosforo_mg": "mg", "sodio_mg": "mg", "c
 NUTRIENTE_NOMBRE = {"potasio_mg": "potasio", "fosforo_mg": "fósforo", "sodio_mg": "sodio", "carbohidratos_g": "carbohidratos"}
 
 
-def _build_prompt_receta(foods, presupuesto, densidad_maxima=None):
+def _build_prompt_receta(foods, presupuesto, densidad_maxima=None, situacion_clinica=None, riesgo_hiperkalemia=False):
     lineas_ingredientes = []
     for f in foods:
         aportes = ", ".join(
@@ -338,6 +338,28 @@ tratante recomienda en general no superar esta densidad en el plato final:
         if lineas_densidad else ""
     )
 
+    # La situación clínica declarada (etapa ERC o modalidad de diálisis) es
+    # el pilar de la app: sin esto, la receta generada quedaría idéntica la
+    # declare el paciente o no, y esa personalización es justo lo que importa.
+    if situacion_clinica and situacion_clinica.get("declarada"):
+        bloque_situacion = (
+            f"\nSituación clínica declarada por el paciente: {situacion_clinica.get('etiqueta')}. "
+            f"{situacion_clinica.get('consideracion')} Ten esto en cuenta al elegir cantidades — "
+            "por ejemplo, si la consideración indica que el potasio puede liberalizarse, no seas "
+            "más estricto de lo necesario; si indica mayor riesgo o vigilancia, sé más conservador."
+        )
+    else:
+        bloque_situacion = (
+            "\nEl paciente no declaró su etapa de enfermedad renal ni si está en diálisis — "
+            "usa solo los criterios generales de arriba, sin asumir una situación más grave o más "
+            "leve que la que se te indicó."
+        )
+    if riesgo_hiperkalemia:
+        bloque_situacion += (
+            " El paciente tiene además factores de riesgo de hiperpotasemia (diabetes o "
+            "medicamentos que retienen potasio) — prioriza especialmente mantener el potasio bajo."
+        )
+
     return f"""Eres un asistente que arma una receta casera chilena para un paciente con \
 enfermedad renal crónica, usando SOLO los ingredientes que tiene disponibles. La precisión \
 de las cantidades importa para su salud: si te pasas del presupuesto de un nutriente, el \
@@ -348,6 +370,7 @@ Ingredientes disponibles, con su aporte por 100 g:
 
 Presupuesto que le queda disponible al paciente hoy (no lo superes):
 {chr(10).join(lineas_presupuesto)}{bloque_densidad}
+{bloque_situacion}
 
 Responde EXCLUSIVAMENTE con un JSON válido (sin texto adicional, sin bloques de código \
 markdown), con esta forma:
@@ -383,7 +406,7 @@ salteados, cazuelas, revueltos).
 - Pasos de preparación breves (máximo 5), en español, para una preparación casera simple."""
 
 
-def call_claude_receta(ingrediente_ids, presupuesto, densidad_maxima=None):
+def call_claude_receta(ingrediente_ids, presupuesto, densidad_maxima=None, situacion_clinica=None, riesgo_hiperkalemia=False):
     foods = []
     for fid in ingrediente_ids:
         food = KNOWN_FOODS_BY_ID.get(fid)
@@ -400,7 +423,7 @@ def call_claude_receta(ingrediente_ids, presupuesto, densidad_maxima=None):
             "con la línea: ANTHROPIC_API_KEY=tu_api_key"
         )
 
-    prompt = _build_prompt_receta(foods, presupuesto, densidad_maxima)
+    prompt = _build_prompt_receta(foods, presupuesto, densidad_maxima, situacion_clinica, riesgo_hiperkalemia)
     body = json.dumps({
         "model": ANTHROPIC_MODEL,
         "max_tokens": 3072,
@@ -707,6 +730,8 @@ def handle_generar_receta(handler):
         return
     presupuesto = body.get("presupuesto") if isinstance(body.get("presupuesto"), dict) else {}
     densidad_maxima = body.get("densidad_maxima") if isinstance(body.get("densidad_maxima"), dict) else {}
+    situacion_clinica = body.get("situacion_clinica") if isinstance(body.get("situacion_clinica"), dict) else None
+    riesgo_hiperkalemia = bool(body.get("riesgo_hiperkalemia"))
 
     ip = handler._client_ip()
     permitido, retry_after, motivo = RATE_LIMITER.check(ip)
@@ -723,7 +748,7 @@ def handle_generar_receta(handler):
         return
 
     try:
-        receta = call_claude_receta(ingredientes, presupuesto, densidad_maxima)
+        receta = call_claude_receta(ingredientes, presupuesto, densidad_maxima, situacion_clinica, riesgo_hiperkalemia)
         handler._send_json(200, receta)
     except ValueError as e:
         handler._send_json(400, {"error": str(e)})

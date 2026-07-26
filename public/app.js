@@ -1453,6 +1453,17 @@ function densidadMaximaSinMeta() {
   return out;
 }
 
+// La receta generada tiene que usar la situación clínica declarada (etapa
+// ERC o modalidad de diálisis) — no solo umbrales genéricos de K/P/Na. Sin
+// esto, la clínica del paciente es letra muerta para esta feature, que es
+// justo el pilar de la app.
+function situacionClinicaParaIA() {
+  const s = situacionActual();
+  if (!LIMITES || !s || !LIMITES.situaciones[s]) return { declarada: false };
+  const cfg = LIMITES.situaciones[s];
+  return { declarada: true, etiqueta: cfg.etiqueta, consideracion: cfg.consideracion };
+}
+
 async function generarRecetaIA() {
   const ingredientes = candidatosParaIA();
   if (ingredientes.length === 0) {
@@ -1472,6 +1483,8 @@ async function generarRecetaIA() {
         ingredientes,
         presupuesto: presupuestoRestanteHoy(),
         densidad_maxima: densidadMaximaSinMeta(),
+        situacion_clinica: situacionClinicaParaIA(),
+        riesgo_hiperkalemia: riesgoHiperkalemia(),
       }),
     });
     const data = await res.json();
@@ -1507,6 +1520,14 @@ function renderRecetaIA(receta) {
     ? `<div class="receta-consejo"><span aria-hidden="true">💡</span><span><strong>Consejo:</strong> ${escapeHtml(receta.consejo)}</span></div>`
     : "";
 
+  // Determinístico, no depende de que la IA se acuerde de mencionarlo: sin
+  // etapa ERC ni modalidad de diálisis declarada, esta receta se ajustó solo
+  // con criterios generales — el paciente tiene que ver esa ausencia, no que
+  // la app funcione igual con o sin sus datos clínicos.
+  const sinSituacion = !situacionClinicaParaIA().declarada
+    ? `<div class="receta-consejo"><span aria-hidden="true">🩺</span><span>Esta receta se ajustó con criterios generales porque no has declarado tu etapa de enfermedad renal ni si estás en diálisis. Completa <strong>"Tus datos clínicos"</strong> para que se ajuste a tu situación real.</span></div>`
+    : "";
+
   const pasos = (receta.pasos || []).map((p) => `<li>${escapeHtml(p)}</li>`).join("");
   const ingredientesHtml = (receta.ingredientes || [])
     .map((i) => `<li>${escapeHtml(i.nombre)} — ${i.gramos} g</li>`)
@@ -1519,6 +1540,7 @@ function renderRecetaIA(receta) {
       <ul class="refrigerador-receta-lista">${ingredientesHtml}</ul>
       <div class="semaforo-row">${semaforo}</div>
       ${notaSinMeta()}
+      ${sinSituacion}
       ${consejoHtml}
       <ol class="refrigerador-receta-lista">${pasos}</ol>
     </div>`;
