@@ -78,6 +78,15 @@ KNOWN_FOODS_BY_ID = {f["id"]: f for f in KNOWN_FOODS}
 
 NUTRIENTES_RECETA = ["potasio_mg", "fosforo_mg", "sodio_mg", "carbohidratos_g"]
 
+# Para identificar ingredientes de refrigerador (crudos/sin preparar) se
+# excluyen los platos chilenos compuestos de KNOWN_FOODS_LIST: son el mismo
+# nombre que usaría el reconocimiento de un plato ya servido ("cazuela",
+# "empanada de pino"), y sugerírselos a la IA como candidato para una foto de
+# ingredientes sueltos la empujaba a adivinar un plato preparado en vez de
+# listar cada ingrediente individual.
+_RECETAS_IDS = {r["id"] for r in json.loads((PUBLIC_DIR / "recetas.json").read_text())}
+INGREDIENTES_CRUDOS_LIST = ", ".join(f["nombre"] for f in KNOWN_FOODS if f["id"] not in _RECETAS_IDS)
+
 PROMPT = f"""Eres un asistente que identifica alimentos en fotografías para una app de \
 nutrición renal usada por pacientes con enfermedad renal crónica. La precisión importa: \
 una identificación incorrecta puede llevar a una estimación de potasio/fósforo/sodio \
@@ -102,6 +111,34 @@ visualmente similar.
 - "alternativas": incluye 1-2 nombres de la lista conocida que también podrían encajar si \
 no estás seguro (deja el array vacío si tienes alta confianza).
 - Estima la porción visible en gramos según el tamaño aparente del alimento en la imagen."""
+
+PROMPT_INGREDIENTES = f"""Eres un asistente que identifica ingredientes y productos de \
+alimentos en una fotografía de un refrigerador, despensa o mesón de cocina, para una app de \
+nutrición renal usada por pacientes con enfermedad renal crónica. La precisión importa: una \
+identificación incorrecta puede llevar a sugerir una receta con un ingrediente equivocado.
+
+A diferencia de una foto de un plato ya servido, acá el paciente muestra ingredientes CRUDOS \
+o productos SIN preparar (verduras, carnes, lácteos, abarrotes). Identifica cada ingrediente \
+individual que veas — no adivines un plato preparado a partir de ellos.
+
+Responde EXCLUSIVAMENTE con un array JSON válido (sin texto adicional, sin bloques de \
+código markdown), con esta forma:
+
+[{{"alimento": "nombre del ingrediente", "confianza": numero_entre_0_y_1, \
+"alternativas": ["otro nombre posible", "..."]}}]
+
+Reglas:
+- Incluye un objeto por cada ingrediente o producto distinto que identifiques (máximo 8).
+- Siempre que el ingrediente corresponda razonablemente a uno de esta lista conocida, usa \
+EXACTAMENTE ese nombre (coincidencia exacta de texto): {INGREDIENTES_CRUDOS_LIST}.
+- Preferí el nombre del ingrediente crudo o individual (ej. "Pechuga de pollo", "Cebolla") \
+en vez de un plato preparado — acá el paciente todavía no ha cocinado nada.
+- Si no corresponde a ninguno de la lista, usa un nombre genérico simple en español (sin \
+marcas ni preparaciones específicas).
+- "confianza" debe reflejar tu certeza real: usa un valor bajo (menos de 0.5) si el \
+ingrediente es ambiguo, está parcialmente oculto, o el empaque no deja verlo con claridad.
+- "alternativas": incluye 1-2 nombres de la lista conocida que también podrían encajar si \
+no estás seguro (deja el array vacío si tienes alta confianza)."""
 
 
 class RateLimiter:
@@ -191,7 +228,7 @@ def format_espera(segundos):
     return f"{horas} hora{'s' if horas != 1 else ''}"
 
 
-def call_claude_vision(data_url):
+def _call_claude_vision_con_prompt(data_url, prompt):
     match = re.match(r"^data:(image/\w+);base64,(.+)$", data_url, re.DOTALL)
     if not match:
         raise ValueError("Formato de imagen inválido")
@@ -211,7 +248,7 @@ def call_claude_vision(data_url):
             "role": "user",
             "content": [
                 {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": b64data}},
-                {"type": "text", "text": PROMPT},
+                {"type": "text", "text": prompt},
             ],
         }],
     }).encode("utf-8")
@@ -243,6 +280,14 @@ def call_claude_vision(data_url):
     if not isinstance(items, list):
         raise RuntimeError("La IA no devolvió una lista de alimentos")
     return items
+
+
+def call_claude_vision(data_url):
+    return _call_claude_vision_con_prompt(data_url, PROMPT)
+
+
+def call_claude_vision_ingredientes(data_url):
+    return _call_claude_vision_con_prompt(data_url, PROMPT_INGREDIENTES)
 
 
 NUTRIENTE_UNIDAD = {"potasio_mg": "mg", "fosforo_mg": "mg", "sodio_mg": "mg", "carbohidratos_g": "g"}
@@ -521,6 +566,63 @@ def handle_analyze(handler):
             return
 
         items = call_claude_vision(image)
+        handler._send_json(200, {"items": items})
+    except RuntimeError as e:
+        handler._send_json(500, {"error": str(e)})
+    except Exception as e:
+        handler._send_json(500, {"error": f"Error inesperado: {e}"})
+
+
+def handle_identificar_ingredientes(handler):
+    """POST /api/identificar-ingredientes — como /api/analyze, pero con un
+    prompt aparte para ingredientes crudos de refrigerador/despensa en vez de
+    un plato ya servido (ver PROMPT_INGREDIENTES). Comparte guardas y cupo con
+    /api/analyze porque también llama a la API de Claude y cuesta dinero."""
+    if APP_KEY:
+        provided = handler.headers.get("X-App-Key", "")
+        if not hmac.compare_digest(provided, APP_KEY):
+            print(f"[auth] rechazado ip={handler._client_ip()}", flush=True)
+            handler._send_json(401, {"error": "Acceso no autorizado a la API."})
+            return
+
+    try:
+        length = int(handler.headers.get("Content-Length", 0))
+    except ValueError:
+        handler._send_json(400, {"error": "Content-Length inválido"})
+        return
+
+    if length > MAX_BODY_BYTES:
+        handler._send_json(413, {
+            "error": "La imagen es demasiado grande. Intenta con una foto de menor resolución."
+        })
+        return
+
+    try:
+        raw = handler.rfile.read(length)
+        payload = json.loads(raw.decode("utf-8"))
+        image = payload.get("image")
+        if not image:
+            handler._send_json(400, {"error": "Falta la imagen"})
+            return
+
+        ip = handler._client_ip()
+        permitido, retry_after, motivo = RATE_LIMITER.check(ip)
+        if not permitido:
+            print(
+                f"[rate-limit] bloqueado ip={ip} motivo={motivo} retry_after={retry_after}s",
+                flush=True,
+            )
+            espera = format_espera(retry_after)
+            mensaje = (
+                "La app alcanzó su límite de análisis por hoy. "
+                f"Vuelve a intentarlo en {espera}."
+                if motivo == "global" else
+                f"Hiciste muchos análisis en poco tiempo. Vuelve a intentarlo en {espera}."
+            )
+            handler._send_json(429, {"error": mensaje}, {"Retry-After": str(retry_after)})
+            return
+
+        items = call_claude_vision_ingredientes(image)
         handler._send_json(200, {"items": items})
     except RuntimeError as e:
         handler._send_json(500, {"error": str(e)})
@@ -949,6 +1051,7 @@ def handle_get_consumo_paciente(handler, id):
 # do_GET/do_POST/do_PATCH/do_DELETE, que quedan como despachadores genéricos.
 ROUTES = [
     ("POST", re.compile(r"^/api/analyze$"), handle_analyze),
+    ("POST", re.compile(r"^/api/identificar-ingredientes$"), handle_identificar_ingredientes),
     ("POST", re.compile(r"^/api/generar-receta$"), handle_generar_receta),
     ("POST", re.compile(r"^/api/pacientes$"), handle_crear_paciente),
     ("GET", re.compile(r"^/api/pacientes/me$"), handle_get_paciente_me),

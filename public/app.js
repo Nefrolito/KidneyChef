@@ -858,6 +858,7 @@ const els = {
   refrigeradorIdentificados: document.getElementById("refrigerador-identificados"),
   refrigeradorGenerarBtn: document.getElementById("refrigerador-generar-btn"),
   refrigeradorRecetaIa: document.getElementById("refrigerador-receta-ia"),
+  refrigeradorLimpiarBtn: document.getElementById("refrigerador-limpiar-btn"),
 };
 
 // Sin infraestructura de push, se refresca por polling mientras la app está
@@ -923,6 +924,7 @@ async function init() {
   els.refrigeradorCameraInput.addEventListener("change", (e) => handleRefrigeradorFileSelected(e.target.files[0]));
   els.refrigeradorIdentificarBtn.addEventListener("click", identificarIngredientesRefrigerador);
   els.refrigeradorGenerarBtn.addEventListener("click", generarRecetaIA);
+  els.refrigeradorLimpiarBtn.addEventListener("click", limpiarSeleccionRefrigerador);
 
   document.querySelectorAll(".btn-liquido").forEach((btn) => {
     btn.addEventListener("click", () => registrarLiquido(Number(btn.dataset.ml)));
@@ -1227,10 +1229,22 @@ function renderRefrigeradorChecklist() {
     .join("");
 }
 
+// Ingredientes para el matching contra las 35 recetas fijas: lo marcado a
+// mano MÁS lo identificado por foto, traducido de vuelta al id canónico del
+// checklist (nutrientes_id -> id) cuando existe equivalencia. Antes solo
+// miraba el checklist e ignoraba por completo la foto, lo que hacía parecer
+// que "Buscar entre recetas conocidas" tiraba resultados sin relación con lo
+// recién fotografiado.
 function ingredientesSeleccionados() {
-  return new Set(
+  const ids = new Set(
     [...document.querySelectorAll(".refrigerador-ingrediente:checked")].map((el) => el.value)
   );
+  for (const item of ingredientesIdentificados) {
+    for (const ing of INGREDIENTES_REFRIGERADOR) {
+      if (ing.nutrientes_id === item.match.id) ids.add(ing.id);
+    }
+  }
+  return ids;
 }
 
 function buscarRecetasRefrigerador() {
@@ -1241,8 +1255,15 @@ function buscarRecetasRefrigerador() {
   for (const receta of RECETAS_DATA) {
     if (!receta.armable) continue;
     const faltantes = receta.ingredientes.filter((id) => !tiene.has(id));
+    const tieneAlgunoEnComun = faltantes.length < receta.ingredientes.length;
     if (faltantes.length === 0) completas.push(receta);
-    else if (faltantes.length <= MAX_INGREDIENTES_FALTANTES) casiListas.push({ receta, faltantes });
+    // "Casi lista" exige además tener al menos un ingrediente en común: sin
+    // esto, una receta de 1-2 ingredientes en total calificaba igual aunque
+    // no tuvieras NINGUNO de ellos, mostrando resultados sin relación real
+    // con lo que el paciente marcó.
+    else if (faltantes.length <= MAX_INGREDIENTES_FALTANTES && tieneAlgunoEnComun) {
+      casiListas.push({ receta, faltantes });
+    }
   }
 
   renderRefrigeradorResultados(completas, casiListas);
@@ -1329,7 +1350,7 @@ async function identificarIngredientesRefrigerador() {
   setRefrigeradorStatus("Identificando ingredientes con IA…");
 
   try {
-    const res = await fetch(`${API_BASE}/api/analyze`, {
+    const res = await fetch(`${API_BASE}/api/identificar-ingredientes`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
       body: JSON.stringify({ image: refrigeradorImagenDataUrl }),
@@ -1345,11 +1366,11 @@ async function identificarIngredientesRefrigerador() {
       setRefrigeradorStatus("No identificamos ningún ingrediente conocido en la foto. Intenta con otra imagen o márcalos a mano.", true);
       return;
     }
-    for (const nuevo of nuevos) {
-      if (!ingredientesIdentificados.some((x) => x.match.id === nuevo.match.id)) {
-        ingredientesIdentificados.push(nuevo);
-      }
-    }
+    // Cada foto reemplaza a la anterior, no se acumulan: una foto nueva
+    // significa "esto es lo que tengo ahora", no "agrega esto a lo de antes"
+    // — acumular en silencio hacía que una receta generada mezclara
+    // ingredientes de fotos distintas sin que se notara en la UI.
+    ingredientesIdentificados = nuevos;
     setRefrigeradorStatus("");
     renderIngredientesIdentificados();
   } catch (err) {
@@ -1370,6 +1391,18 @@ function renderIngredientesIdentificados() {
       renderIngredientesIdentificados();
     });
   });
+}
+
+function limpiarSeleccionRefrigerador() {
+  ingredientesIdentificados = [];
+  renderIngredientesIdentificados();
+  document.querySelectorAll(".refrigerador-ingrediente:checked").forEach((el) => { el.checked = false; });
+  refrigeradorImagenDataUrl = null;
+  els.refrigeradorPreviewWrap.hidden = true;
+  els.refrigeradorIdentificarBtn.disabled = true;
+  els.refrigeradorResultados.hidden = true;
+  els.refrigeradorRecetaIa.hidden = true;
+  setRefrigeradorStatus("");
 }
 
 // Ingredientes candidatos para la receta generada: los identificados por foto
