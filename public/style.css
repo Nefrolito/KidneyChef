@@ -360,6 +360,28 @@ h1, h2, h3 {
 }
 @keyframes status-spin { to { transform: rotate(360deg); } }
 
+/* Flota centrado en pantalla en vez de quedar enterrado en el flujo de la
+   card — si el paciente ya scrolleó a otra parte (por ejemplo a marcar el
+   checklist), igual tiene que ver que la IA está trabajando o que algo
+   falló, sin tener que volver a subir. */
+#refrigerador-ia-status {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 500;
+  width: calc(100% - 3rem);
+  max-width: 320px;
+  margin: 0;
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+#refrigerador-ia-status:empty { display: none; padding: 0; border: none; box-shadow: none; }
+#refrigerador-ia-status .status-spinner { width: 18px; height: 18px; }
+
 .results-card h2, .history-card h2 {
   margin: 0 0 1rem;
   font-size: 1.1rem;
