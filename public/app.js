@@ -1339,15 +1339,17 @@ function handleRefrigeradorFileSelected(file) {
   reader.readAsDataURL(file);
 }
 
-function setRefrigeradorStatus(msg, isError = false) {
-  els.refrigeradorIaStatus.textContent = msg;
+function setRefrigeradorStatus(msg, isError = false, isLoading = false) {
+  els.refrigeradorIaStatus.innerHTML = isLoading
+    ? `<span class="status-spinner" aria-hidden="true"></span>${escapeHtml(msg)}`
+    : escapeHtml(msg);
   els.refrigeradorIaStatus.classList.toggle("error", isError);
 }
 
 async function identificarIngredientesRefrigerador() {
   if (!refrigeradorImagenDataUrl) return;
   els.refrigeradorIdentificarBtn.disabled = true;
-  setRefrigeradorStatus("Identificando ingredientes con IA…");
+  setRefrigeradorStatus("Identificando ingredientes con IA…", false, true);
 
   try {
     const res = await fetch(`${API_BASE}/api/identificar-ingredientes`, {
@@ -1480,7 +1482,7 @@ async function generarRecetaIA() {
 
   els.refrigeradorGenerarBtn.disabled = true;
   els.refrigeradorRecetaIa.hidden = true;
-  setRefrigeradorStatus("Generando una receta a tu medida…");
+  setRefrigeradorStatus("Generando una receta a tu medida…", false, true);
 
   try {
     const res = await fetch(`${API_BASE}/api/generar-receta`, {
