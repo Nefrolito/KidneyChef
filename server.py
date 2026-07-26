@@ -334,8 +334,9 @@ markdown), con esta forma:
 Reglas:
 - Usa solo ids exactos de la lista de ingredientes disponibles — no inventes otros ni \
 cambies el texto del id.
-- No es obligatorio usar todos los ingredientes: elige los que tengan sentido para un plato \
-coherente.
+- Trata de usar TODOS los ingredientes disponibles en la receta. Solo deja alguno afuera si \
+de verdad no combina en un plato coherente, o si incluirlo te hace pasar el presupuesto de \
+algún nutriente con límite fijado.
 - Antes de responder, suma tú mismo el aporte de los gramos que elegiste para cada \
 nutriente con presupuesto fijado, y ajusta las cantidades hasta quedar dentro del límite.
 - "consejo": si al sumar los gramos algún nutriente con presupuesto fijado queda usando más \

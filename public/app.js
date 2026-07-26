@@ -1481,7 +1481,7 @@ function renderRecetaIA(receta) {
     (n) => ["amarillo", "rojo"].includes(clasificar(n, valorPorcion(n), densidad100g(n)).nivel)
   );
   const consejoHtml = receta.consejo && algoElevado
-    ? `<p class="nota-sin-meta">💡 ${escapeHtml(receta.consejo)}</p>`
+    ? `<div class="receta-consejo"><span aria-hidden="true">💡</span><span><strong>Consejo:</strong> ${escapeHtml(receta.consejo)}</span></div>`
     : "";
 
   const pasos = (receta.pasos || []).map((p) => `<li>${escapeHtml(p)}</li>`).join("");

@@ -857,6 +857,24 @@ h1, h2, h3 {
   color: var(--muted);
 }
 
+/* Consejo de la IA para bajar el semáforo de la receta generada — a
+   propósito más llamativo que .nota-sin-meta, porque es una sugerencia
+   accionable, no una aclaración de letra chica. */
+.receta-consejo {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  margin: 0.75rem 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: var(--amarillo-bg);
+  border: 1px solid var(--amarillo-border);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+.receta-consejo strong { color: var(--amarillo); }
+
 /* Checkbox de medicamentos: necesita más espacio por el texto explicativo */
 .clinical-check-ancho {
   align-items: flex-start;
