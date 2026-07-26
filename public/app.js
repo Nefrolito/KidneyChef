@@ -1470,6 +1470,13 @@ async function generarRecetaIA() {
     setRefrigeradorStatus("Identifica o marca al menos un ingrediente antes de generar una receta.", true);
     return;
   }
+  // Esta feature vive de la situación clínica del paciente — sin etapa ERC ni
+  // modalidad de diálisis declarada no hay nada que ajustar de verdad, así
+  // que no se genera nada hasta que la complete (no es solo una invitación).
+  if (!situacionClinicaParaIA().declarada) {
+    setRefrigeradorStatus("Antes de generar una receta, declara tu etapa de enfermedad renal o si estás en diálisis en \"Tus datos clínicos\".", true);
+    return;
+  }
 
   els.refrigeradorGenerarBtn.disabled = true;
   els.refrigeradorRecetaIa.hidden = true;
@@ -1520,14 +1527,6 @@ function renderRecetaIA(receta) {
     ? `<div class="receta-consejo"><span aria-hidden="true">💡</span><span><strong>Consejo:</strong> ${escapeHtml(receta.consejo)}</span></div>`
     : "";
 
-  // Determinístico, no depende de que la IA se acuerde de mencionarlo: sin
-  // etapa ERC ni modalidad de diálisis declarada, esta receta se ajustó solo
-  // con criterios generales — el paciente tiene que ver esa ausencia, no que
-  // la app funcione igual con o sin sus datos clínicos.
-  const sinSituacion = !situacionClinicaParaIA().declarada
-    ? `<div class="receta-consejo"><span aria-hidden="true">🩺</span><span>Esta receta se ajustó con criterios generales porque no has declarado tu etapa de enfermedad renal ni si estás en diálisis. Completa <strong>"Tus datos clínicos"</strong> para que se ajuste a tu situación real.</span></div>`
-    : "";
-
   const pasos = (receta.pasos || []).map((p) => `<li>${escapeHtml(p)}</li>`).join("");
   const ingredientesHtml = (receta.ingredientes || [])
     .map((i) => `<li>${escapeHtml(i.nombre)} — ${i.gramos} g</li>`)
@@ -1540,7 +1539,6 @@ function renderRecetaIA(receta) {
       <ul class="refrigerador-receta-lista">${ingredientesHtml}</ul>
       <div class="semaforo-row">${semaforo}</div>
       ${notaSinMeta()}
-      ${sinSituacion}
       ${consejoHtml}
       <ol class="refrigerador-receta-lista">${pasos}</ol>
     </div>`;
