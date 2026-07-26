@@ -244,6 +244,12 @@ def _call_claude_vision_con_prompt(data_url, prompt):
     body = json.dumps({
         "model": ANTHROPIC_MODEL,
         "max_tokens": 1024,
+        # Sonnet 5 piensa por defecto (adaptive thinking). Desactivarlo del
+        # todo ("disabled") hace que a veces escriba su razonamiento como
+        # texto plano antes del JSON en vez de pensar internamente — efort
+        # bajo consigue lo mismo (respuestas rápidas, sin pensar de más) sin
+        # ese riesgo.
+        "output_config": {"effort": "low"},
         "messages": [{
             "role": "user",
             "content": [
@@ -294,7 +300,7 @@ NUTRIENTE_UNIDAD = {"potasio_mg": "mg", "fosforo_mg": "mg", "sodio_mg": "mg", "c
 NUTRIENTE_NOMBRE = {"potasio_mg": "potasio", "fosforo_mg": "fósforo", "sodio_mg": "sodio", "carbohidratos_g": "carbohidratos"}
 
 
-def _build_prompt_receta(foods, presupuesto):
+def _build_prompt_receta(foods, presupuesto, densidad_maxima=None):
     lineas_ingredientes = []
     for f in foods:
         aportes = ", ".join(
@@ -313,6 +319,25 @@ def _build_prompt_receta(foods, presupuesto):
     if not lineas_presupuesto:
         lineas_presupuesto = ["- sin límite numérico fijado: igual arma una porción moderada de una comida, no una olla familiar"]
 
+    # Sin meta personal de potasio/fósforo (paciente sin Plan Clínico), no hay
+    # un total que no superar, pero igual existe una guía general de cuánto es
+    # "alto" en contenido (mg por 100 g) — sin esto, la IA no tenía con qué
+    # comparar para saber si valía la pena avisar, aunque el semáforo del
+    # celular sí marcara amarillo/rojo por contenido.
+    lineas_densidad = [
+        f"- {NUTRIENTE_NOMBRE[n]}: no más de {v}mg por cada 100 g del plato final (sumando todos los ingredientes)"
+        for n, v in (densidad_maxima or {}).items()
+        if n in NUTRIENTES_RECETA
+    ]
+    bloque_densidad = (
+        f"""
+
+Además, aunque no haya un presupuesto total fijado para estos nutrientes, el equipo \
+tratante recomienda en general no superar esta densidad en el plato final:
+{chr(10).join(lineas_densidad)}"""
+        if lineas_densidad else ""
+    )
+
     return f"""Eres un asistente que arma una receta casera chilena para un paciente con \
 enfermedad renal crónica, usando SOLO los ingredientes que tiene disponibles. La precisión \
 de las cantidades importa para su salud: si te pasas del presupuesto de un nutriente, el \
@@ -322,7 +347,7 @@ Ingredientes disponibles, con su aporte por 100 g:
 {chr(10).join(lineas_ingredientes)}
 
 Presupuesto que le queda disponible al paciente hoy (no lo superes):
-{chr(10).join(lineas_presupuesto)}
+{chr(10).join(lineas_presupuesto)}{bloque_densidad}
 
 Responde EXCLUSIVAMENTE con un JSON válido (sin texto adicional, sin bloques de código \
 markdown), con esta forma:
@@ -340,9 +365,10 @@ algún nutriente con límite fijado.
 - Antes de responder, suma tú mismo el aporte de los gramos que elegiste para cada \
 nutriente con presupuesto fijado, y ajusta las cantidades hasta quedar dentro del límite.
 - "consejo": si al sumar los gramos algún nutriente con presupuesto fijado queda usando más \
-de la mitad de ese presupuesto, escribe una sugerencia breve y concreta para bajarlo usando \
-SOLO los ingredientes ya disponibles (ej. "usa la mitad de la papa para bajar el potasio", \
-"no le agregues sal, el tomate y la cebolla ya aportan sodio"). Si todo queda holgado, deja \
+de la mitad de ese presupuesto, O si la densidad de potasio/fósforo del plato final supera \
+la guía de arriba, escribe una sugerencia breve y concreta para bajarlo usando SOLO los \
+ingredientes ya disponibles (ej. "usa la mitad de la papa para bajar el potasio", "no le \
+agregues sal, el tomate y la cebolla ya aportan sodio"). Si todo queda holgado, deja \
 "consejo" como cadena vacía.
 - Los nombres de la lista son categorías amplias (ej. "Carne de res", "Pechuga de pollo") y \
 no distinguen el corte o la forma exacta del ingrediente (molida, en trozos, entera, etc.). \
@@ -353,7 +379,7 @@ salteados, cazuelas, revueltos).
 - Pasos de preparación breves (máximo 5), en español, para una preparación casera simple."""
 
 
-def call_claude_receta(ingrediente_ids, presupuesto):
+def call_claude_receta(ingrediente_ids, presupuesto, densidad_maxima=None):
     foods = []
     for fid in ingrediente_ids:
         food = KNOWN_FOODS_BY_ID.get(fid)
@@ -370,10 +396,19 @@ def call_claude_receta(ingrediente_ids, presupuesto):
             "con la línea: ANTHROPIC_API_KEY=tu_api_key"
         )
 
-    prompt = _build_prompt_receta(foods, presupuesto)
+    prompt = _build_prompt_receta(foods, presupuesto, densidad_maxima)
     body = json.dumps({
         "model": ANTHROPIC_MODEL,
-        "max_tokens": 1536,
+        "max_tokens": 3072,
+        # Sonnet 5 piensa por defecto (adaptive thinking) y con varias
+        # restricciones (presupuesto + densidad + consejo) puede gastar todo
+        # max_tokens pensando sin dejar nada para el JSON final. Desactivar
+        # el pensamiento del todo tiene un efecto peor: a veces escribe el
+        # razonamiento como texto plano antes del JSON en vez de pensar
+        # internamente, y eso rompe el parseo igual. Effort bajo + más
+        # max_tokens de margen es la combinación que la documentación de la
+        # API recomienda para este caso.
+        "output_config": {"effort": "low"},
         "messages": [{"role": "user", "content": prompt}],
     }).encode("utf-8")
 
@@ -667,6 +702,7 @@ def handle_generar_receta(handler):
         handler._send_json(400, {"error": "Falta la lista de ingredientes"})
         return
     presupuesto = body.get("presupuesto") if isinstance(body.get("presupuesto"), dict) else {}
+    densidad_maxima = body.get("densidad_maxima") if isinstance(body.get("densidad_maxima"), dict) else {}
 
     ip = handler._client_ip()
     permitido, retry_after, motivo = RATE_LIMITER.check(ip)
@@ -683,7 +719,7 @@ def handle_generar_receta(handler):
         return
 
     try:
-        receta = call_claude_receta(ingredientes, presupuesto)
+        receta = call_claude_receta(ingredientes, presupuesto, densidad_maxima)
         handler._send_json(200, receta)
     except ValueError as e:
         handler._send_json(400, {"error": str(e)})

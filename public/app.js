@@ -1434,6 +1434,25 @@ function presupuestoRestanteHoy() {
   return out;
 }
 
+// Sin meta personal de potasio/fósforo no hay un total que no superar, pero
+// el semáforo del celular igual clasifica por CONTENIDO (mg/100g, ver
+// clasificar()) — sin mandarle este umbral a la IA, ella no tenía con qué
+// comparar para decidir si valía la pena escribir un consejo, aunque el
+// semáforo ya mostrara amarillo o rojo.
+function densidadMaximaSinMeta() {
+  if (!LIMITES) return {};
+  const out = {};
+  if (metaDiaria("potasio_mg") == null) {
+    const cfg = (riesgoHiperkalemia() && LIMITES.potasio.clasificacion_contenido_estricta)
+      || LIMITES.potasio.clasificacion_contenido;
+    out.potasio_mg = cfg.moderado_hasta;
+  }
+  if (metaDiaria("fosforo_mg") == null) {
+    out.fosforo_mg = LIMITES.fosforo.clasificacion_contenido.moderado_hasta;
+  }
+  return out;
+}
+
 async function generarRecetaIA() {
   const ingredientes = candidatosParaIA();
   if (ingredientes.length === 0) {
@@ -1449,7 +1468,11 @@ async function generarRecetaIA() {
     const res = await fetch(`${API_BASE}/api/generar-receta`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
-      body: JSON.stringify({ ingredientes, presupuesto: presupuestoRestanteHoy() }),
+      body: JSON.stringify({
+        ingredientes,
+        presupuesto: presupuestoRestanteHoy(),
+        densidad_maxima: densidadMaximaSinMeta(),
+      }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Error desconocido");
