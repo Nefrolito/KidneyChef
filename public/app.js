@@ -1468,9 +1468,21 @@ async function generarRecetaIA() {
 function renderRecetaIA(receta) {
   els.refrigeradorRecetaIa.hidden = false;
   const densidad100g = (n) => (receta.total_gramos > 0 ? (receta.totales[n] / receta.total_gramos) * 100 : 0);
+  const valorPorcion = (n) => Math.round(receta.totales[n] || 0);
   const semaforo = nutrientesVisibles()
-    .map((n) => badge(n, Math.round(receta.totales[n] || 0), densidad100g(n)))
+    .map((n) => badge(n, valorPorcion(n), densidad100g(n)))
     .join("");
+
+  // El consejo de la IA solo se muestra si el semáforo REAL (recalculado con
+  // datos auditados, no lo que haya dicho la IA) efectivamente marca medio o
+  // alto en algo — evita mostrar una sugerencia de mejora cuando en realidad
+  // todo ya está bien.
+  const algoElevado = nutrientesVisibles().some(
+    (n) => ["amarillo", "rojo"].includes(clasificar(n, valorPorcion(n), densidad100g(n)).nivel)
+  );
+  const consejoHtml = receta.consejo && algoElevado
+    ? `<p class="nota-sin-meta">💡 ${escapeHtml(receta.consejo)}</p>`
+    : "";
 
   const pasos = (receta.pasos || []).map((p) => `<li>${escapeHtml(p)}</li>`).join("");
   const ingredientesHtml = (receta.ingredientes || [])
@@ -1484,6 +1496,7 @@ function renderRecetaIA(receta) {
       <ul class="refrigerador-receta-lista">${ingredientesHtml}</ul>
       <div class="semaforo-row">${semaforo}</div>
       ${notaSinMeta()}
+      ${consejoHtml}
       <ol class="refrigerador-receta-lista">${pasos}</ol>
     </div>`;
 }

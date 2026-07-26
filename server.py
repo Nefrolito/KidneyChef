@@ -328,7 +328,8 @@ Responde EXCLUSIVAMENTE con un JSON válido (sin texto adicional, sin bloques de
 markdown), con esta forma:
 
 {{"nombre": "nombre del plato", "pasos": ["paso 1", "paso 2"], \
-"ingredientes": [{{"id": "id_exacto_de_la_lista", "gramos": numero}}]}}
+"ingredientes": [{{"id": "id_exacto_de_la_lista", "gramos": numero}}], \
+"consejo": "sugerencia opcional, o cadena vacía"}}
 
 Reglas:
 - Usa solo ids exactos de la lista de ingredientes disponibles — no inventes otros ni \
@@ -337,6 +338,11 @@ cambies el texto del id.
 coherente.
 - Antes de responder, suma tú mismo el aporte de los gramos que elegiste para cada \
 nutriente con presupuesto fijado, y ajusta las cantidades hasta quedar dentro del límite.
+- "consejo": si al sumar los gramos algún nutriente con presupuesto fijado queda usando más \
+de la mitad de ese presupuesto, escribe una sugerencia breve y concreta para bajarlo usando \
+SOLO los ingredientes ya disponibles (ej. "usa la mitad de la papa para bajar el potasio", \
+"no le agregues sal, el tomate y la cebolla ya aportan sodio"). Si todo queda holgado, deja \
+"consejo" como cadena vacía.
 - Los nombres de la lista son categorías amplias (ej. "Carne de res", "Pechuga de pollo") y \
 no distinguen el corte o la forma exacta del ingrediente (molida, en trozos, entera, etc.). \
 No asumas un corte específico que el nombre no aclara — evita preparaciones que solo \
@@ -366,7 +372,7 @@ def call_claude_receta(ingrediente_ids, presupuesto):
     prompt = _build_prompt_receta(foods, presupuesto)
     body = json.dumps({
         "model": ANTHROPIC_MODEL,
-        "max_tokens": 1024,
+        "max_tokens": 1536,
         "messages": [{"role": "user", "content": prompt}],
     }).encode("utf-8")
 
@@ -423,12 +429,15 @@ def call_claude_receta(ingrediente_ids, presupuesto):
     if not ingredientes_out:
         raise RuntimeError("La IA no propuso cantidades utilizables para los ingredientes recibidos")
 
+    consejo = receta.get("consejo")
+
     return {
         "nombre": str(receta.get("nombre") or "Receta"),
         "pasos": [str(p) for p in receta.get("pasos", []) if isinstance(p, (str, int, float))][:8],
         "ingredientes": ingredientes_out,
         "totales": {n: round(v, 1) for n, v in totales.items()},
         "total_gramos": round(total_gramos),
+        "consejo": str(consejo).strip() if isinstance(consejo, str) and consejo.strip() else None,
     }
 
 
