@@ -396,7 +396,13 @@ por al menos 2 horas (o toda la noche) y cocer en agua nueva abundante, botando 
 cocción — es la técnica de doble cocción que se le enseña al paciente renal para lixiviar \
 potasio, y suele bajar más el potasio que reducir la porción. Para carnes/pescado/sodio, \
 sigue sugiriendo ajustes de cantidad o evitar sal añadida (ej. "no le agregues sal, el tomate \
-y la cebolla ya aportan sodio"). Si todo queda holgado, deja "consejo" como cadena vacía.
+y la cebolla ya aportan sodio").
+- Si algún nutriente queda directamente por ENCIMA del presupuesto o de la densidad guía (no \
+solo cerca — de verdad alto/rojo), identifica cuál de los ingredientes es el que más aporta \
+ese nutriente por sí solo, y sugiere en el consejo ELIMINARLO por completo de la receta como \
+alternativa (no solo reducirlo) — sobre todo si ni bajándolo a la mitad alcanzaría a dejarlo \
+dentro del límite. Sé específico: nombra el ingrediente exacto que conviene sacar y por qué.
+- Si todo queda holgado, deja "consejo" como cadena vacía.
 - Los nombres de la lista son categorías amplias (ej. "Carne de res", "Pechuga de pollo") y \
 no distinguen el corte o la forma exacta del ingrediente (molida, en trozos, entera, etc.). \
 No asumas un corte específico que el nombre no aclara — evita preparaciones que solo \
