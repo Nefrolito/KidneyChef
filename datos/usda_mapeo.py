@@ -76,6 +76,7 @@ MAPEO = {
     # Carnes y pescados
     "pollo": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
     "res": "Beef, ground, 85% lean meat / 15% fat, patty, cooked, broiled",
+    "carne_molida": "Beef, ground, 85% lean meat / 15% fat, raw (Includes foods for USDA's Food Distribution Program)",
     "cerdo": "Pork, fresh, loin, center loin (chops), bone-in, separable lean only, cooked, broiled",
     "salmon": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
     "atun": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)",

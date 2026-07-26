@@ -1695,6 +1695,27 @@
     "indice_glucemico": null
   },
   {
+    "id": "carne_molida",
+    "nombre": "Carne molida",
+    "categoria": "Carne",
+    "alias": [
+      "carne molida",
+      "ground beef",
+      "molida"
+    ],
+    "potasio_mg": 295,
+    "fosforo_mg": 171,
+    "sodio_mg": 66,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beef, ground, 85% lean meat / 15% fat, raw (Includes foods for USDA's Food Distribution Program)",
+      "fdc_id": "171796"
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
     "id": "cerdo",
     "nombre": "Cerdo",
     "categoria": "Carne",
