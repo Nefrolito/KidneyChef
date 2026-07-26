@@ -860,7 +860,13 @@ const els = {
   superCantidad: document.getElementById("super-cantidad"),
   superTotal: document.getElementById("super-total"),
   superProyeccion: document.getElementById("super-proyeccion"),
+  superTotalesCadena: document.getElementById("super-totales-cadena"),
   superLimpiarBtn: document.getElementById("super-limpiar-btn"),
+  superFotoPreviewWrap: document.getElementById("super-foto-preview-wrap"),
+  superFotoPreview: document.getElementById("super-foto-preview"),
+  superFotoInput: document.getElementById("super-foto-input"),
+  superFotoIdentificarBtn: document.getElementById("super-foto-identificar-btn"),
+  superFotoStatus: document.getElementById("super-foto-status"),
 };
 
 let lastAnalysis = []; // current analysis results, mutable for manual correction
@@ -938,6 +944,8 @@ async function init() {
 
   els.superAgregarBtn.addEventListener("click", agregarItemPersonalizadoSuper);
   els.superLimpiarBtn.addEventListener("click", limpiarSeleccionSuper);
+  els.superFotoInput.addEventListener("change", (e) => handleSuperFotoSelected(e.target.files[0]));
+  els.superFotoIdentificarBtn.addEventListener("click", identificarProductoSuper);
 
   renderCalculadora();
 }
@@ -1438,6 +1446,24 @@ function limpiarSeleccionRefrigerador() {
 const SUPER_SELECCION_STORAGE_KEY = "kidneyChefSuperSeleccion";
 const SUPER_CUSTOM_STORAGE_KEY = "kidneyChefSuperCustom";
 const SEMANAS_POR_MES = 4.33;
+const CADENAS_SUPER = [
+  { id: "jumbo", label: "Jumbo" },
+  { id: "lider", label: "Líder" },
+  { id: "unimarc", label: "Unimarc" },
+  { id: "acuenta", label: "Acuenta" },
+  { id: "alvi", label: "Alvi" },
+];
+
+// La cadena más barata para ESE producto puntual — no asume que el paciente
+// compra todo en la misma cadena (ver totalesPorCadena() para esa otra vista).
+function cadenaMasBarata(item) {
+  let mejor = null;
+  for (const cadena of CADENAS_SUPER) {
+    const precio = item.precios[cadena.id];
+    if (!mejor || precio < mejor.precio) mejor = { cadena: cadena.id, precio };
+  }
+  return mejor;
+}
 
 function loadSuperSeleccion() {
   try {
@@ -1476,12 +1502,22 @@ function renderSuperChecklist() {
     if (!categorias.includes(item.categoria)) categorias.push(item.categoria);
   });
 
-  const filaCatalogo = (item) => `
+  const filaCatalogo = (item) => {
+    const masBarata = cadenaMasBarata(item);
+    const chips = CADENAS_SUPER.map((cadena) => {
+      const precio = item.precios[cadena.id];
+      const esMin = cadena.id === masBarata.cadena;
+      return `<span class="super-chip-precio${esMin ? " super-chip-min" : ""}">${escapeHtml(cadena.label)} <strong>${formatoCLP(precio)}</strong></span>`;
+    }).join("");
+    return `
     <div class="super-item">
-      <input type="checkbox" id="super-check-${item.id}" ${seleccion.has(item.id) ? "checked" : ""}>
-      <span class="super-item-nombre">${escapeHtml(item.nombre)}<small>${escapeHtml(item.presentacion)}</small></span>
-      <span class="super-item-precio">${formatoCLP(item.precio_clp)}</span>
+      <div class="super-item-top">
+        <input type="checkbox" id="super-check-${item.id}" ${seleccion.has(item.id) ? "checked" : ""}>
+        <span class="super-item-nombre">${escapeHtml(item.nombre)}<small>${escapeHtml(item.presentacion)}</small></span>
+      </div>
+      <div class="super-item-precios">${chips}</div>
     </div>`;
+  };
 
   let html = categorias
     .map((categoria) => {
@@ -1493,10 +1529,12 @@ function renderSuperChecklist() {
   if (custom.length) {
     const filaCustom = (item) => `
       <div class="super-item">
-        <input type="checkbox" id="super-check-${item.id}" ${item.checked ? "checked" : ""}>
-        <span class="super-item-nombre">${escapeHtml(item.nombre)}</span>
-        <span class="super-item-precio">${formatoCLP(item.precio_clp)}</span>
-        <button class="super-item-quitar" id="super-quitar-${item.id}" aria-label="Quitar producto">✕</button>
+        <div class="super-item-top">
+          <input type="checkbox" id="super-check-${item.id}" ${item.checked ? "checked" : ""}>
+          <span class="super-item-nombre">${escapeHtml(item.nombre)}</span>
+          <span class="super-item-precio">${formatoCLP(item.precio_clp)}</span>
+          <button class="super-item-quitar" id="super-quitar-${item.id}" aria-label="Quitar producto">✕</button>
+        </div>
       </div>`;
     html += `<div><p class="super-categoria-titulo">Agregados por ti</p>${custom.map(filaCustom).join("")}</div>`;
   }
@@ -1566,14 +1604,132 @@ function actualizarResumenSuper() {
   const itemsCatalogo = PRECIOS_REFERENCIA.filter((i) => seleccion.has(i.id));
   const itemsCustom = custom.filter((i) => i.checked);
   const cantidad = itemsCatalogo.length + itemsCustom.length;
-  const total = itemsCatalogo.reduce((acc, i) => acc + i.precio_clp, 0)
+  const totalMezclado = itemsCatalogo.reduce((acc, i) => acc + cadenaMasBarata(i).precio, 0)
     + itemsCustom.reduce((acc, i) => acc + i.precio_clp, 0);
 
   els.superCantidad.textContent = cantidad;
-  els.superTotal.textContent = formatoCLP(total);
+  els.superTotal.textContent = formatoCLP(totalMezclado);
   els.superProyeccion.textContent = cantidad
-    ? `Si compras esta lista cada semana: ≈ ${formatoCLP(total * SEMANAS_POR_MES)} al mes.`
+    ? `Si compras esta lista cada semana: ≈ ${formatoCLP(totalMezclado * SEMANAS_POR_MES)} al mes.`
     : "";
+
+  renderTotalesPorCadena(itemsCatalogo, itemsCustom);
+}
+
+// A diferencia del total mezclado (que asume que el paciente va cadena por
+// cadena buscando lo más barato de cada producto, poco realista en la
+// práctica), esto muestra cuánto saldría el mismo carro comprando TODO en
+// una sola cadena — la comparación que de verdad sirve para elegir dónde ir.
+function renderTotalesPorCadena(itemsCatalogo, itemsCustom) {
+  if (itemsCatalogo.length + itemsCustom.length === 0) {
+    els.superTotalesCadena.innerHTML = "";
+    return;
+  }
+
+  const extraCustom = itemsCustom.reduce((acc, i) => acc + i.precio_clp, 0);
+  const totales = CADENAS_SUPER.map((cadena) => ({
+    cadena,
+    total: itemsCatalogo.reduce((acc, i) => acc + i.precios[cadena.id], 0) + extraCustom,
+  })).sort((a, b) => a.total - b.total);
+
+  const filas = totales
+    .map((t, idx) => `
+      <div class="super-totales-cadena-fila${idx === 0 ? " super-totales-cadena-min" : ""}">
+        <span>${escapeHtml(t.cadena.label)}</span>
+        <span>${formatoCLP(t.total)}</span>
+      </div>`)
+    .join("");
+
+  els.superTotalesCadena.innerHTML = `
+    <p class="super-totales-cadena-titulo">Si compras todo en una sola cadena</p>
+    ${filas}`;
+}
+
+// --- Agregar producto a la lista de súper con una foto ---
+// Reutiliza el mismo endpoint de IA que el refrigerador (/api/identificar-
+// ingredientes) — no hace falta un modelo de reconocimiento aparte solo para
+// esto. La diferencia es el paso siguiente: acá el resultado de matchFood()
+// (id en nutrientes.json) hay que traducirlo de vuelta al id del catálogo de
+// precios (ej. "res" -> "vacuno"), mismo patrón de reverso que ya usa
+// ingredientesSeleccionados() para las recetas del refrigerador.
+let superFotoImagenDataUrl = null;
+
+function handleSuperFotoSelected(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    superFotoImagenDataUrl = reader.result;
+    els.superFotoPreview.src = superFotoImagenDataUrl;
+    els.superFotoPreviewWrap.hidden = false;
+    els.superFotoIdentificarBtn.disabled = false;
+    setSuperFotoStatus("");
+  };
+  reader.readAsDataURL(file);
+}
+
+function setSuperFotoStatus(msg, isError = false, isLoading = false) {
+  els.superFotoStatus.innerHTML = isLoading
+    ? `<span class="status-spinner" aria-hidden="true"></span>${escapeHtml(msg)}`
+    : escapeHtml(msg);
+  els.superFotoStatus.classList.toggle("error", isError);
+}
+
+function catalogoIdDesdeNutrientesId(nutrientesId) {
+  const ing = INGREDIENTES_REFRIGERADOR.find((i) => i.nutrientes_id === nutrientesId);
+  if (!ing) return null;
+  return PRECIOS_REFERENCIA.some((p) => p.id === ing.id) ? ing.id : null;
+}
+
+async function identificarProductoSuper() {
+  if (!superFotoImagenDataUrl) return;
+  els.superFotoIdentificarBtn.disabled = true;
+  setSuperFotoStatus("Identificando producto con IA…", false, true);
+
+  try {
+    const res = await fetch(`${API_BASE}/api/identificar-ingredientes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      body: JSON.stringify({ image: superFotoImagenDataUrl }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Error desconocido");
+
+    const identificados = (data.items || []).map((item) => item.alimento).filter(Boolean);
+    if (identificados.length === 0) {
+      setSuperFotoStatus("No identificamos ningún producto en la foto. Intenta con otra imagen o agrégalo a mano abajo.", true);
+      return;
+    }
+
+    const agregados = [];
+    const sinCatalogo = [];
+    for (const nombreIA of identificados) {
+      const match = matchFood(nombreIA);
+      const catalogoId = match && catalogoIdDesdeNutrientesId(match.id);
+      if (catalogoId) {
+        const seleccion = loadSuperSeleccion();
+        seleccion.add(catalogoId);
+        saveSuperSeleccion(seleccion);
+        agregados.push(PRECIOS_REFERENCIA.find((p) => p.id === catalogoId).nombre);
+      } else {
+        sinCatalogo.push(nombreIA);
+      }
+    }
+
+    renderSuperChecklist();
+
+    const partes = [];
+    if (agregados.length) partes.push(`Marcamos en la lista: ${agregados.join(", ")}.`);
+    if (sinCatalogo.length) {
+      partes.push(`No tenemos precio de referencia para "${sinCatalogo.join(", ")}" — agrégalo abajo con su precio.`);
+      els.superItemNombre.value = sinCatalogo[0];
+      els.superItemNombre.focus();
+    }
+    setSuperFotoStatus(partes.join(" "), sinCatalogo.length > 0 && agregados.length === 0);
+  } catch (err) {
+    setSuperFotoStatus(err.message, true);
+  } finally {
+    els.superFotoIdentificarBtn.disabled = false;
+  }
 }
 
 // Ingredientes candidatos para la receta generada: los identificados por foto

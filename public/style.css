@@ -1056,12 +1056,13 @@ h1, h2, h3 {
 }
 .super-item {
   display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.55rem 0;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
   border-bottom: 1px solid var(--border);
 }
 .super-item:last-child { border-bottom: none; }
+.super-item-top { display: flex; align-items: center; gap: 0.65rem; }
 .super-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--brand); flex-shrink: 0; }
 .super-item-nombre { flex: 1; min-width: 0; font-size: 0.88rem; font-weight: 500; }
 .super-item-nombre small { display: block; color: var(--muted); font-size: 0.72rem; font-weight: 500; margin-top: 0.1rem; }
@@ -1075,6 +1076,35 @@ h1, h2, h3 {
   line-height: 1;
   padding: 0.1rem;
 }
+
+/* Fila de chips con el precio estimado por cadena — la más barata se resalta
+   en verde para que sea obvio dónde conviene comprar ese producto. */
+.super-item-precios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding-left: 1.9rem;
+}
+.super-chip-precio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.super-chip-precio strong { color: var(--text); font-weight: 700; }
+.super-chip-precio.super-chip-min {
+  background: var(--verde-bg);
+  border-color: var(--verde-border);
+  color: var(--verde);
+}
+.super-chip-precio.super-chip-min strong { color: var(--verde); }
 
 .super-agregar {
   display: flex;
@@ -1104,3 +1134,25 @@ h1, h2, h3 {
 .super-resumen-total { font-size: 1rem; }
 .super-resumen-total strong { color: var(--brand-dark); font-size: 1.2rem; }
 .super-proyeccion { margin: 0.6rem 0 0; font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+
+.super-totales-cadena {
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border);
+}
+.super-totales-cadena-titulo {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+.super-totales-cadena-fila {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.2rem 0;
+}
+.super-totales-cadena-fila.super-totales-cadena-min { color: var(--verde); }

@@ -1,29 +1,353 @@
 [
-  { "id": "vacuno", "nombre": "Carne de vacuno", "categoria": "Carnes y pescados", "presentacion": "1 kg", "precio_clp": 7990 },
-  { "id": "cerdo", "nombre": "Cerdo", "categoria": "Carnes y pescados", "presentacion": "1 kg", "precio_clp": 5490 },
-  { "id": "merluza", "nombre": "Merluza (o pescado blanco similar)", "categoria": "Carnes y pescados", "presentacion": "1 kg", "precio_clp": 5990 },
-  { "id": "pollo", "nombre": "Pollo", "categoria": "Carnes y pescados", "presentacion": "1 kg", "precio_clp": 3490 },
-  { "id": "vienesa", "nombre": "Vienesa", "categoria": "Carnes y pescados", "presentacion": "500 g", "precio_clp": 2190 },
-  { "id": "acelga", "nombre": "Acelga", "categoria": "Verduras y legumbres", "presentacion": "1 manojo", "precio_clp": 900 },
-  { "id": "cebolla", "nombre": "Cebolla", "categoria": "Verduras y legumbres", "presentacion": "1 kg", "precio_clp": 990 },
-  { "id": "choclo", "nombre": "Choclo", "categoria": "Verduras y legumbres", "presentacion": "malla 3 unidades", "precio_clp": 1990 },
-  { "id": "cilantro", "nombre": "Cilantro", "categoria": "Verduras y legumbres", "presentacion": "1 manojo", "precio_clp": 500 },
-  { "id": "lenteja", "nombre": "Lentejas", "categoria": "Verduras y legumbres", "presentacion": "1 kg", "precio_clp": 2190 },
-  { "id": "palta", "nombre": "Palta", "categoria": "Verduras y legumbres", "presentacion": "1 kg", "precio_clp": 3990 },
-  { "id": "papa", "nombre": "Papa", "categoria": "Verduras y legumbres", "presentacion": "1 kg", "precio_clp": 890 },
-  { "id": "porotos_negros", "nombre": "Porotos negros", "categoria": "Verduras y legumbres", "presentacion": "1 kg", "precio_clp": 2590 },
-  { "id": "tomate", "nombre": "Tomate", "categoria": "Verduras y legumbres", "presentacion": "1 kg", "precio_clp": 1290 },
-  { "id": "zanahoria", "nombre": "Zanahoria", "categoria": "Verduras y legumbres", "presentacion": "1 kg", "precio_clp": 790 },
-  { "id": "zapallo", "nombre": "Zapallo", "categoria": "Verduras y legumbres", "presentacion": "1 kg", "precio_clp": 890 },
-  { "id": "huevo", "nombre": "Huevo", "categoria": "Lácteos y huevos", "presentacion": "1 docena", "precio_clp": 3490 },
-  { "id": "leche", "nombre": "Leche", "categoria": "Lácteos y huevos", "presentacion": "1 litro", "precio_clp": 1090 },
-  { "id": "mantequilla", "nombre": "Mantequilla", "categoria": "Lácteos y huevos", "presentacion": "250 g", "precio_clp": 2790 },
-  { "id": "queso_gauda", "nombre": "Queso gauda o mantecoso", "categoria": "Lácteos y huevos", "presentacion": "1 kg", "precio_clp": 6990 },
-  { "id": "arroz", "nombre": "Arroz", "categoria": "Abarrotes", "presentacion": "1 kg", "precio_clp": 1390 },
-  { "id": "fideo", "nombre": "Fideos", "categoria": "Abarrotes", "presentacion": "400 g", "precio_clp": 990 },
-  { "id": "harina", "nombre": "Harina", "categoria": "Abarrotes", "presentacion": "1 kg", "precio_clp": 990 },
-  { "id": "manteca", "nombre": "Manteca", "categoria": "Abarrotes", "presentacion": "250 g", "precio_clp": 1490 },
-  { "id": "trigo_mote", "nombre": "Mote de trigo", "categoria": "Abarrotes", "presentacion": "500 g", "precio_clp": 1290 },
-  { "id": "pan_blanco", "nombre": "Pan blanco (marraqueta, hallulla)", "categoria": "Abarrotes", "presentacion": "1 kg", "precio_clp": 1990 },
-  { "id": "durazno_conserva", "nombre": "Durazno en conserva", "categoria": "Otros", "presentacion": "820 g lata", "precio_clp": 2190 }
+  {
+    "id": "vacuno",
+    "nombre": "Carne de vacuno",
+    "categoria": "Carnes y pescados",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 8950,
+      "lider": 7590,
+      "unimarc": 8390,
+      "acuenta": 7190,
+      "alvi": 6950
+    }
+  },
+  {
+    "id": "cerdo",
+    "nombre": "Cerdo",
+    "categoria": "Carnes y pescados",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 6150,
+      "lider": 5220,
+      "unimarc": 5760,
+      "acuenta": 4940,
+      "alvi": 4780
+    }
+  },
+  {
+    "id": "merluza",
+    "nombre": "Merluza (o pescado blanco similar)",
+    "categoria": "Carnes y pescados",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 6710,
+      "lider": 5690,
+      "unimarc": 6290,
+      "acuenta": 5390,
+      "alvi": 5210
+    }
+  },
+  {
+    "id": "pollo",
+    "nombre": "Pollo",
+    "categoria": "Carnes y pescados",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 3910,
+      "lider": 3320,
+      "unimarc": 3660,
+      "acuenta": 3140,
+      "alvi": 3040
+    }
+  },
+  {
+    "id": "vienesa",
+    "nombre": "Vienesa",
+    "categoria": "Carnes y pescados",
+    "presentacion": "500 g",
+    "precios": {
+      "jumbo": 2450,
+      "lider": 2080,
+      "unimarc": 2300,
+      "acuenta": 1970,
+      "alvi": 1910
+    }
+  },
+  {
+    "id": "acelga",
+    "nombre": "Acelga",
+    "categoria": "Verduras y legumbres",
+    "presentacion": "1 manojo",
+    "precios": {
+      "jumbo": 1010,
+      "lider": 860,
+      "unimarc": 940,
+      "acuenta": 810,
+      "alvi": 780
+    }
+  },
+  {
+    "id": "cebolla",
+    "nombre": "Cebolla",
+    "categoria": "Verduras y legumbres",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 1110,
+      "lider": 940,
+      "unimarc": 1040,
+      "acuenta": 890,
+      "alvi": 860
+    }
+  },
+  {
+    "id": "choclo",
+    "nombre": "Choclo",
+    "categoria": "Verduras y legumbres",
+    "presentacion": "malla 3 unidades",
+    "precios": {
+      "jumbo": 2230,
+      "lider": 1890,
+      "unimarc": 2090,
+      "acuenta": 1790,
+      "alvi": 1730
+    }
+  },
+  {
+    "id": "cilantro",
+    "nombre": "Cilantro",
+    "categoria": "Verduras y legumbres",
+    "presentacion": "1 manojo",
+    "precios": {
+      "jumbo": 560,
+      "lider": 480,
+      "unimarc": 520,
+      "acuenta": 450,
+      "alvi": 440
+    }
+  },
+  {
+    "id": "lenteja",
+    "nombre": "Lentejas",
+    "categoria": "Verduras y legumbres",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 2450,
+      "lider": 2080,
+      "unimarc": 2300,
+      "acuenta": 1970,
+      "alvi": 1910
+    }
+  },
+  {
+    "id": "palta",
+    "nombre": "Palta",
+    "categoria": "Verduras y legumbres",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 4470,
+      "lider": 3790,
+      "unimarc": 4190,
+      "acuenta": 3590,
+      "alvi": 3470
+    }
+  },
+  {
+    "id": "papa",
+    "nombre": "Papa",
+    "categoria": "Verduras y legumbres",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 1000,
+      "lider": 850,
+      "unimarc": 930,
+      "acuenta": 800,
+      "alvi": 770
+    }
+  },
+  {
+    "id": "porotos_negros",
+    "nombre": "Porotos negros",
+    "categoria": "Verduras y legumbres",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 2900,
+      "lider": 2460,
+      "unimarc": 2720,
+      "acuenta": 2330,
+      "alvi": 2250
+    }
+  },
+  {
+    "id": "tomate",
+    "nombre": "Tomate",
+    "categoria": "Verduras y legumbres",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 1440,
+      "lider": 1230,
+      "unimarc": 1350,
+      "acuenta": 1160,
+      "alvi": 1120
+    }
+  },
+  {
+    "id": "zanahoria",
+    "nombre": "Zanahoria",
+    "categoria": "Verduras y legumbres",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 880,
+      "lider": 750,
+      "unimarc": 830,
+      "acuenta": 710,
+      "alvi": 690
+    }
+  },
+  {
+    "id": "zapallo",
+    "nombre": "Zapallo",
+    "categoria": "Verduras y legumbres",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 1000,
+      "lider": 850,
+      "unimarc": 930,
+      "acuenta": 800,
+      "alvi": 770
+    }
+  },
+  {
+    "id": "huevo",
+    "nombre": "Huevo",
+    "categoria": "Lácteos y huevos",
+    "presentacion": "1 docena",
+    "precios": {
+      "jumbo": 3910,
+      "lider": 3320,
+      "unimarc": 3660,
+      "acuenta": 3140,
+      "alvi": 3040
+    }
+  },
+  {
+    "id": "leche",
+    "nombre": "Leche",
+    "categoria": "Lácteos y huevos",
+    "presentacion": "1 litro",
+    "precios": {
+      "jumbo": 1220,
+      "lider": 1040,
+      "unimarc": 1140,
+      "acuenta": 980,
+      "alvi": 950
+    }
+  },
+  {
+    "id": "mantequilla",
+    "nombre": "Mantequilla",
+    "categoria": "Lácteos y huevos",
+    "presentacion": "250 g",
+    "precios": {
+      "jumbo": 3120,
+      "lider": 2650,
+      "unimarc": 2930,
+      "acuenta": 2510,
+      "alvi": 2430
+    }
+  },
+  {
+    "id": "queso_gauda",
+    "nombre": "Queso gauda o mantecoso",
+    "categoria": "Lácteos y huevos",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 7830,
+      "lider": 6640,
+      "unimarc": 7340,
+      "acuenta": 6290,
+      "alvi": 6080
+    }
+  },
+  {
+    "id": "arroz",
+    "nombre": "Arroz",
+    "categoria": "Abarrotes",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 1560,
+      "lider": 1320,
+      "unimarc": 1460,
+      "acuenta": 1250,
+      "alvi": 1210
+    }
+  },
+  {
+    "id": "fideo",
+    "nombre": "Fideos",
+    "categoria": "Abarrotes",
+    "presentacion": "400 g",
+    "precios": {
+      "jumbo": 1110,
+      "lider": 940,
+      "unimarc": 1040,
+      "acuenta": 890,
+      "alvi": 860
+    }
+  },
+  {
+    "id": "harina",
+    "nombre": "Harina",
+    "categoria": "Abarrotes",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 1110,
+      "lider": 940,
+      "unimarc": 1040,
+      "acuenta": 890,
+      "alvi": 860
+    }
+  },
+  {
+    "id": "manteca",
+    "nombre": "Manteca",
+    "categoria": "Abarrotes",
+    "presentacion": "250 g",
+    "precios": {
+      "jumbo": 1670,
+      "lider": 1420,
+      "unimarc": 1560,
+      "acuenta": 1340,
+      "alvi": 1300
+    }
+  },
+  {
+    "id": "trigo_mote",
+    "nombre": "Mote de trigo",
+    "categoria": "Abarrotes",
+    "presentacion": "500 g",
+    "precios": {
+      "jumbo": 1440,
+      "lider": 1230,
+      "unimarc": 1350,
+      "acuenta": 1160,
+      "alvi": 1120
+    }
+  },
+  {
+    "id": "pan_blanco",
+    "nombre": "Pan blanco (marraqueta, hallulla)",
+    "categoria": "Abarrotes",
+    "presentacion": "1 kg",
+    "precios": {
+      "jumbo": 2230,
+      "lider": 1890,
+      "unimarc": 2090,
+      "acuenta": 1790,
+      "alvi": 1730
+    }
+  },
+  {
+    "id": "durazno_conserva",
+    "nombre": "Durazno en conserva",
+    "categoria": "Otros",
+    "presentacion": "820 g lata",
+    "precios": {
+      "jumbo": 2450,
+      "lider": 2080,
+      "unimarc": 2300,
+      "acuenta": 1970,
+      "alvi": 1910
+    }
+  }
 ]

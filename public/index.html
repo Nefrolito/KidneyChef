@@ -308,9 +308,23 @@
     <section class="card supermercado-card" data-tab="supermercado">
       <h2>Lista de supermercado</h2>
       <p class="clinical-note">
-        Marca lo que necesitas comprar. Los precios son una referencia general
-        en CLP y pueden variar según el supermercado y la temporada.
+        Marca lo que necesitas comprar. Los precios por cadena son
+        <strong>estimados a modo de referencia, no precios en tiempo real</strong>
+        — pueden variar según la sucursal, la promoción y la temporada.
       </p>
+
+      <div id="super-foto-preview-wrap" class="preview-wrap preview-wrap-chica" hidden>
+        <img id="super-foto-preview" alt="Vista previa del producto">
+      </div>
+      <div class="capture-actions">
+        <label class="btn btn-secondary btn-stacked">
+          <svg class="btn-icon-bare" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h2.5l1.2-2h8.6l1.2 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.6"/></svg>
+          <span class="btn-text"><strong>Agregar con foto</strong><small>Cámara o galería</small></span>
+          <input id="super-foto-input" type="file" accept="image/*" hidden>
+        </label>
+      </div>
+      <button id="super-foto-identificar-btn" class="btn btn-secondary" style="width:100%;margin-top:0.6rem;" disabled>Identificar producto</button>
+      <p id="super-foto-status" class="status" role="status" aria-live="polite"></p>
 
       <div id="super-checklist" class="super-checklist"></div>
 
@@ -326,10 +340,11 @@
           <strong id="super-cantidad">0</strong>
         </div>
         <div class="super-resumen-fila super-resumen-total">
-          <span>Total esta compra</span>
+          <span>Total comprando cada producto donde sea más barato</span>
           <strong id="super-total">$0</strong>
         </div>
         <p class="super-proyeccion" id="super-proyeccion"></p>
+        <div id="super-totales-cadena" class="super-totales-cadena"></div>
       </div>
 
       <button id="super-limpiar-btn" class="btn btn-ghost" style="width:100%;">Limpiar selección</button>
