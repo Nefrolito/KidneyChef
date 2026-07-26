@@ -3690,5 +3690,110 @@
     },
     "aditivos_fosfato": null,
     "indice_glucemico": null
+  },
+  {
+    "id": "vacio_vacuno",
+    "nombre": "Vacío",
+    "categoria": "Carne",
+    "alias": [
+      "vacio",
+      "flank steak"
+    ],
+    "potasio_mg": 340,
+    "fosforo_mg": 204,
+    "sodio_mg": 57,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beef, flank, steak, separable lean only, trimmed to 0\" fat, choice, raw",
+      "fdc_id": "168609",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente por grupo muscular (vacío ~ flank steak), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "lomo_liso_vacuno",
+    "nombre": "Lomo liso",
+    "categoria": "Carne",
+    "alias": [
+      "lomo liso",
+      "top loin", "new york"
+    ],
+    "potasio_mg": 283,
+    "fosforo_mg": 205,
+    "sodio_mg": 46,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beef, loin, top loin steak, boneless, lip off, separable lean only, trimmed to 0\" fat, choice, raw",
+      "fdc_id": "174003",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente por grupo muscular (lomo liso ~ top loin steak), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "filete_vacuno",
+    "nombre": "Filete",
+    "categoria": "Carne",
+    "alias": [
+      "filete",
+      "lomo fino", "tenderloin"
+    ],
+    "potasio_mg": 284,
+    "fosforo_mg": 212,
+    "sodio_mg": 45,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0\" fat, choice, raw",
+      "fdc_id": "171768",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente por grupo muscular (filete ~ tenderloin steak), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "punta_paleta_vacuno",
+    "nombre": "Punta paleta",
+    "categoria": "Carne",
+    "alias": [
+      "punta de paleta",
+      "arm chuck"
+    ],
+    "potasio_mg": 332,
+    "fosforo_mg": 201,
+    "sodio_mg": 74,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beef, chuck, arm pot roast, separable lean only, trimmed to 1/8\" fat, choice, raw",
+      "fdc_id": "174056",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente por grupo muscular (punta paleta ~ arm pot roast), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "plateada_vacuno",
+    "nombre": "Plateada",
+    "categoria": "Carne",
+    "alias": [
+      "plateada",
+      "bottom round"
+    ],
+    "potasio_mg": 341,
+    "fosforo_mg": 215,
+    "sodio_mg": 56,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Beef, round, bottom round, roast, separable lean only, trimmed to 1/8\" fat, choice, raw",
+      "fdc_id": "174058",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente por grupo muscular (plateada ~ bottom round roast), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   }
 ]

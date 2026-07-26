@@ -84,6 +84,11 @@ MAPEO = {
     # en cada entrada de nutrientes.json.
     "posta_negra_vacuno": 'Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0" fat, choice, raw',
     "asado_tira_vacuno": 'Beef, chuck, short ribs, boneless, separable lean and fat, trimmed to 0" fat, choice, raw',
+    "vacio_vacuno": 'Beef, flank, steak, separable lean only, trimmed to 0" fat, choice, raw',
+    "lomo_liso_vacuno": 'Beef, loin, top loin steak, boneless, lip off, separable lean only, trimmed to 0" fat, choice, raw',
+    "filete_vacuno": 'Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0" fat, choice, raw',
+    "punta_paleta_vacuno": 'Beef, chuck, arm pot roast, separable lean only, trimmed to 1/8" fat, choice, raw',
+    "plateada_vacuno": 'Beef, round, bottom round, roast, separable lean only, trimmed to 1/8" fat, choice, raw',
     "cerdo": "Pork, fresh, loin, center loin (chops), bone-in, separable lean only, cooked, broiled",
     "salmon": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
     "atun": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)",

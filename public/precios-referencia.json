@@ -55,6 +55,76 @@
           "alvi": 5650,
           "tottus": 6490
         }
+      },
+      {
+        "id": "vacio_vacuno",
+        "nombre": "Vacío",
+        "presentacion": "1 kg",
+        "nutrientes_id": "vacio_vacuno",
+        "precios": {
+          "jumbo": 12490,
+          "lider": 10590,
+          "unimarc": 11710,
+          "acuenta": 10030,
+          "alvi": 9700,
+          "tottus": 11150
+        }
+      },
+      {
+        "id": "lomo_liso_vacuno",
+        "nombre": "Lomo liso",
+        "presentacion": "1 kg",
+        "nutrientes_id": "lomo_liso_vacuno",
+        "precios": {
+          "jumbo": 15990,
+          "lider": 13560,
+          "unimarc": 14990,
+          "acuenta": 12840,
+          "alvi": 12420,
+          "tottus": 14280
+        }
+      },
+      {
+        "id": "filete_vacuno",
+        "nombre": "Filete",
+        "presentacion": "1 kg",
+        "nutrientes_id": "filete_vacuno",
+        "precios": {
+          "jumbo": 18990,
+          "lider": 16100,
+          "unimarc": 17800,
+          "acuenta": 15250,
+          "alvi": 14760,
+          "tottus": 16960
+        }
+      },
+      {
+        "id": "punta_paleta_vacuno",
+        "nombre": "Punta paleta",
+        "presentacion": "1 kg",
+        "nutrientes_id": "punta_paleta_vacuno",
+        "precios": {
+          "jumbo": 6890,
+          "lider": 5840,
+          "unimarc": 6460,
+          "acuenta": 5530,
+          "alvi": 5350,
+          "tottus": 6150
+        }
+      },
+      {
+        "id": "plateada_vacuno",
+        "nombre": "Plateada",
+        "presentacion": "1 kg",
+        "nutrientes_id": "plateada_vacuno",
+        "precios": {
+          "jumbo": 9490,
+          "lider": 8050,
+          "unimarc": 8900,
+          "acuenta": 7620,
+          "alvi": 7370,
+          "tottus": 8470
+        }
       }
     ]
   },
