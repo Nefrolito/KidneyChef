@@ -367,9 +367,13 @@ nutriente con presupuesto fijado, y ajusta las cantidades hasta quedar dentro de
 - "consejo": si al sumar los gramos algún nutriente con presupuesto fijado queda usando más \
 de la mitad de ese presupuesto, O si la densidad de potasio/fósforo del plato final supera \
 la guía de arriba, escribe una sugerencia breve y concreta para bajarlo usando SOLO los \
-ingredientes ya disponibles (ej. "usa la mitad de la papa para bajar el potasio", "no le \
-agregues sal, el tomate y la cebolla ya aportan sodio"). Si todo queda holgado, deja \
-"consejo" como cadena vacía.
+ingredientes ya disponibles. Para papa, zanahoria, zapallo y legumbres (lentejas, porotos), \
+antes de sugerir solo reducir la cantidad, considera sugerir la técnica de remojar en trozos \
+por al menos 2 horas (o toda la noche) y cocer en agua nueva abundante, botando el agua de \
+cocción — es la técnica de doble cocción que se le enseña al paciente renal para lixiviar \
+potasio, y suele bajar más el potasio que reducir la porción. Para carnes/pescado/sodio, \
+sigue sugiriendo ajustes de cantidad o evitar sal añadida (ej. "no le agregues sal, el tomate \
+y la cebolla ya aportan sodio"). Si todo queda holgado, deja "consejo" como cadena vacía.
 - Los nombres de la lista son categorías amplias (ej. "Carne de res", "Pechuga de pollo") y \
 no distinguen el corte o la forma exacta del ingrediente (molida, en trozos, entera, etc.). \
 No asumas un corte específico que el nombre no aclara — evita preparaciones que solo \
