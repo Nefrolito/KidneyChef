@@ -337,6 +337,12 @@ cambies el texto del id.
 coherente.
 - Antes de responder, suma tú mismo el aporte de los gramos que elegiste para cada \
 nutriente con presupuesto fijado, y ajusta las cantidades hasta quedar dentro del límite.
+- Los nombres de la lista son categorías amplias (ej. "Carne de res", "Pechuga de pollo") y \
+no distinguen el corte o la forma exacta del ingrediente (molida, en trozos, entera, etc.). \
+No asumas un corte específico que el nombre no aclara — evita preparaciones que solo \
+funcionan con un corte particular (ej. "bistec" o "filete" para carne de res genérica); \
+preferí preparaciones versátiles que funcionan con cualquier forma del ingrediente (guisos, \
+salteados, cazuelas, revueltos).
 - Pasos de preparación breves (máximo 5), en español, para una preparación casera simple."""
 
 
