@@ -98,6 +98,12 @@ MAPEO = {
     # USDA SR Legacy no tiene "hake" (merluza) como especie propia; se usa
     # whiting, especie muy cercana. Mismo valor para filete y merluza entera.
     "merluza": "Fish, whiting, mixed species, raw",
+    # Cortes de cerdo para la lista de supermercado, mismo criterio (crudos,
+    # equivalencia USDA por corte/grupo muscular, no dato chileno medido).
+    "chuleta_cerdo": "Pork, fresh, loin, center loin (chops), bone-in, separable lean and fat, raw",
+    "costillar_cerdo": "Pork, fresh, spareribs, separable lean and fat, raw",
+    "pulpa_cerdo": "Pork, fresh, leg (ham), whole, separable lean only, raw",
+    "panceta_cerdo": "Pork, fresh, belly, raw",
     "cerdo": "Pork, fresh, loin, center loin (chops), bone-in, separable lean only, cooked, broiled",
     "salmon": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
     "atun": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)",

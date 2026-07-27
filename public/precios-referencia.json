@@ -133,14 +133,64 @@
     "nombre": "Cerdo",
     "categoria": "Carnes y pescados",
     "presentacion": "1 kg",
-    "precios": {
-      "jumbo": 6150,
-      "lider": 5220,
-      "unimarc": 5760,
-      "acuenta": 4940,
-      "alvi": 4780,
-      "tottus": 5490
-    }
+    "cortes": [
+      {
+        "id": "chuleta_cerdo",
+        "nombre": "Chuleta de cerdo",
+        "presentacion": "1 kg",
+        "nutrientes_id": "chuleta_cerdo",
+        "precios": {
+          "jumbo": 6290,
+          "lider": 5330,
+          "unimarc": 5900,
+          "acuenta": 5050,
+          "alvi": 4890,
+          "tottus": 5620
+        }
+      },
+      {
+        "id": "costillar_cerdo",
+        "nombre": "Costillar",
+        "presentacion": "1 kg",
+        "nutrientes_id": "costillar_cerdo",
+        "precios": {
+          "jumbo": 5690,
+          "lider": 4830,
+          "unimarc": 5330,
+          "acuenta": 4570,
+          "alvi": 4420,
+          "tottus": 5080
+        }
+      },
+      {
+        "id": "pulpa_cerdo",
+        "nombre": "Pulpa de cerdo",
+        "presentacion": "1 kg",
+        "nutrientes_id": "pulpa_cerdo",
+        "precios": {
+          "jumbo": 7290,
+          "lider": 6180,
+          "unimarc": 6830,
+          "acuenta": 5850,
+          "alvi": 5660,
+          "tottus": 6510
+        }
+      },
+      {
+        "id": "panceta_cerdo",
+        "nombre": "Panceta",
+        "presentacion": "1 kg",
+        "nutrientes_id": "panceta_cerdo",
+        "precios": {
+          "jumbo": 4490,
+          "lider": 3810,
+          "unimarc": 4210,
+          "acuenta": 3610,
+          "alvi": 3490,
+          "tottus": 4010
+        }
+      }
+    ]
   },
   {
     "id": "merluza",

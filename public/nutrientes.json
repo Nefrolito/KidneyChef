@@ -3879,5 +3879,89 @@
     },
     "aditivos_fosfato": null,
     "indice_glucemico": null
+  },
+  {
+    "id": "chuleta_cerdo",
+    "nombre": "Chuleta de cerdo",
+    "categoria": "Carne",
+    "alias": [
+      "chuleta",
+      "pork chop"
+    ],
+    "potasio_mg": 343,
+    "fosforo_mg": 209,
+    "sodio_mg": 55,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pork, fresh, loin, center loin (chops), bone-in, separable lean and fat, raw",
+      "fdc_id": "168238",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente (chuleta ~ center loin chop), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "costillar_cerdo",
+    "nombre": "Costillar",
+    "categoria": "Carne",
+    "alias": [
+      "costillar de cerdo",
+      "spareribs"
+    ],
+    "potasio_mg": 242,
+    "fosforo_mg": 141,
+    "sodio_mg": 81,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pork, fresh, spareribs, separable lean and fat, raw",
+      "fdc_id": "167853",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente (costillar ~ spareribs), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "pulpa_cerdo",
+    "nombre": "Pulpa de cerdo",
+    "categoria": "Carne",
+    "alias": [
+      "pulpa",
+      "pork leg lean"
+    ],
+    "potasio_mg": 369,
+    "fosforo_mg": 229,
+    "sodio_mg": 55,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pork, fresh, leg (ham), whole, separable lean only, raw",
+      "fdc_id": "168224",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente por grupo muscular (pulpa ~ pork leg, lean only), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "panceta_cerdo",
+    "nombre": "Panceta",
+    "categoria": "Carne",
+    "alias": [
+      "panceta de cerdo",
+      "pork belly"
+    ],
+    "potasio_mg": 185,
+    "fosforo_mg": 108,
+    "sodio_mg": 32,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Pork, fresh, belly, raw",
+      "fdc_id": "167812",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente (panceta ~ pork belly), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   }
 ]
