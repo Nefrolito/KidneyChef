@@ -260,10 +260,10 @@
     "categoria": "Verduras y legumbres",
     "presentacion": "1 manojo",
     "precios": {
-      "jumbo": 1010,
-      "lider": 860,
+      "jumbo": 1670,
+      "lider": 1420,
       "unimarc": 940,
-      "tottus": 900
+      "tottus": 1490
     }
   },
   {
@@ -272,10 +272,10 @@
     "categoria": "Verduras y legumbres",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 1110,
-      "lider": 940,
-      "unimarc": 1040,
-      "tottus": 990
+      "jumbo": 1690,
+      "lider": 1430,
+      "unimarc": 1650,
+      "tottus": 1510
     }
   },
   {
@@ -296,10 +296,10 @@
     "categoria": "Verduras y legumbres",
     "presentacion": "1 manojo",
     "precios": {
-      "jumbo": 560,
-      "lider": 480,
-      "unimarc": 520,
-      "tottus": 500
+      "jumbo": 950,
+      "lider": 810,
+      "unimarc": 950,
+      "tottus": 850
     }
   },
   {
@@ -308,10 +308,10 @@
     "categoria": "Verduras y legumbres",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 2450,
-      "lider": 2080,
-      "unimarc": 2300,
-      "tottus": 2190
+      "jumbo": 2690,
+      "lider": 2280,
+      "unimarc": 2000,
+      "tottus": 2400
     }
   },
   {
@@ -320,10 +320,10 @@
     "categoria": "Verduras y legumbres",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 4470,
-      "lider": 3790,
-      "unimarc": 4190,
-      "tottus": 3990
+      "jumbo": 2990,
+      "lider": 2540,
+      "unimarc": 3410,
+      "tottus": 2670
     }
   },
   {
@@ -332,10 +332,10 @@
     "categoria": "Verduras y legumbres",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 1000,
-      "lider": 850,
-      "unimarc": 930,
-      "tottus": 890
+      "jumbo": 1670,
+      "lider": 1420,
+      "unimarc": 1690,
+      "tottus": 1490
     }
   },
   {
@@ -344,10 +344,10 @@
     "categoria": "Verduras y legumbres",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 2900,
-      "lider": 2460,
-      "unimarc": 2720,
-      "tottus": 2590
+      "jumbo": 2190,
+      "lider": 1860,
+      "unimarc": 2290,
+      "tottus": 1960
     }
   },
   {
@@ -356,10 +356,10 @@
     "categoria": "Verduras y legumbres",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 1440,
-      "lider": 1230,
-      "unimarc": 1350,
-      "tottus": 1290
+      "jumbo": 1990,
+      "lider": 1690,
+      "unimarc": 1990,
+      "tottus": 1780
     }
   },
   {
@@ -368,10 +368,10 @@
     "categoria": "Verduras y legumbres",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 880,
-      "lider": 750,
-      "unimarc": 830,
-      "tottus": 790
+      "jumbo": 1190,
+      "lider": 1010,
+      "unimarc": 1190,
+      "tottus": 1060
     }
   },
   {
@@ -380,10 +380,10 @@
     "categoria": "Verduras y legumbres",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 1000,
-      "lider": 850,
-      "unimarc": 930,
-      "tottus": 890
+      "jumbo": 3640,
+      "lider": 3090,
+      "unimarc": 2380,
+      "tottus": 3250
     }
   },
   {
@@ -392,10 +392,10 @@
     "categoria": "Lácteos y huevos",
     "presentacion": "1 docena",
     "precios": {
-      "jumbo": 3910,
-      "lider": 3320,
-      "unimarc": 3660,
-      "tottus": 3490
+      "jumbo": 3990,
+      "lider": 3380,
+      "unimarc": 3850,
+      "tottus": 3560
     }
   },
   {
@@ -404,10 +404,10 @@
     "categoria": "Lácteos y huevos",
     "presentacion": "1 litro",
     "precios": {
-      "jumbo": 1220,
-      "lider": 1040,
-      "unimarc": 1140,
-      "tottus": 1090
+      "jumbo": 1100,
+      "lider": 930,
+      "unimarc": 1090,
+      "tottus": 980
     }
   },
   {
@@ -416,10 +416,10 @@
     "categoria": "Lácteos y huevos",
     "presentacion": "250 g",
     "precios": {
-      "jumbo": 3120,
-      "lider": 2650,
-      "unimarc": 2930,
-      "tottus": 2790
+      "jumbo": 2790,
+      "lider": 2370,
+      "unimarc": 2690,
+      "tottus": 2490
     }
   },
   {
@@ -428,10 +428,10 @@
     "categoria": "Lácteos y huevos",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 7830,
-      "lider": 6640,
-      "unimarc": 7340,
-      "tottus": 6990
+      "jumbo": 10760,
+      "lider": 9120,
+      "unimarc": 9560,
+      "tottus": 9610
     }
   },
   {
@@ -440,10 +440,10 @@
     "categoria": "Abarrotes",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 1560,
-      "lider": 1320,
-      "unimarc": 1460,
-      "tottus": 1390
+      "jumbo": 1290,
+      "lider": 1090,
+      "unimarc": 1000,
+      "tottus": 1150
     }
   },
   {
@@ -452,10 +452,10 @@
     "categoria": "Abarrotes",
     "presentacion": "400 g",
     "precios": {
-      "jumbo": 1110,
-      "lider": 940,
-      "unimarc": 1040,
-      "tottus": 990
+      "jumbo": 810,
+      "lider": 690,
+      "unimarc": 690,
+      "tottus": 720
     }
   },
   {
@@ -464,10 +464,10 @@
     "categoria": "Abarrotes",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 1110,
-      "lider": 940,
-      "unimarc": 1040,
-      "tottus": 990
+      "jumbo": 890,
+      "lider": 750,
+      "unimarc": 880,
+      "tottus": 790
     }
   },
   {
@@ -476,10 +476,10 @@
     "categoria": "Abarrotes",
     "presentacion": "250 g",
     "precios": {
-      "jumbo": 1670,
-      "lider": 1420,
-      "unimarc": 1560,
-      "tottus": 1490
+      "jumbo": 910,
+      "lider": 770,
+      "unimarc": 1300,
+      "tottus": 810
     }
   },
   {
@@ -488,10 +488,10 @@
     "categoria": "Abarrotes",
     "presentacion": "500 g",
     "precios": {
-      "jumbo": 1440,
-      "lider": 1230,
-      "unimarc": 1350,
-      "tottus": 1290
+      "jumbo": 1590,
+      "lider": 1350,
+      "unimarc": 1490,
+      "tottus": 1420
     }
   },
   {
@@ -500,10 +500,10 @@
     "categoria": "Abarrotes",
     "presentacion": "1 kg",
     "precios": {
-      "jumbo": 2230,
-      "lider": 1890,
-      "unimarc": 2090,
-      "tottus": 1990
+      "jumbo": 2290,
+      "lider": 1940,
+      "unimarc": 2190,
+      "tottus": 2040
     }
   },
   {
