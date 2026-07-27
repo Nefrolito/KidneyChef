@@ -20,12 +20,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "posta_negra_vacuno",
         "precios": {
-          "jumbo": 11190,
-          "lider": 9490,
-          "unimarc": 10490,
-          "acuenta": 8990,
-          "alvi": 8690,
-          "tottus": 9990
+          "jumbo": 12990,
+          "lider": 11020,
+          "unimarc": 12190,
+          "acuenta": 10430,
+          "alvi": 10090,
+          "tottus": 11600
         }
       },
       {
@@ -34,12 +34,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "asado_tira_vacuno",
         "precios": {
-          "jumbo": 7830,
-          "lider": 6640,
-          "unimarc": 7340,
-          "acuenta": 6290,
-          "alvi": 6080,
-          "tottus": 6990
+          "jumbo": 14590,
+          "lider": 12370,
+          "unimarc": 21990,
+          "acuenta": 11720,
+          "alvi": 11340,
+          "tottus": 13030
         }
       },
       {
@@ -48,12 +48,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "carne_molida",
         "precios": {
-          "jumbo": 7270,
-          "lider": 6170,
-          "unimarc": 6810,
-          "acuenta": 5840,
-          "alvi": 5650,
-          "tottus": 6490
+          "jumbo": 13380,
+          "lider": 11350,
+          "unimarc": 9500,
+          "acuenta": 10740,
+          "alvi": 10400,
+          "tottus": 11950
         }
       },
       {
@@ -76,12 +76,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "lomo_liso_vacuno",
         "precios": {
-          "jumbo": 15990,
-          "lider": 13560,
-          "unimarc": 14990,
-          "acuenta": 12840,
-          "alvi": 12420,
-          "tottus": 14280
+          "jumbo": 14990,
+          "lider": 12710,
+          "unimarc": 13990,
+          "acuenta": 12040,
+          "alvi": 11650,
+          "tottus": 13390
         }
       },
       {
@@ -92,7 +92,7 @@
         "precios": {
           "jumbo": 18990,
           "lider": 16100,
-          "unimarc": 17800,
+          "unimarc": 14990,
           "acuenta": 15250,
           "alvi": 14760,
           "tottus": 16960
@@ -104,12 +104,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "punta_paleta_vacuno",
         "precios": {
-          "jumbo": 6890,
-          "lider": 5840,
-          "unimarc": 6460,
-          "acuenta": 5530,
-          "alvi": 5350,
-          "tottus": 6150
+          "jumbo": 11590,
+          "lider": 9830,
+          "unimarc": 10990,
+          "acuenta": 9310,
+          "alvi": 9010,
+          "tottus": 10350
         }
       },
       {
@@ -118,12 +118,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "plateada_vacuno",
         "precios": {
-          "jumbo": 9490,
-          "lider": 8050,
-          "unimarc": 8900,
-          "acuenta": 7620,
-          "alvi": 7370,
-          "tottus": 8470
+          "jumbo": 11890,
+          "lider": 10080,
+          "unimarc": 8690,
+          "acuenta": 9550,
+          "alvi": 9240,
+          "tottus": 10620
         }
       }
     ]
@@ -140,12 +140,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "chuleta_cerdo",
         "precios": {
-          "jumbo": 6290,
-          "lider": 5330,
-          "unimarc": 5900,
-          "acuenta": 5050,
-          "alvi": 4890,
-          "tottus": 5620
+          "jumbo": 6650,
+          "lider": 5640,
+          "unimarc": 5390,
+          "acuenta": 5340,
+          "alvi": 5170,
+          "tottus": 5940
         }
       },
       {
@@ -154,12 +154,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "costillar_cerdo",
         "precios": {
-          "jumbo": 5690,
-          "lider": 4830,
-          "unimarc": 5330,
-          "acuenta": 4570,
-          "alvi": 4420,
-          "tottus": 5080
+          "jumbo": 6990,
+          "lider": 5930,
+          "unimarc": 7650,
+          "acuenta": 5610,
+          "alvi": 5430,
+          "tottus": 6240
         }
       },
       {
@@ -168,12 +168,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "pulpa_cerdo",
         "precios": {
-          "jumbo": 7290,
-          "lider": 6180,
-          "unimarc": 6830,
-          "acuenta": 5850,
-          "alvi": 5660,
-          "tottus": 6510
+          "jumbo": 5990,
+          "lider": 5080,
+          "unimarc": 5990,
+          "acuenta": 4810,
+          "alvi": 4650,
+          "tottus": 5350
         }
       },
       {
@@ -204,12 +204,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "merluza",
         "precios": {
-          "jumbo": 8990,
-          "lider": 7620,
-          "unimarc": 8430,
-          "acuenta": 7220,
-          "alvi": 6990,
-          "tottus": 8030
+          "jumbo": 7980,
+          "lider": 6770,
+          "unimarc": 10180,
+          "acuenta": 6410,
+          "alvi": 6200,
+          "tottus": 7130
         }
       },
       {
@@ -218,12 +218,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "merluza",
         "precios": {
-          "jumbo": 5290,
-          "lider": 4490,
-          "unimarc": 4960,
-          "acuenta": 4250,
-          "alvi": 4110,
-          "tottus": 4720
+          "jumbo": 8990,
+          "lider": 7620,
+          "unimarc": 8430,
+          "acuenta": 7220,
+          "alvi": 6990,
+          "tottus": 8030
         }
       }
     ]
@@ -240,12 +240,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "pechuga_pollo",
         "precios": {
-          "jumbo": 5490,
-          "lider": 4660,
-          "unimarc": 5150,
-          "acuenta": 4410,
-          "alvi": 4270,
-          "tottus": 4900
+          "jumbo": 5990,
+          "lider": 5080,
+          "unimarc": 5740,
+          "acuenta": 4810,
+          "alvi": 4650,
+          "tottus": 5350
         }
       },
       {
@@ -254,12 +254,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "trutro_pollo",
         "precios": {
-          "jumbo": 3490,
-          "lider": 2960,
-          "unimarc": 3270,
-          "acuenta": 2800,
-          "alvi": 2710,
-          "tottus": 3120
+          "jumbo": 3690,
+          "lider": 3130,
+          "unimarc": 2850,
+          "acuenta": 2960,
+          "alvi": 2870,
+          "tottus": 3300
         }
       },
       {
@@ -268,12 +268,12 @@
         "presentacion": "1 kg",
         "nutrientes_id": "alitas_pollo",
         "precios": {
-          "jumbo": 3290,
-          "lider": 2790,
-          "unimarc": 3080,
-          "acuenta": 2640,
-          "alvi": 2560,
-          "tottus": 2940
+          "jumbo": 5180,
+          "lider": 4390,
+          "unimarc": 2990,
+          "acuenta": 4160,
+          "alvi": 4020,
+          "tottus": 4630
         }
       }
     ]
