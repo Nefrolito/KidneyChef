@@ -1451,8 +1451,6 @@ const CADENAS_SUPER = [
   { id: "lider", label: "Líder" },
   { id: "unimarc", label: "Unimarc" },
   { id: "tottus", label: "Tottus" },
-  { id: "acuenta", label: "Acuenta" },
-  { id: "alvi", label: "Alvi" },
 ];
 
 // La cadena más barata para ESE producto puntual — no asume que el paciente

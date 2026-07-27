@@ -8,8 +8,6 @@
       "jumbo": 8950,
       "lider": 7590,
       "unimarc": 8390,
-      "acuenta": 7190,
-      "alvi": 6950,
       "tottus": 7990
     },
     "nutrientes_id": "res",
@@ -23,8 +21,6 @@
           "jumbo": 12990,
           "lider": 11020,
           "unimarc": 12190,
-          "acuenta": 10430,
-          "alvi": 10090,
           "tottus": 11600
         }
       },
@@ -37,8 +33,6 @@
           "jumbo": 14590,
           "lider": 12370,
           "unimarc": 21990,
-          "acuenta": 11720,
-          "alvi": 11340,
           "tottus": 13030
         }
       },
@@ -51,8 +45,6 @@
           "jumbo": 13380,
           "lider": 11350,
           "unimarc": 9500,
-          "acuenta": 10740,
-          "alvi": 10400,
           "tottus": 11950
         }
       },
@@ -65,8 +57,6 @@
           "jumbo": 12490,
           "lider": 10590,
           "unimarc": 11710,
-          "acuenta": 10030,
-          "alvi": 9700,
           "tottus": 11150
         }
       },
@@ -79,8 +69,6 @@
           "jumbo": 14990,
           "lider": 12710,
           "unimarc": 13990,
-          "acuenta": 12040,
-          "alvi": 11650,
           "tottus": 13390
         }
       },
@@ -93,8 +81,6 @@
           "jumbo": 18990,
           "lider": 16100,
           "unimarc": 14990,
-          "acuenta": 15250,
-          "alvi": 14760,
           "tottus": 16960
         }
       },
@@ -107,8 +93,6 @@
           "jumbo": 11590,
           "lider": 9830,
           "unimarc": 10990,
-          "acuenta": 9310,
-          "alvi": 9010,
           "tottus": 10350
         }
       },
@@ -121,8 +105,6 @@
           "jumbo": 11890,
           "lider": 10080,
           "unimarc": 8690,
-          "acuenta": 9550,
-          "alvi": 9240,
           "tottus": 10620
         }
       }
@@ -143,8 +125,6 @@
           "jumbo": 6650,
           "lider": 5640,
           "unimarc": 5390,
-          "acuenta": 5340,
-          "alvi": 5170,
           "tottus": 5940
         }
       },
@@ -157,8 +137,6 @@
           "jumbo": 6990,
           "lider": 5930,
           "unimarc": 7650,
-          "acuenta": 5610,
-          "alvi": 5430,
           "tottus": 6240
         }
       },
@@ -171,8 +149,6 @@
           "jumbo": 5990,
           "lider": 5080,
           "unimarc": 5990,
-          "acuenta": 4810,
-          "alvi": 4650,
           "tottus": 5350
         }
       },
@@ -185,8 +161,6 @@
           "jumbo": 4490,
           "lider": 3810,
           "unimarc": 4210,
-          "acuenta": 3610,
-          "alvi": 3490,
           "tottus": 4010
         }
       }
@@ -207,8 +181,6 @@
           "jumbo": 7980,
           "lider": 6770,
           "unimarc": 10180,
-          "acuenta": 6410,
-          "alvi": 6200,
           "tottus": 7130
         }
       },
@@ -221,8 +193,6 @@
           "jumbo": 8990,
           "lider": 7620,
           "unimarc": 8430,
-          "acuenta": 7220,
-          "alvi": 6990,
           "tottus": 8030
         }
       }
@@ -243,8 +213,6 @@
           "jumbo": 5990,
           "lider": 5080,
           "unimarc": 5740,
-          "acuenta": 4810,
-          "alvi": 4650,
           "tottus": 5350
         }
       },
@@ -257,8 +225,6 @@
           "jumbo": 3690,
           "lider": 3130,
           "unimarc": 2850,
-          "acuenta": 2960,
-          "alvi": 2870,
           "tottus": 3300
         }
       },
@@ -271,8 +237,6 @@
           "jumbo": 5180,
           "lider": 4390,
           "unimarc": 2990,
-          "acuenta": 4160,
-          "alvi": 4020,
           "tottus": 4630
         }
       }
@@ -287,8 +251,6 @@
       "jumbo": 2450,
       "lider": 2080,
       "unimarc": 2300,
-      "acuenta": 1970,
-      "alvi": 1910,
       "tottus": 2190
     }
   },
@@ -301,8 +263,6 @@
       "jumbo": 1010,
       "lider": 860,
       "unimarc": 940,
-      "acuenta": 810,
-      "alvi": 780,
       "tottus": 900
     }
   },
@@ -315,8 +275,6 @@
       "jumbo": 1110,
       "lider": 940,
       "unimarc": 1040,
-      "acuenta": 890,
-      "alvi": 860,
       "tottus": 990
     }
   },
@@ -329,8 +287,6 @@
       "jumbo": 2230,
       "lider": 1890,
       "unimarc": 2090,
-      "acuenta": 1790,
-      "alvi": 1730,
       "tottus": 1990
     }
   },
@@ -343,8 +299,6 @@
       "jumbo": 560,
       "lider": 480,
       "unimarc": 520,
-      "acuenta": 450,
-      "alvi": 440,
       "tottus": 500
     }
   },
@@ -357,8 +311,6 @@
       "jumbo": 2450,
       "lider": 2080,
       "unimarc": 2300,
-      "acuenta": 1970,
-      "alvi": 1910,
       "tottus": 2190
     }
   },
@@ -371,8 +323,6 @@
       "jumbo": 4470,
       "lider": 3790,
       "unimarc": 4190,
-      "acuenta": 3590,
-      "alvi": 3470,
       "tottus": 3990
     }
   },
@@ -385,8 +335,6 @@
       "jumbo": 1000,
       "lider": 850,
       "unimarc": 930,
-      "acuenta": 800,
-      "alvi": 770,
       "tottus": 890
     }
   },
@@ -399,8 +347,6 @@
       "jumbo": 2900,
       "lider": 2460,
       "unimarc": 2720,
-      "acuenta": 2330,
-      "alvi": 2250,
       "tottus": 2590
     }
   },
@@ -413,8 +359,6 @@
       "jumbo": 1440,
       "lider": 1230,
       "unimarc": 1350,
-      "acuenta": 1160,
-      "alvi": 1120,
       "tottus": 1290
     }
   },
@@ -427,8 +371,6 @@
       "jumbo": 880,
       "lider": 750,
       "unimarc": 830,
-      "acuenta": 710,
-      "alvi": 690,
       "tottus": 790
     }
   },
@@ -441,8 +383,6 @@
       "jumbo": 1000,
       "lider": 850,
       "unimarc": 930,
-      "acuenta": 800,
-      "alvi": 770,
       "tottus": 890
     }
   },
@@ -455,8 +395,6 @@
       "jumbo": 3910,
       "lider": 3320,
       "unimarc": 3660,
-      "acuenta": 3140,
-      "alvi": 3040,
       "tottus": 3490
     }
   },
@@ -469,8 +407,6 @@
       "jumbo": 1220,
       "lider": 1040,
       "unimarc": 1140,
-      "acuenta": 980,
-      "alvi": 950,
       "tottus": 1090
     }
   },
@@ -483,8 +419,6 @@
       "jumbo": 3120,
       "lider": 2650,
       "unimarc": 2930,
-      "acuenta": 2510,
-      "alvi": 2430,
       "tottus": 2790
     }
   },
@@ -497,8 +431,6 @@
       "jumbo": 7830,
       "lider": 6640,
       "unimarc": 7340,
-      "acuenta": 6290,
-      "alvi": 6080,
       "tottus": 6990
     }
   },
@@ -511,8 +443,6 @@
       "jumbo": 1560,
       "lider": 1320,
       "unimarc": 1460,
-      "acuenta": 1250,
-      "alvi": 1210,
       "tottus": 1390
     }
   },
@@ -525,8 +455,6 @@
       "jumbo": 1110,
       "lider": 940,
       "unimarc": 1040,
-      "acuenta": 890,
-      "alvi": 860,
       "tottus": 990
     }
   },
@@ -539,8 +467,6 @@
       "jumbo": 1110,
       "lider": 940,
       "unimarc": 1040,
-      "acuenta": 890,
-      "alvi": 860,
       "tottus": 990
     }
   },
@@ -553,8 +479,6 @@
       "jumbo": 1670,
       "lider": 1420,
       "unimarc": 1560,
-      "acuenta": 1340,
-      "alvi": 1300,
       "tottus": 1490
     }
   },
@@ -567,8 +491,6 @@
       "jumbo": 1440,
       "lider": 1230,
       "unimarc": 1350,
-      "acuenta": 1160,
-      "alvi": 1120,
       "tottus": 1290
     }
   },
@@ -581,8 +503,6 @@
       "jumbo": 2230,
       "lider": 1890,
       "unimarc": 2090,
-      "acuenta": 1790,
-      "alvi": 1730,
       "tottus": 1990
     }
   },
@@ -595,8 +515,6 @@
       "jumbo": 2450,
       "lider": 2080,
       "unimarc": 2300,
-      "acuenta": 1970,
-      "alvi": 1910,
       "tottus": 2190
     }
   }
