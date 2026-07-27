@@ -1063,7 +1063,61 @@ h1, h2, h3 {
 }
 .super-item:last-child { border-bottom: none; }
 .super-item-top { display: flex; align-items: center; gap: 0.65rem; }
-.super-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--brand); flex-shrink: 0; }
+.super-item input[type="checkbox"],
+.super-frecuente-chip input[type="checkbox"],
+.clinical-check input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border: 2px solid var(--muted);
+  border-radius: 6px;
+  background: var(--bg);
+  flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.super-item input[type="checkbox"]:hover,
+.super-frecuente-chip input[type="checkbox"]:hover,
+.clinical-check input[type="checkbox"]:hover { border-color: var(--brand); }
+.super-item input[type="checkbox"]:checked,
+.super-frecuente-chip input[type="checkbox"]:checked,
+.clinical-check input[type="checkbox"]:checked { background: var(--brand); border-color: var(--brand); }
+.super-item input[type="checkbox"]:checked::after,
+.super-frecuente-chip input[type="checkbox"]:checked::after,
+.clinical-check input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* "Más comprados" — chips con lo que el paciente marca seguido en Súper,
+   calculado en el cliente a partir de cuántas veces marcó cada producto
+   (kidneyChefFrecuenciaCompra en localStorage), no una lista fija. Mismo
+   componente reusado en el checklist manual del Refrigerador, agregado a
+   nivel de producto genérico (no por corte) porque ahí no se elige corte. */
+.mas-comprados { margin-bottom: 1.1rem; }
+.frecuentes-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.super-frecuente-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem 0.4rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--brand-50);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
 .super-item-nombre { flex: 1; min-width: 0; font-size: 0.88rem; font-weight: 500; }
 .super-item-nombre small { display: block; color: var(--muted); font-size: 0.72rem; font-weight: 500; margin-top: 0.1rem; }
 

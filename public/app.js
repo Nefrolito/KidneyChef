@@ -878,16 +878,19 @@ async function init() {
   try {
     RECETAS_DATA = await fetch("recetas.json").then((r) => r.json());
     INGREDIENTES_REFRIGERADOR = await fetch("ingredientes-refrigerador.json").then((r) => r.json());
-    renderRefrigeradorChecklist();
   } catch (e) {
     console.warn("No se pudo cargar recetas.json / ingredientes-refrigerador.json", e);
   }
   try {
     PRECIOS_REFERENCIA = await fetch("precios-referencia.json").then((r) => r.json());
-    renderSuperChecklist();
   } catch (e) {
     console.warn("No se pudo cargar precios-referencia.json", e);
   }
+  // Ambos catálogos deben estar cargados antes de renderizar cualquiera de
+  // los dos checklists: "Más comprados" del refrigerador agrega frecuencia
+  // de cortes de PRECIOS_REFERENCIA a nivel de INGREDIENTES_REFRIGERADOR.
+  renderRefrigeradorChecklist();
+  renderSuperChecklist();
   // Si el modelo clínico no carga, la app sigue funcionando con los umbrales
   // fijos de UMBRALES en vez de quedarse sin semáforo.
   try {
@@ -1240,6 +1243,25 @@ const MAX_INGREDIENTES_FALTANTES = 2; // "casi listas": les falta esto o menos
 // de la app, y se avisa en la UI que hay que ajustar según cuánto se sirva.
 const PORCION_REFERENCIA_RECETA_G = 300;
 
+// Mismo historial de frecuencia que Súper (kidneyChefFrecuenciaCompra), pero
+// agregado al id de producto genérico: un corte marcado seguido en Súper
+// (ej. posta_negra_vacuno) suma para "vacuno" acá, porque el checklist del
+// refrigerador no distingue cortes. Devuelve ids de INGREDIENTES_REFRIGERADOR,
+// no objetos, para no depender de que PRECIOS_REFERENCIA ya esté cargado.
+function idsIngredientesMasComprados() {
+  const frecuencia = loadFrecuenciaCompra();
+  const porIdBase = new Map();
+  for (const [id, veces] of Object.entries(frecuencia)) {
+    const idBase = idCatalogoBase(id);
+    porIdBase.set(idBase, (porIdBase.get(idBase) || 0) + veces);
+  }
+  return [...porIdBase.entries()]
+    .filter(([idBase]) => INGREDIENTES_REFRIGERADOR.some((ing) => ing.id === idBase))
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, MAS_COMPRADOS_MAX)
+    .map(([idBase]) => idBase);
+}
+
 function renderRefrigeradorChecklist() {
   const porCategoria = new Map();
   for (const ing of INGREDIENTES_REFRIGERADOR) {
@@ -1247,7 +1269,29 @@ function renderRefrigeradorChecklist() {
     porCategoria.get(ing.categoria).push(ing);
   }
 
-  els.refrigeradorChecklist.innerHTML = [...porCategoria.entries()]
+  const destacadosIds = idsIngredientesMasComprados();
+  const destacados = destacadosIds
+    .map((id) => INGREDIENTES_REFRIGERADOR.find((ing) => ing.id === id))
+    .filter(Boolean);
+
+  const bloqueDestacados = destacados.length
+    ? `<div class="mas-comprados">
+        <p class="super-categoria-titulo">Tus productos más comprados</p>
+        <div class="frecuentes-chips">
+          ${destacados
+            .map(
+              (ing) => `
+            <label class="super-frecuente-chip">
+              <input type="checkbox" id="refrigerador-check-freq-${ing.id}">
+              <span>${escapeHtml(ing.nombre)}</span>
+            </label>`
+            )
+            .join("")}
+        </div>
+      </div>`
+    : "";
+
+  els.refrigeradorChecklist.innerHTML = bloqueDestacados + [...porCategoria.entries()]
     .map(([categoria, ingredientes]) => `
       <div class="refrigerador-categoria">
         <h4>${escapeHtml(categoria)}</h4>
@@ -1255,13 +1299,24 @@ function renderRefrigeradorChecklist() {
           ${ingredientes
             .map((ing) => `
               <label class="clinical-check">
-                <input type="checkbox" class="refrigerador-ingrediente" value="${ing.id}">
+                <input type="checkbox" class="refrigerador-ingrediente" id="refrigerador-check-${ing.id}" value="${ing.id}">
                 ${escapeHtml(ing.nombre)}
               </label>`)
             .join("")}
         </div>
       </div>`)
     .join("");
+
+  destacados.forEach((ing) => {
+    const checkbox = document.getElementById(`refrigerador-check-${ing.id}`);
+    const chipCheckbox = document.getElementById(`refrigerador-check-freq-${ing.id}`);
+    const onToggle = (checked) => {
+      checkbox.checked = checked;
+      chipCheckbox.checked = checked;
+    };
+    checkbox.addEventListener("change", (e) => onToggle(e.target.checked));
+    chipCheckbox.addEventListener("change", (e) => onToggle(e.target.checked));
+  });
 }
 
 // Ingredientes para el matching contra las 35 recetas fijas: lo marcado a
@@ -1434,6 +1489,7 @@ function limpiarSeleccionRefrigerador() {
   ingredientesIdentificados = [];
   renderIngredientesIdentificados();
   document.querySelectorAll(".refrigerador-ingrediente:checked").forEach((el) => { el.checked = false; });
+  document.querySelectorAll('[id^="refrigerador-check-freq-"]:checked').forEach((el) => { el.checked = false; });
   refrigeradorImagenDataUrl = null;
   els.refrigeradorPreviewWrap.hidden = true;
   els.refrigeradorIdentificarBtn.disabled = true;
@@ -1445,7 +1501,40 @@ function limpiarSeleccionRefrigerador() {
 // --- Lista de supermercado con precios de referencia ---
 const SUPER_SELECCION_STORAGE_KEY = "kidneyChefSuperSeleccion";
 const SUPER_CUSTOM_STORAGE_KEY = "kidneyChefSuperCustom";
+const SUPER_FRECUENCIA_STORAGE_KEY = "kidneyChefFrecuenciaCompra";
+const MAS_COMPRADOS_MAX = 6;
 const SEMANAS_POR_MES = 4.33;
+
+// Cuántas veces marcó el paciente cada producto a lo largo del tiempo — no
+// se resetea con "Limpiar selección" (esa borra la lista de esta semana, no
+// el historial de qué compra seguido). Base de "Más comprados" en Súper y,
+// agregada a nivel de producto genérico, también en el checklist manual del
+// Refrigerador.
+function loadFrecuenciaCompra() {
+  try {
+    return JSON.parse(localStorage.getItem(SUPER_FRECUENCIA_STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function registrarCompraFrecuente(id) {
+  const frecuencia = loadFrecuenciaCompra();
+  frecuencia[id] = (frecuencia[id] || 0) + 1;
+  localStorage.setItem(SUPER_FRECUENCIA_STORAGE_KEY, JSON.stringify(frecuencia));
+}
+
+// El id de catálogo "base" de un id de Súper: para un corte (ej.
+// posta_negra_vacuno) es el producto padre (vacuno), que es el nivel al que
+// existe en ingredientes-refrigerador.json; para un producto sin cortes es
+// el mismo id.
+function idCatalogoBase(id) {
+  for (const item of PRECIOS_REFERENCIA) {
+    if (item.id === id) return item.id;
+    if (item.cortes && item.cortes.some((corte) => corte.id === id)) return item.id;
+  }
+  return id;
+}
 const CADENAS_SUPER = [
   { id: "jumbo", label: "Jumbo" },
   { id: "lider", label: "Líder" },
@@ -1598,7 +1687,25 @@ function renderSuperChecklist() {
     </div>`;
   };
 
-  let html = categorias
+  const destacados = itemsMasComprados();
+  let html = destacados.length
+    ? `<div class="mas-comprados">
+        <p class="super-categoria-titulo">Tus productos más comprados</p>
+        <div class="frecuentes-chips">
+          ${destacados
+            .map(
+              (item) => `
+            <label class="super-frecuente-chip">
+              <input type="checkbox" id="super-check-freq-${item.id}" ${seleccion.has(item.id) ? "checked" : ""}>
+              <span>${escapeHtml(item.nombre)}</span>
+            </label>`
+            )
+            .join("")}
+        </div>
+      </div>`
+    : "";
+
+  html += categorias
     .map((categoria) => {
       const items = PRECIOS_REFERENCIA.filter((i) => i.categoria === categoria);
       return `<div><p class="super-categoria-titulo">${escapeHtml(categoria)}</p>${items.map(filaCatalogo).join("")}</div>`;
@@ -1622,9 +1729,19 @@ function renderSuperChecklist() {
 
   itemsPreciables().forEach((item) => {
     if (item.cortes) return; // "vacuno" y similares son solo título, sin checkbox propio
-    document.getElementById(`super-check-${item.id}`).addEventListener("change", (e) => {
-      toggleSuperCatalogo(item.id, e.target.checked);
-    });
+    const checkbox = document.getElementById(`super-check-${item.id}`);
+    const chipCheckbox = document.getElementById(`super-check-freq-${item.id}`);
+    // El chip de "más comprados" y el checkbox del listado son dos <input>
+    // que representan el mismo id — al mover cualquiera de los dos, el otro
+    // se actualiza a mano (sin volver a renderizar toda la lista) para que
+    // no queden desincronizados.
+    const onToggle = (checked) => {
+      toggleSuperCatalogo(item.id, checked);
+      checkbox.checked = checked;
+      if (chipCheckbox) chipCheckbox.checked = checked;
+    };
+    checkbox.addEventListener("change", (e) => onToggle(e.target.checked));
+    if (chipCheckbox) chipCheckbox.addEventListener("change", (e) => onToggle(e.target.checked));
   });
   custom.forEach((item) => {
     document.getElementById(`super-check-${item.id}`).addEventListener("change", (e) => {
@@ -1638,9 +1755,26 @@ function renderSuperChecklist() {
 
 function toggleSuperCatalogo(id, checked) {
   const seleccion = loadSuperSeleccion();
-  if (checked) seleccion.add(id); else seleccion.delete(id);
+  if (checked) {
+    seleccion.add(id);
+    registrarCompraFrecuente(id);
+  } else {
+    seleccion.delete(id);
+  }
   saveSuperSeleccion(seleccion);
   actualizarResumenSuper();
+}
+
+// Los N productos que más veces marcó el paciente en Súper (frecuencia > 0),
+// de más a menos frecuente. Solo productos con checkbox propio — un padre
+// con cortes (ej. "vacuno") nunca se marca directamente, así que nunca junta
+// frecuencia él mismo.
+function itemsMasComprados() {
+  const frecuencia = loadFrecuenciaCompra();
+  return itemsPreciables()
+    .filter((item) => !item.cortes && (frecuencia[item.id] || 0) > 0)
+    .sort((a, b) => (frecuencia[b.id] || 0) - (frecuencia[a.id] || 0))
+    .slice(0, MAS_COMPRADOS_MAX);
 }
 
 function toggleSuperCustom(id, checked) {
