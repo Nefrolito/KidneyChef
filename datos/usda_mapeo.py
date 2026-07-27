@@ -89,6 +89,15 @@ MAPEO = {
     "filete_vacuno": 'Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0" fat, choice, raw',
     "punta_paleta_vacuno": 'Beef, chuck, arm pot roast, separable lean only, trimmed to 1/8" fat, choice, raw',
     "plateada_vacuno": 'Beef, round, bottom round, roast, separable lean only, trimmed to 1/8" fat, choice, raw',
+    # Cortes de pollo y merluza para la lista de supermercado — mismo criterio
+    # que los cortes de vacuno arriba: crudos (no cocidos, a diferencia de la
+    # entrada genérica "pollo" que usa pechuga cocida para las recetas).
+    "pechuga_pollo": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
+    "trutro_pollo": "Chicken, broilers or fryers, leg, meat and skin, raw",
+    "alitas_pollo": "Chicken, broilers or fryers, wing, meat and skin, raw",
+    # USDA SR Legacy no tiene "hake" (merluza) como especie propia; se usa
+    # whiting, especie muy cercana. Mismo valor para filete y merluza entera.
+    "merluza": "Fish, whiting, mixed species, raw",
     "cerdo": "Pork, fresh, loin, center loin (chops), bone-in, separable lean only, cooked, broiled",
     "salmon": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
     "atun": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)",

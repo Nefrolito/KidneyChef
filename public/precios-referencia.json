@@ -147,28 +147,86 @@
     "nombre": "Merluza (o pescado blanco similar)",
     "categoria": "Carnes y pescados",
     "presentacion": "1 kg",
-    "precios": {
-      "jumbo": 6710,
-      "lider": 5690,
-      "unimarc": 6290,
-      "acuenta": 5390,
-      "alvi": 5210,
-      "tottus": 5990
-    }
+    "cortes": [
+      {
+        "id": "filete_merluza",
+        "nombre": "Filete de merluza",
+        "presentacion": "1 kg",
+        "nutrientes_id": "merluza",
+        "precios": {
+          "jumbo": 8990,
+          "lider": 7620,
+          "unimarc": 8430,
+          "acuenta": 7220,
+          "alvi": 6990,
+          "tottus": 8030
+        }
+      },
+      {
+        "id": "merluza_entera",
+        "nombre": "Merluza entera",
+        "presentacion": "1 kg",
+        "nutrientes_id": "merluza",
+        "precios": {
+          "jumbo": 5290,
+          "lider": 4490,
+          "unimarc": 4960,
+          "acuenta": 4250,
+          "alvi": 4110,
+          "tottus": 4720
+        }
+      }
+    ]
   },
   {
     "id": "pollo",
     "nombre": "Pollo",
     "categoria": "Carnes y pescados",
     "presentacion": "1 kg",
-    "precios": {
-      "jumbo": 3910,
-      "lider": 3320,
-      "unimarc": 3660,
-      "acuenta": 3140,
-      "alvi": 3040,
-      "tottus": 3490
-    }
+    "cortes": [
+      {
+        "id": "pechuga_pollo",
+        "nombre": "Pechuga",
+        "presentacion": "1 kg",
+        "nutrientes_id": "pechuga_pollo",
+        "precios": {
+          "jumbo": 5490,
+          "lider": 4660,
+          "unimarc": 5150,
+          "acuenta": 4410,
+          "alvi": 4270,
+          "tottus": 4900
+        }
+      },
+      {
+        "id": "trutro_pollo",
+        "nombre": "Trutro entero",
+        "presentacion": "1 kg",
+        "nutrientes_id": "trutro_pollo",
+        "precios": {
+          "jumbo": 3490,
+          "lider": 2960,
+          "unimarc": 3270,
+          "acuenta": 2800,
+          "alvi": 2710,
+          "tottus": 3120
+        }
+      },
+      {
+        "id": "alitas_pollo",
+        "nombre": "Alitas",
+        "presentacion": "1 kg",
+        "nutrientes_id": "alitas_pollo",
+        "precios": {
+          "jumbo": 3290,
+          "lider": 2790,
+          "unimarc": 3080,
+          "acuenta": 2640,
+          "alvi": 2560,
+          "tottus": 2940
+        }
+      }
+    ]
   },
   {
     "id": "vienesa",

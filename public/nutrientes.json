@@ -3795,5 +3795,89 @@
     },
     "aditivos_fosfato": null,
     "indice_glucemico": null
+  },
+  {
+    "id": "pechuga_pollo",
+    "nombre": "Pechuga de pollo",
+    "categoria": "Carne",
+    "alias": [
+      "pechuga",
+      "chicken breast raw"
+    ],
+    "potasio_mg": 334,
+    "fosforo_mg": 213,
+    "sodio_mg": 45,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
+      "fdc_id": "171077",
+      "nota_equivalencia": "Corte crudo, sin cocción — a diferencia de la entrada genérica 'pollo' (pechuga cocida) que usa el resto de la app, esta es la referencia para el precio por kg crudo en el supermercado."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "trutro_pollo",
+    "nombre": "Trutro entero",
+    "categoria": "Carne",
+    "alias": [
+      "trutro",
+      "chicken leg", "muslo y contramuslo"
+    ],
+    "potasio_mg": 203,
+    "fosforo_mg": 155,
+    "sodio_mg": 84,
+    "carbohidratos_g": 0.17,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Chicken, broilers or fryers, leg, meat and skin, raw",
+      "fdc_id": "172378",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente (trutro entero ~ leg, meat and skin), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "alitas_pollo",
+    "nombre": "Alitas",
+    "categoria": "Carne",
+    "alias": [
+      "alitas",
+      "chicken wings"
+    ],
+    "potasio_mg": 187,
+    "fosforo_mg": 123,
+    "sodio_mg": 84,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Chicken, broilers or fryers, wing, meat and skin, raw",
+      "fdc_id": "172390",
+      "nota_equivalencia": "Corte chileno sin tabla nacional digitalizada disponible; se usa el corte USDA equivalente (alitas ~ wing, meat and skin), no un dato chileno medido."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "merluza",
+    "nombre": "Merluza",
+    "categoria": "Pescado",
+    "alias": [
+      "merluza",
+      "hake", "pescada"
+    ],
+    "potasio_mg": 249,
+    "fosforo_mg": 222,
+    "sodio_mg": 72,
+    "carbohidratos_g": 0.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Fish, whiting, mixed species, raw",
+      "fdc_id": "173713",
+      "nota_equivalencia": "USDA SR Legacy no tiene 'hake' (merluza) como especie propia; se usa whiting (especie muy cercana, misma familia Merlucciidae/Gadiformes), no un dato chileno medido. Mismo valor para filete y merluza entera — la composición de la carne comestible no cambia por el corte, solo el precio por kg (sin desperdicio de espina/cabeza en el filete)."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   }
 ]
