@@ -1054,6 +1054,45 @@ h1, h2, h3 {
   letter-spacing: 0.03em;
   color: var(--muted);
 }
+/* "Pasillos" plegables — un <details> nativo por categoría, mismo patrón
+   que .refrigerador-manual, para no tener que hacer scroll por las 4
+   categorías completas para llegar a la de más abajo. */
+.super-pasillo {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.super-pasillo summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.8rem 0.95rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--brand-dark);
+  background: var(--brand-50);
+}
+.super-pasillo summary::-webkit-details-marker { display: none; }
+.super-pasillo summary::before {
+  content: "▸";
+  font-size: 0.8rem;
+  color: var(--brand);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+.super-pasillo[open] summary::before { transform: rotate(90deg); }
+.super-pasillo-count {
+  margin-left: auto;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.super-pasillo-contenido { padding: 0.2rem 0.95rem 0.3rem; }
 .super-item {
   display: flex;
   flex-direction: column;

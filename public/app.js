@@ -1705,10 +1705,20 @@ function renderSuperChecklist() {
       </div>`
     : "";
 
+  // Cada categoría es un "pasillo" plegable (mismo <details> nativo que ya
+  // usa "O márcalos a mano" en Refrigerador) — todo expandido a la vez
+  // obligaba a un scroll larguísimo para llegar, por ejemplo, a Abarrotes.
+  // Cerrados por defecto: el paciente entra al pasillo que necesita, como en
+  // un súper real, en vez de desplazarse por los otros tres primero.
   html += categorias
     .map((categoria) => {
       const items = PRECIOS_REFERENCIA.filter((i) => i.categoria === categoria);
-      return `<div><p class="super-categoria-titulo">${escapeHtml(categoria)}</p>${items.map(filaCatalogo).join("")}</div>`;
+      const cantidad = items.reduce((acc, i) => acc + (i.cortes ? i.cortes.length : 1), 0);
+      return `
+      <details class="super-pasillo">
+        <summary>${escapeHtml(categoria)}<span class="super-pasillo-count">${cantidad}</span></summary>
+        <div class="super-pasillo-contenido">${items.map(filaCatalogo).join("")}</div>
+      </details>`;
     })
     .join("");
 
