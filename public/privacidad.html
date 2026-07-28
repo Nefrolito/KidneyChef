@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Política de Privacidad — KidneyChef</title>
+<style>
+  :root {
+    --brand: #0e7490;
+    --brand-dark: #0b5a70;
+    --bg: #f4f8fa;
+    --card: #ffffff;
+    --text: #17262c;
+    --muted: #5b7280;
+    --border: #dfe7eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b1418;
+      --card: #101c22;
+      --text: #e8f1f4;
+      --muted: #93a5ae;
+      --border: #223038;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+  h1 { color: var(--brand-dark); font-size: 1.6rem; margin-bottom: 0.2rem; }
+  .fecha { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+  h2 { color: var(--brand); font-size: 1.05rem; margin-top: 2.2rem; }
+  p, li { font-size: 0.95rem; }
+  ul { padding-left: 1.3rem; }
+  .aviso {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--brand);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+  .completar {
+    background: #fef3c7;
+    color: #7c4a03;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  @media (prefers-color-scheme: dark) {
+    .completar { background: #4a3103; color: #ffd97d; }
+  }
+  a { color: var(--brand); }
+  footer { margin-top: 3rem; color: var(--muted); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Política de Privacidad de KidneyChef</h1>
+  <p class="fecha">Última actualización: <span class="completar">completar fecha de publicación</span></p>
+
+  <div class="aviso">
+    <strong>Borrador de referencia, no es asesoría legal.</strong> Este texto describe con
+    precisión qué datos maneja KidneyChef hoy y a quién se los envía, pero antes de
+    publicarlo o de enviar la app a revisión de Apple/Google conviene que lo revise un
+    abogado — sobre todo por tratarse de datos de salud y por la nueva Ley 21.719 de
+    protección de datos personales en Chile (entra en vigencia en diciembre de 2026).
+  </div>
+
+  <h2>Qué es KidneyChef</h2>
+  <p>
+    KidneyChef es una herramienta educativa de apoyo para pacientes con enfermedad renal
+    crónica: reconoce por foto el contenido aproximado de potasio, fósforo y sodio de una
+    comida. <strong>No es un dispositivo médico ni reemplaza la indicación de tu
+    nefrólogo(a) o nutricionista</strong>, quienes deben definir tus límites diarios
+    reales. El reconocimiento por IA puede equivocarse: siempre puedes corregir el
+    alimento identificado.
+  </p>
+
+  <h2>Qué datos recolectamos y para qué</h2>
+  <ul>
+    <li>
+      <strong>Fotos de comida o de tu refrigerador.</strong> Se envían a la API de
+      Claude (Anthropic) solo para identificar los alimentos y estimar su aporte
+      nutricional. No quedan almacenadas en servidores de KidneyChef una vez procesada
+      la respuesta.
+    </li>
+    <li>
+      <strong>Historial de alimentos analizados y calculadora del día.</strong> Se guarda
+      únicamente en tu propio dispositivo (almacenamiento local del navegador/app), no en
+      un servidor — si desinstalas la app o borras los datos, se pierde.
+    </li>
+    <li>
+      <strong>Datos clínicos, solo si activas el vínculo con tu tratante</strong>
+      (nefrólogo/a o nutricionista): un código de cliente, tus metas diarias de potasio y
+      fósforo (mg) que te asigna tu tratante, y tu registro de consumo diario. Estos datos
+      se sincronizan con nuestra base de datos (Supabase) para que tu tratante pueda
+      verlos y ajustarlos — sin activar este vínculo, nada de esto sale de tu dispositivo.
+    </li>
+    <li>
+      <strong>Datos de la cuenta del tratante</strong> (si eres nefrólogo/a o
+      nutricionista): nombre, correo y contraseña (guardada de forma cifrada, nunca en
+      texto plano), y la lista de pacientes vinculados a tu cuenta.
+    </li>
+    <li>
+      <strong>Datos de suscripción y pago.</strong> La compra se procesa por RevenueCat y
+      la tienda de aplicaciones (App Store o Google Play) — KidneyChef nunca ve ni
+      almacena el número de tu tarjeta.
+    </li>
+  </ul>
+
+  <h2>Con quién compartimos datos</h2>
+  <ul>
+    <li><strong>Anthropic</strong> (API de Claude) — para el reconocimiento de alimentos por foto, según sus propias políticas de privacidad.</li>
+    <li><strong>Supabase</strong> — almacenamiento de los datos clínicos y de vínculo paciente-tratante, solo si activas el Plan Clínico.</li>
+    <li><strong>RevenueCat, Apple y Google</strong> — gestión de la suscripción y el pago.</li>
+  </ul>
+  <p>No vendemos tus datos ni los compartimos con terceros con fines publicitarios.</p>
+
+  <h2>Tus derechos</h2>
+  <p>
+    Puedes pedir acceder, corregir o eliminar tus datos clínicos sincronizados
+    escribiendo a <span class="completar">completar correo de contacto</span>. Los datos
+    guardados solo en tu dispositivo (historial, calculadora del día) se eliminan
+    borrando la app o sus datos desde los ajustes de tu teléfono.
+  </p>
+
+  <h2>Menores de edad</h2>
+  <p>
+    KidneyChef está pensado para uso por pacientes adultos o bajo supervisión de un
+    adulto responsable/tratante en el caso de pacientes menores de edad.
+  </p>
+
+  <h2>Cambios a esta política</h2>
+  <p>
+    Si actualizamos esta política, la nueva fecha quedará indicada arriba. El uso
+    continuado de la app después de un cambio implica su aceptación.
+  </p>
+
+  <h2>Contacto</h2>
+  <p><span class="completar">completar correo de contacto</span></p>
+
+  <footer>KidneyChef — herramienta educativa de apoyo, no sustituye la atención de tu equipo de salud.</footer>
+</div>
+</body>
+</html>

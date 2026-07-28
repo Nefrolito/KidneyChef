@@ -812,6 +812,9 @@ h1, h2, h3 {
   margin: 0 0 1.1rem;
 }
 
+.about-privacidad { margin: -0.6rem 0 1.1rem; font-size: 0.85rem; }
+.about-privacidad a { color: var(--brand); }
+
 .disclaimer {
   display: flex;
   gap: 0.65rem;
