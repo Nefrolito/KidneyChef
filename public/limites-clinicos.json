@@ -1,7 +1,7 @@
 {
   "_fuente": "KDIGO 2024 / KDOQI 2020, según el resumen aportado por Camilo Ulloa.",
-  "_principio_rector": "Las guías actuales ABANDONAN las restricciones universales de potasio y fósforo: solo el sodio tiene una meta numérica poblacional. Potasio y fósforo deben individualizarse según laboratorio, diuresis residual, modalidad de diálisis y contexto clínico. Por eso este archivo NO fija cifras de K ni de P por etapa.",
-  "_validado_clinicamente": "Umbrales de contenido de K/P y consideraciones de etapa 3a/3b confirmados por Camilo el 2026-07-22.",
+  "_principio_rector": "La guía KDOQI 2020 vigente NO fija cifras de K ni P por etapa: recomienda ajustar la ingesta para mantener la kalemia/fosfatemia en rango normal, según laboratorio y criterio clínico. Por eso el semáforo básico solo clasifica el CONTENIDO relativo del alimento, no una meta diaria. A partir de 2026-08-02, y como excepción explícita pedida por Camilo, potasio y fósforo SÍ tienen una meta diaria por defecto desde ciertas etapas (ver 'objetivo_mg_dia_por_defecto' en cada nutriente) — basada en los rangos de referencia general más citados en material educativo renal (KDOQI/NKF: K 1500-2000 mg/día, P 800-1000 mg/día), no en una cifra oficial por etapa de la guía. Sigue teniendo prioridad la meta que el tratante fije a mano para un paciente puntual.",
+  "_validado_clinicamente": "Umbrales de contenido de K/P y consideraciones de etapa 3a/3b confirmados por Camilo el 2026-07-22. Metas automáticas de K/P por etapa (objetivo_mg_dia_por_defecto) confirmadas por Camilo el 2026-08-02.",
   "regla_porcion": {
     "_nota": "Para los nutrientes CON meta diaria (sodio, y los que el tratante individualice), el umbral por porción se deriva del límite diario: el día se reparte en 4 ocasiones de comida y un alimento que consume hasta la mitad de ese presupuesto es verde; hasta el total, amarillo; por encima, rojo.",
     "comidas_por_dia": 4,
@@ -31,7 +31,10 @@
       "_nota": "Camilo indicó que la diabetes justifica un nivel superior de restricción de potasio. Se unifica con los fármacos retenedores bajo el mismo mecanismo, porque clínicamente apuntan al mismo riesgo: en el diabético se suma la acidosis tubular renal tipo 4 / hipoaldosteronismo hiporreninémico, y con frecuencia además recibe bloqueo del SRAA.",
       "activadores": ["diabetes", "farmacos_retenedores_de_potasio"],
       "efecto": "usar_clasificacion_estricta_y_advertir"
-    }
+    },
+    "objetivo_mg_dia_por_defecto": 2000,
+    "etapas_aplicables": ["4", "5", "hemodialisis"],
+    "_nota_objetivo_por_defecto": "Meta diaria automática pedida por Camilo el 2026-08-02, aplicable SOLO cuando el tratante no fijó una meta propia. Se activa desde etapa 4 (eGFR <30) y en hemodiálisis. NO se activa en diálisis peritoneal (ver situaciones.peritoneal: ahí el potasio suele poder liberalizarse, a veces incluso requiere aporte) ni en 3a/3b (siguen sin meta automática). Tampoco se activa si factores_riesgo_hiperkalemia está activo (diabetes o fármacos retenedores de potasio) — en ese caso Camilo prefirió individualización real por el tratante en vez de un número fijo, dado el riesgo más impredecible de esos pacientes. Cifra basada en el rango de referencia general KDOQI/NKF (1500-2000 mg/día), no en una tabla oficial por etapa (la guía 2020 no la tiene, ver _principio_rector)."
   },
   "fosforo": {
     "_nota": "Sin cifra universal. La guía prioriza REDUCIR ADITIVOS FOSFATADOS por sobre el conteo de fósforo total: el fósforo inorgánico añadido se absorbe mucho más que el orgánico de los alimentos naturales.",
@@ -42,7 +45,10 @@
       "unidad": "mg_por_100g",
       "bajo_hasta": 50,
       "moderado_hasta": 150
-    }
+    },
+    "objetivo_mg_dia_por_defecto": 1000,
+    "etapas_aplicables": ["4", "5", "hemodialisis"],
+    "_nota_objetivo_por_defecto": "Mismo criterio y mismas excepciones que potasio.objetivo_mg_dia_por_defecto (ver esa nota) — pedido por Camilo el 2026-08-02. Cifra basada en el rango de referencia general KDOQI/NKF (800-1000 mg/día) para cuando se necesita restringir por hiperfosfatemia."
   },
   "carbohidratos": {
     "_nota": "Solo se activa si el paciente declara diabetes. El objetivo se individualiza (ADA); 180 g/día equivale a ~45 g por comida.",
@@ -80,16 +86,16 @@
     },
     "4": {
       "etiqueta": "ERC etapa 4",
-      "consideracion": "Sodio <2 g/día. Restringir potasio solo si hay hiperpotasemia o riesgo. Fósforo según fosfatemia, calcio y PTH."
+      "consideracion": "Sodio <2 g/día. Potasio y fósforo con meta automática (2000 mg / 1000 mg) salvo diabetes o fármacos retenedores de potasio, donde se individualiza según laboratorio en vez de aplicar la cifra fija."
     },
     "5": {
       "etiqueta": "ERC etapa 5 (sin diálisis)",
-      "consideracion": "Sodio <2 g/día. Potasio y fósforo individualizados según laboratorio."
+      "consideracion": "Sodio <2 g/día. Potasio y fósforo con meta automática (2000 mg / 1000 mg) salvo diabetes o fármacos retenedores de potasio, donde se individualiza según laboratorio en vez de aplicar la cifra fija."
     },
     "hemodialisis": {
       "etiqueta": "En hemodiálisis",
       "requiere_diuresis": true,
-      "consideracion": "Potasio según kalemia predialítica, diuresis residual y pauta de diálisis. Terapia intermitente: el potasio se acumula entre sesiones. Fósforo: coordinar dieta con quelantes. La meta de líquidos se calcula desde la diuresis registrada."
+      "consideracion": "Potasio y fósforo con meta automática (2000 mg / 1000 mg) salvo diabetes o fármacos retenedores de potasio, donde se individualiza según kalemia predialítica, diuresis residual y pauta de diálisis en vez de la cifra fija. Terapia intermitente: el potasio se acumula entre sesiones. Fósforo: coordinar dieta con quelantes. La meta de líquidos se calcula desde la diuresis registrada."
     },
     "peritoneal": {
       "etiqueta": "En diálisis peritoneal",

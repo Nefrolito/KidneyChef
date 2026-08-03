@@ -348,8 +348,9 @@ function riesgoHiperkalemia() {
 }
 
 // Meta diaria de un nutriente, o null si no corresponde fijar una.
-// Solo el sodio tiene meta universal; potasio y fósforo únicamente cuando el
-// equipo tratante los individualizó (plan clínico).
+// Sodio siempre tiene meta universal. Potasio y fósforo la tienen desde
+// ciertas etapas de ERC (metaPorDefectoDesdeEtapa) salvo que el tratante ya
+// haya fijado una propia, que siempre prima.
 function metaDiaria(nutriente) {
   if (!LIMITES) return null;
   const perfil = ensurePerfil();
@@ -363,7 +364,24 @@ function metaDiaria(nutriente) {
       ? LIMITES.carbohidratos.objetivo_g_dia_por_defecto
       : null;
   }
-  return null; // potasio y fósforo: sin cifra universal
+  if (nutriente === "potasio_mg") return metaPorDefectoDesdeEtapa(LIMITES.potasio);
+  if (nutriente === "fosforo_mg") return metaPorDefectoDesdeEtapa(LIMITES.fosforo);
+  return null;
+}
+
+// Meta automática de K/P desde ciertas etapas de ERC
+// (config.etapas_aplicables en limites-clinicos.json), salvo que el paciente
+// tenga riesgo de hiperkalemia (diabetes o fármacos retenedores de potasio):
+// ahí Camilo prefirió individualización real por el tratante en vez de un
+// número fijo, dado que el riesgo es más impredecible. No se activa en
+// diálisis peritoneal ni en 3a/3b porque no están en etapas_aplicables.
+// Pedido explícito de Camilo, 2026-08-02 — ver _nota_objetivo_por_defecto.
+function metaPorDefectoDesdeEtapa(config) {
+  if (!config || config.objetivo_mg_dia_por_defecto == null) return null;
+  if (riesgoHiperkalemia()) return null;
+  const etapa = situacionActual();
+  if (!etapa || !config.etapas_aplicables.includes(etapa)) return null;
+  return config.objetivo_mg_dia_por_defecto;
 }
 
 // "3" | "4" | "5" | "hemodialisis" | "peritoneal" | null (no declarada)
@@ -2156,9 +2174,11 @@ function renderRecetasGuardadas() {
 // El total acumulado del día se compara contra la meta DIARIA completa, no
 // contra el umbral de una porción (con dos o tres comidas eso siempre
 // marcaba rojo). Barra verde hasta 80% de la meta, ámbar de 80% a 100%,
-// roja al superarla. Potasio y fósforo solo muestran barra cuando el equipo
-// tratante fijó una meta personal (Plan Clínico); si no, se muestra el
-// total sin inventar un límite que la app no conoce.
+// roja al superarla. Potasio y fósforo muestran barra cuando el equipo
+// tratante fijó una meta personal (Plan Clínico) O cuando aplica la meta
+// automática por etapa de ERC (metaPorDefectoDesdeEtapa); si ninguna de las
+// dos corresponde, se muestra el total sin inventar un límite que la app no
+// conoce realmente.
 function nivelPorMeta(total, meta) {
   if (total > meta) return "rojo";
   if (total >= meta * 0.8) return "amarillo";
