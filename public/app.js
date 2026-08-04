@@ -195,7 +195,38 @@ function ensurePerfil() {
   if (perfil.suscripcion === undefined) {
     perfil.suscripcion = { activa: false };
   }
+  if (perfil.terminos === undefined) {
+    perfil.terminos = { version: null, aceptadoEn: null };
+  }
   return perfil;
+}
+
+// Bloquea toda la app (por encima incluso del paywall) hasta que el usuario
+// acepte los Términos y Condiciones y la Política de Privacidad vigentes.
+// Subir TERMINOS_VERSION cuando cambie el contenido de terminos.html o
+// privacidad.html de forma relevante vuelve a pedir la aceptación a todos,
+// incluidos quienes ya la habían dado para una versión anterior.
+const TERMINOS_VERSION = "1.0";
+
+function terminosAceptados() {
+  return ensurePerfil().terminos.version === TERMINOS_VERSION;
+}
+
+function renderTerminos() {
+  const aceptados = terminosAceptados();
+  els.terminosOverlay.hidden = aceptados;
+  if (!aceptados) {
+    els.terminosCheckbox.checked = false;
+    els.terminosAceptarBtn.disabled = true;
+  }
+}
+
+function aceptarTerminos() {
+  if (!els.terminosCheckbox.checked) return;
+  const perfil = ensurePerfil();
+  perfil.terminos = { version: TERMINOS_VERSION, aceptadoEn: new Date().toISOString() };
+  guardarPerfil(perfil);
+  renderTerminos();
 }
 
 // Suscripción: toda la app es gratis por TRIAL_DIAS desde la primera vez que
@@ -856,6 +887,9 @@ const els = {
   paywallPrecio: document.getElementById("paywall-precio"),
   paywallSuscribirBtn: document.getElementById("paywall-suscribir-btn"),
   paywallMsg: document.getElementById("paywall-msg"),
+  terminosOverlay: document.getElementById("terminos-overlay"),
+  terminosCheckbox: document.getElementById("terminos-checkbox"),
+  terminosAceptarBtn: document.getElementById("terminos-aceptar-btn"),
   refrigeradorChecklist: document.getElementById("refrigerador-checklist"),
   refrigeradorBuscarBtn: document.getElementById("refrigerador-buscar-btn"),
   refrigeradorResultados: document.getElementById("refrigerador-resultados"),
@@ -921,6 +955,7 @@ async function init() {
   renderTipOfDay();
   renderPlan();
   renderDatosClinicos();
+  renderTerminos();
   renderSuscripcion();
   initRevenueCat();
   initTabs();
@@ -946,6 +981,10 @@ async function init() {
   els.egfrCreatinina.addEventListener("input", guardarDatosClinicos);
   els.egfrCistatina.addEventListener("input", guardarDatosClinicos);
   els.paywallSuscribirBtn.addEventListener("click", comprarSuscripcion);
+  els.terminosCheckbox.addEventListener("change", () => {
+    els.terminosAceptarBtn.disabled = !els.terminosCheckbox.checked;
+  });
+  els.terminosAceptarBtn.addEventListener("click", aceptarTerminos);
   els.refrigeradorBuscarBtn.addEventListener("click", buscarRecetasRefrigerador);
   els.refrigeradorCameraInput.addEventListener("change", (e) => handleRefrigeradorFileSelected(e.target.files[0]));
   els.refrigeradorIdentificarBtn.addEventListener("click", identificarIngredientesRefrigerador);

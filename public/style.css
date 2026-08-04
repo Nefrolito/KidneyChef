@@ -951,6 +951,44 @@ h1, h2, h3 {
 }
 .trial-banner[hidden] { display: none; }
 
+.terminos-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: var(--bg);
+  overflow-y: auto;
+}
+.terminos-overlay[hidden] { display: none; }
+.terminos-card {
+  max-width: 400px;
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+.terminos-card h2 { margin: 0 0 0.6rem; font-size: 1.15rem; color: var(--brand-dark); text-align: center; }
+.terminos-card p { margin: 0 0 0.85rem; font-size: 0.9rem; color: var(--text); line-height: 1.5; }
+.terminos-links { color: var(--muted); font-size: 0.85rem !important; }
+.terminos-links a { color: var(--brand); }
+.terminos-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: 1.1rem 0 1.3rem;
+  font-size: 0.85rem;
+  color: var(--text);
+  cursor: pointer;
+}
+.terminos-btn { width: 100%; }
+.terminos-btn:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+
 .paywall-overlay {
   position: fixed;
   inset: 0;
@@ -1107,7 +1145,8 @@ h1, h2, h3 {
 .super-item-top { display: flex; align-items: center; gap: 0.65rem; }
 .super-item input[type="checkbox"],
 .super-frecuente-chip input[type="checkbox"],
-.clinical-check input[type="checkbox"] {
+.clinical-check input[type="checkbox"],
+.terminos-check input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
   width: 22px;
@@ -1123,13 +1162,16 @@ h1, h2, h3 {
 }
 .super-item input[type="checkbox"]:hover,
 .super-frecuente-chip input[type="checkbox"]:hover,
-.clinical-check input[type="checkbox"]:hover { border-color: var(--brand); }
+.clinical-check input[type="checkbox"]:hover,
+.terminos-check input[type="checkbox"]:hover { border-color: var(--brand); }
 .super-item input[type="checkbox"]:checked,
 .super-frecuente-chip input[type="checkbox"]:checked,
-.clinical-check input[type="checkbox"]:checked { background: var(--brand); border-color: var(--brand); }
+.clinical-check input[type="checkbox"]:checked,
+.terminos-check input[type="checkbox"]:checked { background: var(--brand); border-color: var(--brand); }
 .super-item input[type="checkbox"]:checked::after,
 .super-frecuente-chip input[type="checkbox"]:checked::after,
-.clinical-check input[type="checkbox"]:checked::after {
+.clinical-check input[type="checkbox"]:checked::after,
+.terminos-check input[type="checkbox"]:checked::after {
   content: "";
   position: absolute;
   left: 7px;
