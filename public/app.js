@@ -183,10 +183,14 @@ function ensurePerfil() {
   if (d.diuresisMl === undefined) d.diuresisMl = null;
   if (d.enDialisis === undefined) d.enDialisis = null;
   if (d.modoEtapa === undefined) d.modoEtapa = "calculada";
-  if (d.edad === undefined) d.edad = null;
   if (d.sexoBiologico === undefined) d.sexoBiologico = null;
   if (d.creatininaMgDl === undefined) d.creatininaMgDl = null;
   if (d.cistatinaMgL === undefined) d.cistatinaMgL = null;
+  if (d.cardiovascular === undefined) d.cardiovascular = false;
+  if (d.dislipidemia === undefined) d.dislipidemia = false;
+  if (d.gota === undefined) d.gota = false;
+  if (d.anemia === undefined) d.anemia = false;
+  if (d.trasplanteRenal === undefined) d.trasplanteRenal = false;
   if (perfil.umbralesPersonalizados === undefined) perfil.umbralesPersonalizados = null;
   if (perfil.metasDiarias === undefined) perfil.metasDiarias = null;
   if (perfil.vinculacion === undefined) {
@@ -198,7 +202,49 @@ function ensurePerfil() {
   if (perfil.terminos === undefined) {
     perfil.terminos = { version: null, aceptadoEn: null };
   }
+  if (perfil.datosPersonales === undefined) {
+    perfil.datosPersonales = { nombre: "", fechaNacimiento: null };
+  }
   return perfil;
+}
+
+// Edad en años cumplidos a partir de una fecha de nacimiento ISO (yyyy-mm-dd),
+// o null si no hay fecha. Reemplaza el campo "Edad" que antes se ingresaba a
+// mano solo para la calculadora de eGFR — ahora se deriva del perfil, para no
+// pedir el mismo dato dos veces y que quede siempre consistente.
+function calcularEdad(fechaNacimientoIso) {
+  if (!fechaNacimientoIso) return null;
+  const nacimiento = new Date(fechaNacimientoIso);
+  if (isNaN(nacimiento.getTime())) return null;
+  const hoy = new Date();
+  let edad = hoy.getFullYear() - nacimiento.getFullYear();
+  const cumpleEsteAno = new Date(hoy.getFullYear(), nacimiento.getMonth(), nacimiento.getDate());
+  if (hoy < cumpleEsteAno) edad--;
+  return edad;
+}
+
+function edadActual() {
+  return calcularEdad(ensurePerfil().datosPersonales.fechaNacimiento);
+}
+
+function renderDatosPersonales() {
+  const { nombre, fechaNacimiento } = ensurePerfil().datosPersonales;
+  els.perfilNombre.value = nombre || "";
+  els.perfilFechaNacimiento.value = fechaNacimiento || "";
+  const edad = calcularEdad(fechaNacimiento);
+  els.perfilEdadCalculada.textContent = edad != null ? `${edad} años` : "";
+}
+
+function guardarDatosPersonales() {
+  const perfil = ensurePerfil();
+  perfil.datosPersonales = {
+    nombre: els.perfilNombre.value,
+    fechaNacimiento: els.perfilFechaNacimiento.value || null,
+  };
+  guardarPerfil(perfil);
+  renderDatosPersonales();
+  renderResultadoEgfr();
+  renderEtapaSello();
 }
 
 // Bloquea toda la app (por encima incluso del paywall) hasta que el usuario
@@ -227,6 +273,46 @@ function aceptarTerminos() {
   perfil.terminos = { version: TERMINOS_VERSION, aceptadoEn: new Date().toISOString() };
   guardarPerfil(perfil);
   renderTerminos();
+  renderPerfilOverlay();
+}
+
+// Tras aceptar los Términos, se pide nombre y fecha de nacimiento antes de
+// dejar usar el resto de la app — igual de bloqueante que terminosOverlay,
+// pero solo hasta que ambos campos queden completos una vez (después el
+// paciente los edita, si quiere, desde "Tu perfil" en la pestaña Clínico).
+function perfilCompleto() {
+  const { nombre, fechaNacimiento } = ensurePerfil().datosPersonales;
+  return Boolean(nombre && nombre.trim() && fechaNacimiento);
+}
+
+function renderPerfilOverlay() {
+  const completo = perfilCompleto();
+  els.perfilOverlay.hidden = !terminosAceptados() || completo;
+  if (completo) return;
+  const { nombre, fechaNacimiento } = ensurePerfil().datosPersonales;
+  els.perfilOverlayNombre.value = nombre || "";
+  els.perfilOverlayFechaNacimiento.value = fechaNacimiento || "";
+  actualizarBotonPerfilOverlay();
+}
+
+function actualizarBotonPerfilOverlay() {
+  els.perfilOverlayContinuarBtn.disabled = !(
+    els.perfilOverlayNombre.value.trim() && els.perfilOverlayFechaNacimiento.value
+  );
+}
+
+function continuarPerfilOverlay() {
+  if (els.perfilOverlayContinuarBtn.disabled) return;
+  const perfil = ensurePerfil();
+  perfil.datosPersonales = {
+    nombre: els.perfilOverlayNombre.value.trim(),
+    fechaNacimiento: els.perfilOverlayFechaNacimiento.value || null,
+  };
+  guardarPerfil(perfil);
+  renderDatosPersonales();
+  renderResultadoEgfr();
+  renderEtapaSello();
+  renderPerfilOverlay();
 }
 
 // Suscripción: toda la app es gratis por TRIAL_DIAS desde la primera vez que
@@ -268,10 +354,14 @@ function datosClinicosPorDefecto() {
     etapaERC: null,
     diabetes: false,
     hipertension: false,
+    cardiovascular: false,
+    dislipidemia: false,
+    gota: false,
+    anemia: false,
+    trasplanteRenal: false,
     diuresisMl: null,
     enDialisis: null,
     modoEtapa: "calculada",
-    edad: null,
     sexoBiologico: null,
     creatininaMgDl: null,
     cistatinaMgL: null,
@@ -495,11 +585,15 @@ function renderDatosClinicos() {
   els.enDialisis.value = d.enDialisis || "";
   els.diabetes.checked = !!d.diabetes;
   els.hipertension.checked = !!d.hipertension;
+  els.cardiovascular.checked = !!d.cardiovascular;
+  els.dislipidemia.checked = !!d.dislipidemia;
+  els.gota.checked = !!d.gota;
+  els.anemia.checked = !!d.anemia;
+  els.trasplanteRenal.checked = !!d.trasplanteRenal;
   els.farmacosK.checked = !!d.farmacosRetenedoresK;
   els.datoDiuresis.value = d.diuresisMl ?? "";
   els.modoEtapaCalculada.checked = d.modoEtapa !== "manual";
   els.modoEtapaManual.checked = d.modoEtapa === "manual";
-  els.egfrEdad.value = d.edad ?? "";
   els.egfrSexo.value = d.sexoBiologico || "";
   els.egfrCreatinina.value = d.creatininaMgDl ?? "";
   els.egfrCistatina.value = d.cistatinaMgL ?? "";
@@ -531,9 +625,9 @@ function renderResultadoEgfr() {
     els.egfrResultado.innerHTML = "";
     return;
   }
-  const egfr = calcularEgfr(d);
+  const egfr = calcularEgfr({ ...d, edad: edadActual() });
   if (egfr == null) {
-    els.egfrResultado.textContent = "Ingresa edad, sexo biológico y al menos un valor (creatinina o cistatina C) para calcular tu eGFR.";
+    els.egfrResultado.textContent = "Completa tu fecha de nacimiento (en Tu perfil), tu sexo biológico y al menos un valor (creatinina o cistatina C) para calcular tu eGFR.";
     return;
   }
   const { key, etiqueta } = etapaPorEgfr(egfr);
@@ -563,7 +657,7 @@ function datosSelloEtapa() {
     const label = LIMITES && LIMITES.situaciones[d.etapaERC] && LIMITES.situaciones[d.etapaERC].etiqueta;
     return label ? { superior: "ERC", valor: d.etapaERC.toUpperCase(), label } : null;
   }
-  const egfr = calcularEgfr(d);
+  const egfr = calcularEgfr({ ...d, edad: edadActual() });
   if (egfr == null) return null;
   const { key, selloCorto, etiqueta } = etapaPorEgfr(egfr);
   if (!key) return { superior: "eGFR", valor: egfr >= 90 ? "G1" : "G2", label: etiqueta };
@@ -589,11 +683,15 @@ function guardarDatosClinicos() {
   const d = {
     diabetes: els.diabetes.checked,
     hipertension: els.hipertension.checked,
+    cardiovascular: els.cardiovascular.checked,
+    dislipidemia: els.dislipidemia.checked,
+    gota: els.gota.checked,
+    anemia: els.anemia.checked,
+    trasplanteRenal: els.trasplanteRenal.checked,
     farmacosRetenedoresK: els.farmacosK.checked,
     diuresisMl: diuresisRaw === "" ? null : Number(diuresisRaw),
     enDialisis: els.enDialisis.value || null,
     modoEtapa: els.modoEtapaManual.checked ? "manual" : "calculada",
-    edad: els.egfrEdad.value === "" ? null : Number(els.egfrEdad.value),
     sexoBiologico: els.egfrSexo.value || null,
     creatininaMgDl: els.egfrCreatinina.value === "" ? null : Number(els.egfrCreatinina.value),
     cistatinaMgL: els.egfrCistatina.value === "" ? null : Number(els.egfrCistatina.value),
@@ -604,7 +702,7 @@ function guardarDatosClinicos() {
   } else if (d.modoEtapa === "manual") {
     d.etapaERC = els.etapaERC.value || null;
   } else {
-    const egfr = calcularEgfr(d);
+    const egfr = calcularEgfr({ ...d, edad: edadActual() });
     d.etapaERC = egfr != null ? etapaPorEgfr(egfr).key : null;
   }
 
@@ -869,7 +967,6 @@ const els = {
   modoEtapaCalculada: document.getElementById("modo-etapa-calculada"),
   modoEtapaManual: document.getElementById("modo-etapa-manual"),
   calculadoraEgfr: document.getElementById("calculadora-egfr"),
-  egfrEdad: document.getElementById("egfr-edad"),
   egfrSexo: document.getElementById("egfr-sexo"),
   egfrCreatinina: document.getElementById("egfr-creatinina"),
   egfrCistatina: document.getElementById("egfr-cistatina"),
@@ -878,7 +975,15 @@ const els = {
   etapaERC: document.getElementById("etapa-erc"),
   diabetes: document.getElementById("dato-diabetes"),
   hipertension: document.getElementById("dato-hipertension"),
+  cardiovascular: document.getElementById("dato-cardiovascular"),
+  dislipidemia: document.getElementById("dato-dislipidemia"),
+  gota: document.getElementById("dato-gota"),
+  anemia: document.getElementById("dato-anemia"),
+  trasplanteRenal: document.getElementById("dato-trasplante"),
   farmacosK: document.getElementById("dato-farmacos-k"),
+  perfilNombre: document.getElementById("perfil-nombre"),
+  perfilFechaNacimiento: document.getElementById("perfil-fecha-nacimiento"),
+  perfilEdadCalculada: document.getElementById("perfil-edad-calculada"),
   planUpsell: document.getElementById("plan-upsell"),
   planUpsellText: document.getElementById("plan-upsell-text"),
   trialBanner: document.getElementById("trial-banner"),
@@ -890,6 +995,10 @@ const els = {
   terminosOverlay: document.getElementById("terminos-overlay"),
   terminosCheckbox: document.getElementById("terminos-checkbox"),
   terminosAceptarBtn: document.getElementById("terminos-aceptar-btn"),
+  perfilOverlay: document.getElementById("perfil-overlay"),
+  perfilOverlayNombre: document.getElementById("perfil-overlay-nombre"),
+  perfilOverlayFechaNacimiento: document.getElementById("perfil-overlay-fecha-nacimiento"),
+  perfilOverlayContinuarBtn: document.getElementById("perfil-overlay-continuar-btn"),
   refrigeradorChecklist: document.getElementById("refrigerador-checklist"),
   refrigeradorBuscarBtn: document.getElementById("refrigerador-buscar-btn"),
   refrigeradorResultados: document.getElementById("refrigerador-resultados"),
@@ -954,8 +1063,10 @@ async function init() {
   renderHistory();
   renderTipOfDay();
   renderPlan();
+  renderDatosPersonales();
   renderDatosClinicos();
   renderTerminos();
+  renderPerfilOverlay();
   renderSuscripcion();
   initRevenueCat();
   initTabs();
@@ -971,12 +1082,18 @@ async function init() {
   els.etapaERC.addEventListener("change", guardarDatosClinicos);
   els.diabetes.addEventListener("change", guardarDatosClinicos);
   els.hipertension.addEventListener("change", guardarDatosClinicos);
+  els.cardiovascular.addEventListener("change", guardarDatosClinicos);
+  els.dislipidemia.addEventListener("change", guardarDatosClinicos);
+  els.gota.addEventListener("change", guardarDatosClinicos);
+  els.anemia.addEventListener("change", guardarDatosClinicos);
+  els.trasplanteRenal.addEventListener("change", guardarDatosClinicos);
   els.farmacosK.addEventListener("change", guardarDatosClinicos);
   els.datoDiuresis.addEventListener("change", guardarDatosClinicos);
   els.enDialisis.addEventListener("change", guardarDatosClinicos);
   els.modoEtapaCalculada.addEventListener("change", guardarDatosClinicos);
   els.modoEtapaManual.addEventListener("change", guardarDatosClinicos);
-  els.egfrEdad.addEventListener("input", guardarDatosClinicos);
+  els.perfilNombre.addEventListener("input", guardarDatosPersonales);
+  els.perfilFechaNacimiento.addEventListener("change", guardarDatosPersonales);
   els.egfrSexo.addEventListener("change", guardarDatosClinicos);
   els.egfrCreatinina.addEventListener("input", guardarDatosClinicos);
   els.egfrCistatina.addEventListener("input", guardarDatosClinicos);
@@ -985,6 +1102,9 @@ async function init() {
     els.terminosAceptarBtn.disabled = !els.terminosCheckbox.checked;
   });
   els.terminosAceptarBtn.addEventListener("click", aceptarTerminos);
+  els.perfilOverlayNombre.addEventListener("input", actualizarBotonPerfilOverlay);
+  els.perfilOverlayFechaNacimiento.addEventListener("input", actualizarBotonPerfilOverlay);
+  els.perfilOverlayContinuarBtn.addEventListener("click", continuarPerfilOverlay);
   els.refrigeradorBuscarBtn.addEventListener("click", buscarRecetasRefrigerador);
   els.refrigeradorCameraInput.addEventListener("change", (e) => handleRefrigeradorFileSelected(e.target.files[0]));
   els.refrigeradorIdentificarBtn.addEventListener("click", identificarIngredientesRefrigerador);

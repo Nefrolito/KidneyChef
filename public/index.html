@@ -174,8 +174,23 @@
       <div id="history-list" class="history-list"></div>
     </section>
 
+    <section class="card perfil-card" data-tab="clinico">
+      <h2>Tu perfil</h2>
+      <p class="clinical-note">Se guarda solo en este dispositivo.</p>
+
+      <div class="clinical-field">
+        <label for="perfil-nombre">Nombre</label>
+        <input type="text" id="perfil-nombre" placeholder="Tu nombre" autocomplete="name">
+      </div>
+      <div class="clinical-field">
+        <label for="perfil-fecha-nacimiento">Fecha de nacimiento</label>
+        <input type="date" id="perfil-fecha-nacimiento">
+        <small class="campo-ayuda" id="perfil-edad-calculada"></small>
+      </div>
+    </section>
+
     <section class="card clinical-card" data-tab="clinico">
-      <h2>Tus datos clínicos</h2>
+      <h2>Tus antecedentes clínicos</h2>
       <p class="clinical-note">Ayudan a tu equipo tratante a ajustar tu Plan Clínico. Se guardan solo en este dispositivo.</p>
 
       <div class="clinical-field">
@@ -201,12 +216,9 @@
             Calcula tu tasa de filtración glomerular estimada (eGFR) con la ecuación
             CKD-EPI 2021. Usa tu creatinina, tu cistatina C, o ambas (más precisa si
             tienes las dos). Es una estimación: la confirmación diagnóstica la hace
-            tu equipo tratante.
+            tu equipo tratante. Usa la edad calculada desde tu fecha de nacimiento en
+            "Tu perfil", arriba.
           </p>
-          <div class="clinical-field">
-            <label for="egfr-edad">Edad</label>
-            <input type="number" id="egfr-edad" min="1" max="120" step="1" placeholder="Años">
-          </div>
           <div class="clinical-field">
             <label for="egfr-sexo">Sexo biológico</label>
             <select id="egfr-sexo">
@@ -255,6 +267,11 @@
       <div class="clinical-checks">
         <label class="clinical-check"><input type="checkbox" id="dato-diabetes"> Diabetes</label>
         <label class="clinical-check"><input type="checkbox" id="dato-hipertension"> Hipertensión</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-cardiovascular"> Enfermedad cardiovascular</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-dislipidemia"> Dislipidemia</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-gota"> Gota / hiperuricemia</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-anemia"> Anemia</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-trasplante"> Trasplante renal previo</label>
       </div>
       <label class="clinical-check clinical-check-ancho">
         <input type="checkbox" id="dato-farmacos-k">
@@ -420,6 +437,22 @@
         <span>He leído y acepto los Términos y condiciones y la Política de privacidad.</span>
       </label>
       <button id="terminos-aceptar-btn" class="btn btn-primary terminos-btn" disabled>Aceptar y continuar</button>
+    </div>
+  </div>
+
+  <div id="perfil-overlay" class="terminos-overlay perfil-overlay" hidden>
+    <div class="terminos-card">
+      <h2>Antes de empezar</h2>
+      <p>Cuéntanos un poco de ti para personalizar tu experiencia en KidneyChef.</p>
+      <div class="clinical-field">
+        <label for="perfil-overlay-nombre">Nombre</label>
+        <input type="text" id="perfil-overlay-nombre" placeholder="Tu nombre" autocomplete="name">
+      </div>
+      <div class="clinical-field">
+        <label for="perfil-overlay-fecha-nacimiento">Fecha de nacimiento</label>
+        <input type="date" id="perfil-overlay-fecha-nacimiento">
+      </div>
+      <button id="perfil-overlay-continuar-btn" class="btn btn-primary terminos-btn" disabled>Continuar</button>
     </div>
   </div>
 
