@@ -205,6 +205,9 @@ function ensurePerfil() {
   if (perfil.datosPersonales === undefined) {
     perfil.datosPersonales = { nombre: "", fechaNacimiento: null };
   }
+  if (perfil.confirmacionClinica === undefined) {
+    perfil.confirmacionClinica = { confirmado: false, confirmadoEn: null };
+  }
   return perfil;
 }
 
@@ -313,6 +316,47 @@ function continuarPerfilOverlay() {
   renderResultadoEgfr();
   renderEtapaSello();
   renderPerfilOverlay();
+}
+
+// Una vez confirmados, "Tu perfil" y "Tus antecedentes clínicos" quedan como
+// vista fija (campos deshabilitados) en vez de un formulario siempre abierto
+// — evita ediciones accidentales al mirar los datos. Se reabren solo desde
+// el ícono de lápiz en la esquina superior, pensado para cuando cambien los
+// exámenes y haya que declarar una etapa ERC nueva; al terminar se vuelve a
+// confirmar, y así sucesivamente.
+const CAMPOS_CLINICOS_BLOQUEABLES = [
+  "perfilNombre", "perfilFechaNacimiento",
+  "enDialisis", "modoEtapaCalculada", "modoEtapaManual", "etapaERC",
+  "egfrSexo", "egfrCreatinina", "egfrCistatina", "datoDiuresis",
+  "diabetes", "hipertension", "cardiovascular", "dislipidemia", "gota", "anemia", "trasplanteRenal",
+  "farmacosK",
+];
+
+function datosClinicosConfirmados() {
+  return ensurePerfil().confirmacionClinica.confirmado;
+}
+
+function renderModoClinico() {
+  const confirmado = datosClinicosConfirmados();
+  CAMPOS_CLINICOS_BLOQUEABLES.forEach((campo) => { els[campo].disabled = confirmado; });
+  els.confirmarClinicoBtn.hidden = confirmado;
+  els.clinicoConfirmadoNota.hidden = !confirmado;
+  els.editarClinicoBtn.hidden = !confirmado;
+}
+
+function confirmarDatosClinicos() {
+  const perfil = ensurePerfil();
+  perfil.confirmacionClinica = { confirmado: true, confirmadoEn: new Date().toISOString() };
+  guardarPerfil(perfil);
+  renderModoClinico();
+}
+
+function habilitarEdicionClinica() {
+  const perfil = ensurePerfil();
+  perfil.confirmacionClinica = { confirmado: false, confirmadoEn: null };
+  guardarPerfil(perfil);
+  renderModoClinico();
+  irATab("clinico");
 }
 
 // Suscripción: toda la app es gratis por TRIAL_DIAS desde la primera vez que
@@ -999,6 +1043,9 @@ const els = {
   perfilOverlayNombre: document.getElementById("perfil-overlay-nombre"),
   perfilOverlayFechaNacimiento: document.getElementById("perfil-overlay-fecha-nacimiento"),
   perfilOverlayContinuarBtn: document.getElementById("perfil-overlay-continuar-btn"),
+  confirmarClinicoBtn: document.getElementById("confirmar-clinico-btn"),
+  clinicoConfirmadoNota: document.getElementById("clinico-confirmado-nota"),
+  editarClinicoBtn: document.getElementById("editar-clinico-btn"),
   refrigeradorChecklist: document.getElementById("refrigerador-checklist"),
   refrigeradorBuscarBtn: document.getElementById("refrigerador-buscar-btn"),
   refrigeradorResultados: document.getElementById("refrigerador-resultados"),
@@ -1065,6 +1112,7 @@ async function init() {
   renderPlan();
   renderDatosPersonales();
   renderDatosClinicos();
+  renderModoClinico();
   renderTerminos();
   renderPerfilOverlay();
   renderSuscripcion();
@@ -1105,6 +1153,8 @@ async function init() {
   els.perfilOverlayNombre.addEventListener("input", actualizarBotonPerfilOverlay);
   els.perfilOverlayFechaNacimiento.addEventListener("input", actualizarBotonPerfilOverlay);
   els.perfilOverlayContinuarBtn.addEventListener("click", continuarPerfilOverlay);
+  els.confirmarClinicoBtn.addEventListener("click", confirmarDatosClinicos);
+  els.editarClinicoBtn.addEventListener("click", habilitarEdicionClinica);
   els.refrigeradorBuscarBtn.addEventListener("click", buscarRecetasRefrigerador);
   els.refrigeradorCameraInput.addEventListener("change", (e) => handleRefrigeradorFileSelected(e.target.files[0]));
   els.refrigeradorIdentificarBtn.addEventListener("click", identificarIngredientesRefrigerador);

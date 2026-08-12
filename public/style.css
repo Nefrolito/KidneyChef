@@ -97,6 +97,12 @@ h1, h2, h3 {
 }
 .icon-btn:hover { background: var(--brand-50); }
 .icon-btn img { border-radius: 50%; object-fit: cover; }
+.topbar-actions { display: flex; align-items: center; gap: 0.5rem; }
+.icon-btn[hidden] { display: none; }
+.confirmar-clinico-btn { width: 100%; margin-top: 1.1rem; }
+.confirmar-clinico-btn[hidden] { display: none; }
+.clinico-confirmado-nota { margin-top: 0.9rem; text-align: center; }
+.clinico-confirmado-nota[hidden] { display: none; }
 .brand-mark { flex-shrink: 0; display: flex; filter: drop-shadow(0 2px 6px rgba(14, 116, 144, 0.35)); }
 .brand-text h1 {
   margin: 0;
@@ -631,6 +637,12 @@ h1, h2, h3 {
   font-size: 0.92rem;
   font-family: inherit;
 }
+.clinical-field select:disabled,
+.clinical-field input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.clinical-check:has(input:disabled) { opacity: 0.6; cursor: not-allowed; }
 .campo-ayuda { display: block; margin-top: 0.4rem; font-size: 0.76rem; color: var(--muted); line-height: 1.4; }
 .codigo-cliente-fila { display: flex; align-items: center; gap: 0.6rem; }
 .codigo-cliente-valor {

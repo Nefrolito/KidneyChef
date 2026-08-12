@@ -38,9 +38,14 @@
           <p class="plan-badge" id="plan-badge"></p>
         </div>
       </div>
-      <button id="about-btn" class="icon-btn" aria-label="Acerca de KidneyChef">
-        <img src="icons/about-kidney.png" alt="" width="30" height="30">
-      </button>
+      <div class="topbar-actions">
+        <button id="editar-clinico-btn" class="icon-btn" aria-label="Editar tus datos clínicos" hidden>
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+        <button id="about-btn" class="icon-btn" aria-label="Acerca de KidneyChef">
+          <img src="icons/about-kidney.png" alt="" width="30" height="30">
+        </button>
+      </div>
     </div>
   </header>
 
@@ -280,6 +285,10 @@
           <small>Espironolactona, eplerenona, finerenona, enalapril, losartán u otros IECA, ARA-II o inhibidores de renina. Elevan el potasio en la sangre.</small>
         </span>
       </label>
+      <button id="confirmar-clinico-btn" class="btn btn-primary confirmar-clinico-btn">Confirmar</button>
+      <p class="clinical-note clinico-confirmado-nota" id="clinico-confirmado-nota" hidden>
+        Datos confirmados. Si tus exámenes cambian, edítalos con el ícono ✏️ de arriba.
+      </p>
     </section>
 
     <section id="plan-upsell" class="card plan-upsell-card" data-tab="clinico" hidden>
