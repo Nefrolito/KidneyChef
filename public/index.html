@@ -160,6 +160,25 @@
         </div>
       </div>
 
+      <div id="registro-peso" class="peso-box" hidden>
+        <span class="peso-titulo">Peso de hoy</span>
+        <div class="peso-contenido">
+          <div class="peso-vaso-wrap">
+            <div class="peso-vaso">
+              <div id="peso-vaso-relleno" class="peso-vaso-relleno nivel-verde"></div>
+            </div>
+          </div>
+          <div class="peso-info">
+            <div class="peso-manual">
+              <input type="number" id="peso-manual" min="20" max="300" step="0.1" placeholder="Ej: 68.5">
+              <button id="peso-guardar-btn" class="btn btn-secondary">Guardar</button>
+            </div>
+            <p class="peso-detalle" id="peso-detalle"></p>
+            <p class="peso-alerta" id="peso-alerta" hidden></p>
+          </div>
+        </div>
+      </div>
+
       <p class="summary-caption">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><path d="M12 8v5"/><circle cx="12" cy="16.2" r="0.4" fill="currentColor"/></svg>
         Valores estimados. Son una guía, no un cálculo exacto.

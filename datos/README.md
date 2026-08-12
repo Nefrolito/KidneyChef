@@ -4,8 +4,10 @@
 
 ## Fuentes
 
-- **Potasio, fósforo, sodio, carbohidratos**: USDA FoodData Central, SR Legacy 2018-04.
+- **Potasio, fósforo, sodio, carbohidratos, calorías**: USDA FoodData Central, SR Legacy 2018-04.
   Descarga: https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip
+  (la API pública con `DEMO_KEY` solo permite 10 solicitudes/hora — no alcanza
+  para 166 alimentos, hay que usar el ZIP del bulk download).
 - **Índice glucémico**: tablas internacionales de la Universidad de Sydney
   (Atkinson 2021), obtenidas desde https://glycemicindex.com/gi-search/
 
@@ -27,6 +29,21 @@
   aceite, azúcar, polvo de hornear, color de ají) del checklist. Se corre a
   mano cuando cambia `recetas_chilenas.py`:
   `python3 datos/generar_recetas_json.py`.
+- `agregar_calorias.py` — agrega `calorias_kcal` a cada alimento de
+  `public/nutrientes.json` (2026-08-12). Para los 131 alimentos con `fdc_id`
+  propio usa el valor de USDA directo (tabla `KCAL_POR_FDC_ID`, embebida en el
+  script con la descripción USDA de cada uno para poder auditarla). Para los
+  35 platos/preparaciones sin `fdc_id` (calculados desde una receta, ver
+  `fuente.receta_g_por_100g` de cada uno) sí pesa los ingredientes, resolviendo
+  cada uno contra un alimento canónico ya existente o, si no hay equivalente
+  confiable (condimentos de despensa, o una versión ya cocida que en
+  `nutrientes.json` solo existe cruda — misma lógica de lixiviación de potasio
+  del criterio de abajo), contra un `fdc_id` propio buscado a mano en USDA
+  SR Legacy. Se corre a mano si se agrega un alimento nuevo:
+  `python3 datos/agregar_calorias.py`.
+  **Aproximación declarada:** "trigo_mote" (mote de trigo, un producto muy
+  específico de la cocina chilena) usa el grano de trigo crudo de USDA porque
+  no existe una cifra chilena medida ni un equivalente USDA de "mote" cocido.
 
 ## Criterios aplicados
 

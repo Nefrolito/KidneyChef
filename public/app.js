@@ -111,6 +111,7 @@ const NUTRIENTE_LABEL = {
   fosforo_mg: "Fósforo",
   sodio_mg: "Sodio",
   carbohidratos_g: "Carbohidratos",
+  calorias_kcal: "Calorías",
 };
 
 const NUTRIENTE_ICON = {
@@ -118,6 +119,7 @@ const NUTRIENTE_ICON = {
   fosforo_mg: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><circle cx="6" cy="18" r="2.3"/><circle cx="18" cy="6" r="2.3"/></svg>`,
   sodio_mg: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l1 3H8Z"/><path d="M8 6h8l1.2 12.5A2 2 0 0 1 15.2 21H8.8a2 2 0 0 1-2-2.5L8 6Z"/><circle cx="10.5" cy="11" r="0.4" fill="currentColor"/><circle cx="13.5" cy="11" r="0.4" fill="currentColor"/><circle cx="12" cy="14" r="0.4" fill="currentColor"/></svg>`,
   carbohidratos_g: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3 0-5 2-5 4.5S9 12 12 12s5-2 5-4.5S15 3 12 3Z"/><path d="M5 14c2.5-1 4.5-1 7-1s4.5 0 7 1"/><path d="M6 18c2-.8 4-1 6-1s4 .2 6 1"/></svg>`,
+  calorias_kcal: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 2.5-2 3.5-2 6a2 2 0 0 0 4 0c1 1 1.5 2.3 1.5 3.5a3.5 3.5 0 1 1-7 0C8.5 9 12 7 12 3Z"/></svg>`,
 };
 
 const ICONO_LIQUIDO = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4 7 8.2 7 12a7 7 0 0 1-14 0c0-3.8 3.5-8 7-12Z"/></svg>`;
@@ -530,6 +532,14 @@ function metaDiaria(nutriente) {
   }
   if (nutriente === "potasio_mg") return metaPorDefectoDesdeEtapa(LIMITES.potasio);
   if (nutriente === "fosforo_mg") return metaPorDefectoDesdeEtapa(LIMITES.fosforo);
+  if (nutriente === "calorias_kcal") {
+    // Solo en diálisis, y solo si ya hay un peso registrado hoy: la meta se
+    // deriva del peso (kcal/kg), no es un número fijo. Ver LIMITES.calorias.
+    if (!requiereDiuresis()) return null;
+    const peso = pesoDeHoy();
+    if (!peso) return null;
+    return Math.round(peso.kg * LIMITES.calorias.kcal_por_kg_dia_por_defecto);
+  }
   return null;
 }
 
@@ -573,6 +583,47 @@ function metaLiquidos() {
   const esSupuesto = raw === null || raw === undefined || raw === "";
   const diuresis = esSupuesto ? LIMITES.liquidos.sin_dato.asumir_diuresis_ml : Number(raw);
   return { ml: diuresis + LIMITES.liquidos.margen_ml, esSupuesto };
+}
+
+// Peso corporal diario: solo se pide en diálisis (mismo gate que líquidos,
+// requiereDiuresis()). Un registro por día, no acumulable como los líquidos —
+// registrar un peso nuevo hoy reemplaza al de hoy, no lo suma. Sirve para (1)
+// vigilar la ganancia de peso entre sesiones de diálisis (indicador indirecto
+// de sobrecarga de líquido) y (2) alimentar la meta de calorías por kg.
+const PESO_STORAGE_KEY = "kidneyChefPeso";
+
+function loadPesos() {
+  try {
+    return JSON.parse(localStorage.getItem(PESO_STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function pesoDeHoy() {
+  return loadPesos().find((p) => isToday(p.fecha)) || null;
+}
+
+// El registro más reciente que NO sea de hoy: la referencia para calcular la
+// ganancia interdialítica. loadPesos() ya viene de más nuevo a más viejo
+// porque registrarPeso() usa unshift().
+function pesoAnterior() {
+  return loadPesos().find((p) => !isToday(p.fecha)) || null;
+}
+
+function registrarPeso(kg) {
+  const arr = loadPesos().filter((p) => !isToday(p.fecha));
+  arr.unshift({ kg, fecha: new Date().toISOString() });
+  localStorage.setItem(PESO_STORAGE_KEY, JSON.stringify(arr));
+}
+
+// Ganancia de peso interdialítica (kg), o null si no hay un peso anterior
+// con qué comparar todavía (primer registro).
+function gananciaPeso() {
+  const hoy = pesoDeHoy();
+  const anterior = pesoAnterior();
+  if (!hoy || !anterior) return null;
+  return Math.round((hoy.kg - anterior.kg) * 10) / 10;
 }
 
 // Umbral por porción derivado de la meta diaria: el día se reparte en varias
@@ -995,6 +1046,12 @@ const els = {
   registroLiquidos: document.getElementById("registro-liquidos"),
   liquidoManual: document.getElementById("liquido-manual"),
   liquidoAgregarBtn: document.getElementById("liquido-agregar"),
+  registroPeso: document.getElementById("registro-peso"),
+  pesoManual: document.getElementById("peso-manual"),
+  pesoGuardarBtn: document.getElementById("peso-guardar-btn"),
+  pesoVasoRelleno: document.getElementById("peso-vaso-relleno"),
+  pesoDetalle: document.getElementById("peso-detalle"),
+  pesoAlerta: document.getElementById("peso-alerta"),
   liquidosDeshacerBtn: document.getElementById("liquidos-deshacer"),
   campoDiuresis: document.getElementById("campo-diuresis"),
   datoDiuresis: document.getElementById("dato-diuresis"),
@@ -1202,6 +1259,7 @@ async function init() {
     els.liquidoManual.value = "";
   });
   els.liquidosDeshacerBtn.addEventListener("click", deshacerUltimoLiquido);
+  els.pesoGuardarBtn.addEventListener("click", guardarPeso);
 
   els.superAgregarBtn.addEventListener("click", agregarItemPersonalizadoSuper);
   els.superLimpiarBtn.addEventListener("click", limpiarSeleccionSuper);
@@ -2427,6 +2485,28 @@ function nivelPorMeta(total, meta) {
   return "verde";
 }
 
+// Anillo circular tipo "anillo de actividad": el trazo lleno avanza en sentido
+// horario desde las 12 (de ahí el rotate(-90deg) en CSS) y lleva el color de
+// severidad (verde/ámbar/rojo); la pista de fondo queda neutra. El porcentaje
+// va al centro para la lectura rápida, pero el valor exacto siempre se ve
+// aparte en .calc-total — el color nunca es la única forma de saber dónde
+// está el paciente.
+const ANILLO_RADIO = 42;
+const ANILLO_CIRCUNFERENCIA = 2 * Math.PI * ANILLO_RADIO;
+
+function anilloSVG(pct, nivel) {
+  const offset = ANILLO_CIRCUNFERENCIA * (1 - pct / 100);
+  return `
+    <div class="calc-anillo-wrap">
+      <svg class="calc-anillo" viewBox="0 0 100 100" role="img" aria-label="${pct}%">
+        <circle class="calc-anillo-track" cx="50" cy="50" r="${ANILLO_RADIO}"></circle>
+        <circle class="calc-anillo-relleno nivel-${nivel}" cx="50" cy="50" r="${ANILLO_RADIO}"
+          stroke-dasharray="${ANILLO_CIRCUNFERENCIA}" stroke-dashoffset="${offset}"></circle>
+      </svg>
+      <span class="calc-anillo-valor">${pct}%</span>
+    </div>`;
+}
+
 function filaCalculadora(nutriente, total, unidad) {
   const meta = metaDiaria(nutriente);
   const label = NUTRIENTE_LABEL[nutriente];
@@ -2436,11 +2516,13 @@ function filaCalculadora(nutriente, total, unidad) {
   if (meta == null) {
     return `
       <div class="calc-fila calc-sin-meta">
-        <div class="calc-fila-head">
-          <span class="calc-icon">${icon}</span>
-          <span class="calc-label">${label}</span>
-          <span class="calc-total">${totalFmt} ${unidad}</span>
-          <span class="tag-neutro">sin meta fijada</span>
+        <div class="calc-fila-info">
+          <div class="calc-fila-head">
+            <span class="calc-icon">${icon}</span>
+            <span class="calc-label">${label}</span>
+            <span class="calc-total">${totalFmt} ${unidad}</span>
+            <span class="tag-neutro">sin meta fijada</span>
+          </div>
         </div>
       </div>`;
   }
@@ -2451,13 +2533,15 @@ function filaCalculadora(nutriente, total, unidad) {
     ? `<p class="calc-exceso">Superaste tu meta por ${Math.round(total - meta)} ${unidad}.</p>` : "";
   return `
     <div class="calc-fila">
-      <div class="calc-fila-head">
-        <span class="calc-icon">${icon}</span>
-        <span class="calc-label">${label}</span>
+      ${anilloSVG(pct, nivel)}
+      <div class="calc-fila-info">
+        <div class="calc-fila-head">
+          <span class="calc-icon">${icon}</span>
+          <span class="calc-label">${label}</span>
+        </div>
         <span class="calc-total">${totalFmt} / ${Math.round(meta)} ${unidad}</span>
+        ${exceso}
       </div>
-      <div class="calc-barra"><div class="calc-barra-relleno nivel-${nivel}" style="width:${pct}%"></div></div>
-      ${exceso}
     </div>`;
 }
 
@@ -2472,14 +2556,16 @@ function filaLiquidos(total, metaLiq) {
     : "";
   return `
     <div class="calc-fila">
-      <div class="calc-fila-head">
-        <span class="calc-icon">${ICONO_LIQUIDO}</span>
-        <span class="calc-label">Líquidos</span>
+      ${anilloSVG(pct, nivel)}
+      <div class="calc-fila-info">
+        <div class="calc-fila-head">
+          <span class="calc-icon">${ICONO_LIQUIDO}</span>
+          <span class="calc-label">Líquidos</span>
+        </div>
         <span class="calc-total">${Math.round(total)} / ${Math.round(meta)} ml</span>
+        ${exceso}
+        ${advertencia}
       </div>
-      <div class="calc-barra"><div class="calc-barra-relleno nivel-${nivel}" style="width:${pct}%"></div></div>
-      ${exceso}
-      ${advertencia}
     </div>`;
 }
 
@@ -2491,9 +2577,10 @@ function totalesNutrientesHoy() {
       acc.fosforo_mg += h.fosforo_mg || 0;
       acc.sodio_mg += h.sodio_mg || 0;
       acc.carbohidratos_g += h.carbohidratos_g || 0;
+      acc.calorias_kcal += h.calorias_kcal || 0;
       return acc;
     },
-    { potasio_mg: 0, fosforo_mg: 0, sodio_mg: 0, carbohidratos_g: 0 }
+    { potasio_mg: 0, fosforo_mg: 0, sodio_mg: 0, carbohidratos_g: 0, calorias_kcal: 0 }
   );
 }
 
@@ -2508,6 +2595,12 @@ function renderCalculadora() {
   if (nutrientesVisibles().includes("carbohidratos_g")) {
     filas.push(filaCalculadora("carbohidratos_g", totals.carbohidratos_g, "g"));
   }
+  // Calorías: solo en diálisis, porque su meta depende del peso corporal que
+  // ahí se registra (ver metaDiaria/LIMITES.calorias) — no tiene sentido
+  // mostrarla sin esa meta.
+  if (requiereDiuresis()) {
+    filas.push(filaCalculadora("calorias_kcal", totals.calorias_kcal, "kcal"));
+  }
 
   const metaLiq = metaLiquidos();
   if (metaLiq) {
@@ -2518,6 +2611,54 @@ function renderCalculadora() {
   }
 
   els.calculadora.innerHTML = filas.join("");
+  renderPeso();
+}
+
+// Vaso de peso: se llena según qué tan cerca está la ganancia interdialítica
+// del máximo recomendado (LIMITES.peso.ganancia_maxima_kg_por_defecto), mismo
+// código de color que los anillos (verde/ámbar/rojo). Sin un peso anterior
+// con qué comparar (primer registro) se muestra con un poco de contenido,
+// sin comparación todavía.
+function renderPeso() {
+  const activo = requiereDiuresis();
+  els.registroPeso.hidden = !activo;
+  if (!activo) return;
+
+  const hoy = pesoDeHoy();
+  els.pesoManual.value = hoy ? hoy.kg : "";
+
+  const ganancia = gananciaPeso();
+  const maxGanancia = LIMITES ? LIMITES.peso.ganancia_maxima_kg_por_defecto : null;
+  let nivel = "verde";
+  let pct = hoy ? 15 : 0;
+  if (ganancia != null && maxGanancia) {
+    pct = Math.max(0, Math.min(100, Math.round((ganancia / maxGanancia) * 100)));
+    nivel = nivelPorMeta(ganancia, maxGanancia);
+  }
+  els.pesoVasoRelleno.style.height = `${pct}%`;
+  els.pesoVasoRelleno.className = `peso-vaso-relleno nivel-${nivel}`;
+
+  if (!hoy) {
+    els.pesoDetalle.textContent = "Registra tu peso de hoy para vigilar la ganancia entre sesiones.";
+  } else if (ganancia == null) {
+    els.pesoDetalle.textContent = `${hoy.kg} kg registrados hoy.`;
+  } else {
+    const signo = ganancia > 0 ? "+" : "";
+    els.pesoDetalle.textContent = `${hoy.kg} kg hoy (${signo}${ganancia} kg desde tu último registro).`;
+  }
+
+  const excede = ganancia != null && maxGanancia != null && ganancia > maxGanancia;
+  els.pesoAlerta.hidden = !excede;
+  if (excede) {
+    els.pesoAlerta.textContent = `Ganaste ${ganancia} kg, más de lo recomendado (${maxGanancia} kg/día). Coméntaselo a tu equipo tratante.`;
+  }
+}
+
+function guardarPeso() {
+  const kg = Number(els.pesoManual.value);
+  if (!kg || kg <= 0) return;
+  registrarPeso(kg);
+  renderCalculadora();
 }
 
 const LIQUIDOS_STORAGE_KEY = "kidneyChefLiquidos";
@@ -2591,6 +2732,8 @@ function saveToHistory(idx) {
     sodio_mg: Math.round(item.match.sodio_mg * factor),
     carbohidratos_g: item.match.carbohidratos_g != null
       ? Math.round(item.match.carbohidratos_g * factor) : null,
+    calorias_kcal: item.match.calorias_kcal != null
+      ? Math.round(item.match.calorias_kcal * factor) : null,
     // Densidades por 100 g: sin ellas no se puede reclasificar una entrada
     // guardada cuando el nutriente se evalúa por contenido y no por meta.
     por100g: {
@@ -2598,6 +2741,7 @@ function saveToHistory(idx) {
       fosforo_mg: item.match.fosforo_mg,
       sodio_mg: item.match.sodio_mg,
       carbohidratos_g: item.match.carbohidratos_g,
+      calorias_kcal: item.match.calorias_kcal,
     },
     fecha: new Date().toISOString(),
   };

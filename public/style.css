@@ -698,23 +698,37 @@ h1, h2, h3 {
 
 /* --- Calculadora de consumo diario --- */
 .calculadora-card h2 { margin: 0 0 0.9rem; font-size: 1.1rem; font-weight: 700; }
-.calc-fila { margin-bottom: 1.1rem; }
+.calc-fila { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
 .calc-fila:last-child { margin-bottom: 0; }
-.calc-fila-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+.calc-fila-info { flex: 1; min-width: 0; }
+.calc-fila-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
 .calc-icon { display: flex; color: var(--brand-dark); flex-shrink: 0; }
-.calc-label { font-size: 0.88rem; font-weight: 700; flex: 1; }
+.calc-label { font-size: 0.92rem; font-weight: 700; flex: 1; }
 .calc-total { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
-.calc-barra {
-  height: 10px;
-  border-radius: 999px;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  overflow: hidden;
+
+.calc-anillo-wrap { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+.calc-anillo { width: 100%; height: 100%; transform: rotate(-90deg); }
+.calc-anillo-track { fill: none; stroke: var(--surface-alt); stroke-width: 10; }
+.calc-anillo-relleno {
+  fill: none;
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s ease;
 }
-.calc-barra-relleno { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
-.calc-barra-relleno.nivel-verde { background: var(--verde); }
-.calc-barra-relleno.nivel-amarillo { background: var(--amarillo); }
-.calc-barra-relleno.nivel-rojo { background: var(--rojo); }
+.calc-anillo-relleno.nivel-verde { stroke: var(--verde); }
+.calc-anillo-relleno.nivel-amarillo { stroke: var(--amarillo); }
+.calc-anillo-relleno.nivel-rojo { stroke: var(--rojo); }
+.calc-anillo-valor {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
 .calc-exceso { margin: 0.35rem 0 0; font-size: 0.78rem; font-weight: 700; color: var(--rojo); }
 .calc-advertencia {
   margin: 0.45rem 0 0;
@@ -763,6 +777,51 @@ h1, h2, h3 {
   font-size: 0.88rem;
   font-family: inherit;
 }
+
+.peso-box {
+  margin-top: 1.2rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border);
+}
+.peso-box[hidden] { display: none; }
+.peso-titulo { display: block; font-size: 0.88rem; font-weight: 700; margin-bottom: 0.7rem; }
+.peso-contenido { display: flex; gap: 1rem; align-items: stretch; }
+.peso-vaso-wrap { flex-shrink: 0; width: 44px; }
+.peso-vaso {
+  width: 44px;
+  height: 84px;
+  border-radius: 8px 8px 12px 12px;
+  border: 2px solid var(--border);
+  background: var(--surface-alt);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+.peso-vaso-relleno { width: 100%; border-radius: 0 0 10px 10px; transition: height 0.4s ease, background 0.3s ease; }
+.peso-vaso-relleno.nivel-verde { background: var(--verde); }
+.peso-vaso-relleno.nivel-amarillo { background: var(--amarillo); }
+.peso-vaso-relleno.nivel-rojo { background: var(--rojo); }
+.peso-info { flex: 1; min-width: 0; }
+.peso-manual { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+.peso-manual input {
+  flex: 1;
+  padding: 0.6rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+.peso-detalle { margin: 0; font-size: 0.82rem; color: var(--muted); line-height: 1.4; }
+.peso-alerta {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--rojo);
+  line-height: 1.4;
+}
+.peso-alerta[hidden] { display: none; }
 
 .plan-upsell-card {
   display: flex;

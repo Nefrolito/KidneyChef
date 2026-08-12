@@ -11,6 +11,7 @@
     "fosforo_mg": 11,
     "sodio_mg": 1,
     "carbohidratos_g": 13.8,
+    "calorias_kcal": 52.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)",
@@ -42,6 +43,7 @@
     "fosforo_mg": 22,
     "sodio_mg": 1,
     "carbohidratos_g": 22.8,
+    "calorias_kcal": 89.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Bananas, raw",
@@ -71,6 +73,7 @@
     "fosforo_mg": 14,
     "sodio_mg": 0,
     "carbohidratos_g": 11.8,
+    "calorias_kcal": 47.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Oranges, raw, all commercial varieties",
@@ -99,6 +102,7 @@
     "fosforo_mg": 12,
     "sodio_mg": 1,
     "carbohidratos_g": 15.2,
+    "calorias_kcal": 57.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pears, raw",
@@ -129,6 +133,7 @@
     "fosforo_mg": 20,
     "sodio_mg": 2,
     "carbohidratos_g": 18.1,
+    "calorias_kcal": 69.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Grapes, red or green (European type, such as Thompson seedless), raw",
@@ -158,6 +163,7 @@
     "fosforo_mg": 11,
     "sodio_mg": 1,
     "carbohidratos_g": 7.5,
+    "calorias_kcal": 30.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Watermelon, raw",
@@ -187,6 +193,7 @@
     "fosforo_mg": 15,
     "sodio_mg": 16,
     "carbohidratos_g": 8.2,
+    "calorias_kcal": 34.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Melons, cantaloupe, raw",
@@ -217,6 +224,7 @@
     "fosforo_mg": 24,
     "sodio_mg": 1,
     "carbohidratos_g": 7.7,
+    "calorias_kcal": 32.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Strawberries, raw",
@@ -234,6 +242,7 @@
     "fosforo_mg": 34,
     "sodio_mg": 3,
     "carbohidratos_g": 14.7,
+    "calorias_kcal": 61.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Kiwifruit, green, raw",
@@ -263,6 +272,7 @@
     "fosforo_mg": 8,
     "sodio_mg": 1,
     "carbohidratos_g": 13.1,
+    "calorias_kcal": 50.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pineapple, raw, all varieties",
@@ -289,6 +299,7 @@
     "fosforo_mg": 14,
     "sodio_mg": 1,
     "carbohidratos_g": 15.0,
+    "calorias_kcal": 60.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Mangos, raw",
@@ -318,6 +329,7 @@
     "fosforo_mg": 20,
     "sodio_mg": 0,
     "carbohidratos_g": 9.5,
+    "calorias_kcal": 39.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Peaches, yellow, raw",
@@ -346,6 +358,7 @@
     "fosforo_mg": 16,
     "sodio_mg": 0,
     "carbohidratos_g": 11.4,
+    "calorias_kcal": 46.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Plums, raw",
@@ -375,6 +388,7 @@
     "fosforo_mg": 21,
     "sodio_mg": 0,
     "carbohidratos_g": 16.0,
+    "calorias_kcal": 63.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cherries, sweet, raw",
@@ -404,6 +418,7 @@
     "fosforo_mg": 16,
     "sodio_mg": 2,
     "carbohidratos_g": 9.3,
+    "calorias_kcal": 29.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Lemons, raw, without peel",
@@ -424,6 +439,7 @@
     "fosforo_mg": 52,
     "sodio_mg": 7,
     "carbohidratos_g": 8.5,
+    "calorias_kcal": 160.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Avocados, raw, all commercial varieties",
@@ -443,6 +459,7 @@
     "fosforo_mg": 10,
     "sodio_mg": 8,
     "carbohidratos_g": 10.8,
+    "calorias_kcal": 43.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Papayas, raw",
@@ -462,6 +479,7 @@
     "fosforo_mg": 20,
     "sodio_mg": 2,
     "carbohidratos_g": 13.3,
+    "calorias_kcal": 53.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tangerines, (mandarin oranges), raw",
@@ -490,6 +508,7 @@
     "fosforo_mg": 14,
     "sodio_mg": 1,
     "carbohidratos_g": 19.2,
+    "calorias_kcal": 74.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Figs, raw",
@@ -519,6 +538,7 @@
     "fosforo_mg": 62,
     "sodio_mg": 1,
     "carbohidratos_g": 75.0,
+    "calorias_kcal": 277.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Dates, medjool",
@@ -548,6 +568,7 @@
     "fosforo_mg": 12,
     "sodio_mg": 1,
     "carbohidratos_g": 14.5,
+    "calorias_kcal": 57.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Blueberries, raw",
@@ -576,6 +597,7 @@
     "fosforo_mg": 29,
     "sodio_mg": 1,
     "carbohidratos_g": 11.9,
+    "calorias_kcal": 52.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Raspberries, raw",
@@ -595,6 +617,7 @@
     "fosforo_mg": 36,
     "sodio_mg": 3,
     "carbohidratos_g": 18.7,
+    "calorias_kcal": 83.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pomegranates, raw",
@@ -614,6 +637,7 @@
     "fosforo_mg": 40,
     "sodio_mg": 2,
     "carbohidratos_g": 14.3,
+    "calorias_kcal": 68.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Guavas, common, raw",
@@ -644,6 +668,7 @@
     "fosforo_mg": 57,
     "sodio_mg": 6,
     "carbohidratos_g": 17.5,
+    "calorias_kcal": 77.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Potatoes, flesh and skin, raw",
@@ -673,6 +698,7 @@
     "fosforo_mg": 24,
     "sodio_mg": 5,
     "carbohidratos_g": 3.9,
+    "calorias_kcal": 18.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tomatoes, red, ripe, raw, year round average",
@@ -692,6 +718,7 @@
     "fosforo_mg": 33,
     "sodio_mg": 5,
     "carbohidratos_g": 2.2,
+    "calorias_kcal": 13.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Lettuce, butterhead (includes boston and bibb types), raw",
@@ -711,6 +738,7 @@
     "fosforo_mg": 35,
     "sodio_mg": 69,
     "carbohidratos_g": 9.6,
+    "calorias_kcal": 41.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Carrots, raw",
@@ -739,6 +767,7 @@
     "fosforo_mg": 66,
     "sodio_mg": 33,
     "carbohidratos_g": 6.6,
+    "calorias_kcal": 34.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Broccoli, raw",
@@ -758,6 +787,7 @@
     "fosforo_mg": 49,
     "sodio_mg": 79,
     "carbohidratos_g": 3.6,
+    "calorias_kcal": 23.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Spinach, raw",
@@ -777,6 +807,7 @@
     "fosforo_mg": 44,
     "sodio_mg": 30,
     "carbohidratos_g": 5.0,
+    "calorias_kcal": 25.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cauliflower, raw",
@@ -796,6 +827,7 @@
     "fosforo_mg": 24,
     "sodio_mg": 2,
     "carbohidratos_g": 3.6,
+    "calorias_kcal": 15.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cucumber, with peel, raw",
@@ -816,6 +848,7 @@
     "fosforo_mg": 38,
     "sodio_mg": 8,
     "carbohidratos_g": 3.1,
+    "calorias_kcal": 17.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Squash, summer, zucchini, includes skin, raw",
@@ -835,6 +868,7 @@
     "fosforo_mg": 24,
     "sodio_mg": 2,
     "carbohidratos_g": 5.9,
+    "calorias_kcal": 25.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Eggplant, raw",
@@ -856,6 +890,7 @@
     "fosforo_mg": 26,
     "sodio_mg": 4,
     "carbohidratos_g": 6.0,
+    "calorias_kcal": 26.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Peppers, sweet, red, raw",
@@ -875,6 +910,7 @@
     "fosforo_mg": 29,
     "sodio_mg": 4,
     "carbohidratos_g": 9.3,
+    "calorias_kcal": 40.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Onions, raw",
@@ -894,6 +930,7 @@
     "fosforo_mg": 153,
     "sodio_mg": 17,
     "carbohidratos_g": 33.1,
+    "calorias_kcal": 149.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Garlic, raw",
@@ -915,6 +952,7 @@
     "fosforo_mg": 3,
     "sodio_mg": 735,
     "carbohidratos_g": 6.0,
+    "calorias_kcal": 116.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Olives, ripe, canned (small-extra large)",
@@ -934,6 +972,7 @@
     "fosforo_mg": 24,
     "sodio_mg": 80,
     "carbohidratos_g": 3.0,
+    "calorias_kcal": 14.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Celery, raw",
@@ -955,6 +994,7 @@
     "fosforo_mg": 86,
     "sodio_mg": 5,
     "carbohidratos_g": 3.3,
+    "calorias_kcal": 22.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Mushrooms, white, raw",
@@ -976,6 +1016,7 @@
     "fosforo_mg": 44,
     "sodio_mg": 1,
     "carbohidratos_g": 6.5,
+    "calorias_kcal": 26.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pumpkin, raw",
@@ -1006,6 +1047,7 @@
     "fosforo_mg": 40,
     "sodio_mg": 78,
     "carbohidratos_g": 9.6,
+    "calorias_kcal": 43.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beets, raw",
@@ -1034,6 +1076,7 @@
     "fosforo_mg": 52,
     "sodio_mg": 2,
     "carbohidratos_g": 3.9,
+    "calorias_kcal": 20.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Asparagus, raw",
@@ -1054,6 +1097,7 @@
     "fosforo_mg": 26,
     "sodio_mg": 18,
     "carbohidratos_g": 5.8,
+    "calorias_kcal": 25.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cabbage, raw",
@@ -1074,6 +1118,7 @@
     "fosforo_mg": 46,
     "sodio_mg": 213,
     "carbohidratos_g": 3.7,
+    "calorias_kcal": 19.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Chard, swiss, raw",
@@ -1095,6 +1140,7 @@
     "fosforo_mg": 140,
     "sodio_mg": 1,
     "carbohidratos_g": 23.7,
+    "calorias_kcal": 132.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beans, black, mature seeds, cooked, boiled, without salt",
@@ -1124,6 +1170,7 @@
     "fosforo_mg": 180,
     "sodio_mg": 2,
     "carbohidratos_g": 20.1,
+    "calorias_kcal": 116.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Lentils, mature seeds, cooked, boiled, without salt",
@@ -1153,6 +1200,7 @@
     "fosforo_mg": 168,
     "sodio_mg": 7,
     "carbohidratos_g": 27.4,
+    "calorias_kcal": 164.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
@@ -1183,6 +1231,7 @@
     "fosforo_mg": 117,
     "sodio_mg": 3,
     "carbohidratos_g": 15.6,
+    "calorias_kcal": 84.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Peas, green, cooked, boiled, drained, without salt",
@@ -1212,6 +1261,7 @@
     "fosforo_mg": 125,
     "sodio_mg": 5,
     "carbohidratos_g": 19.6,
+    "calorias_kcal": 110.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Broadbeans (fava beans), mature seeds, cooked, boiled, without salt",
@@ -1241,6 +1291,7 @@
     "fosforo_mg": 43,
     "sodio_mg": 1,
     "carbohidratos_g": 28.2,
+    "calorias_kcal": 130.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Rice, white, long-grain, regular, enriched, cooked",
@@ -1269,6 +1320,7 @@
     "fosforo_mg": 103,
     "sodio_mg": 4,
     "carbohidratos_g": 25.6,
+    "calorias_kcal": 123.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)",
@@ -1299,6 +1351,7 @@
     "fosforo_mg": 58,
     "sodio_mg": 1,
     "carbohidratos_g": 30.9,
+    "calorias_kcal": 158.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pasta, cooked, enriched, without added salt",
@@ -1328,6 +1381,7 @@
     "fosforo_mg": 94,
     "sodio_mg": 298,
     "carbohidratos_g": 49.6,
+    "calorias_kcal": 267.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Bread, white, commercially prepared, low sodium, no salt",
@@ -1357,6 +1411,7 @@
     "fosforo_mg": 212,
     "sodio_mg": 455,
     "carbohidratos_g": 42.7,
+    "calorias_kcal": 252.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Bread, whole-wheat, commercially prepared",
@@ -1387,6 +1442,7 @@
     "fosforo_mg": 458,
     "sodio_mg": 3,
     "carbohidratos_g": 68.2,
+    "calorias_kcal": 371.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cereals, QUAKER, Quick Oats, Dry",
@@ -1415,6 +1471,7 @@
     "fosforo_mg": 152,
     "sodio_mg": 7,
     "carbohidratos_g": 21.3,
+    "calorias_kcal": 120.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Quinoa, cooked",
@@ -1445,6 +1502,7 @@
     "fosforo_mg": 77,
     "sodio_mg": 1,
     "carbohidratos_g": 21.0,
+    "calorias_kcal": 96.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Corn, sweet, yellow, cooked, boiled, drained, without salt",
@@ -1473,6 +1531,7 @@
     "fosforo_mg": 314,
     "sodio_mg": 45,
     "carbohidratos_g": 44.6,
+    "calorias_kcal": 218.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tortillas, ready-to-bake or -fry, corn",
@@ -1501,6 +1560,7 @@
     "fosforo_mg": 206,
     "sodio_mg": 736,
     "carbohidratos_g": 49.4,
+    "calorias_kcal": 306.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tortillas, ready-to-bake or -fry, flour, refrigerated",
@@ -1522,6 +1582,7 @@
     "fosforo_mg": 84,
     "sodio_mg": 43,
     "carbohidratos_g": 4.8,
+    "calorias_kcal": 61.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Milk, whole, 3.25% milkfat, without added vitamin A and vitamin D",
@@ -1541,6 +1602,7 @@
     "fosforo_mg": 101,
     "sodio_mg": 42,
     "carbohidratos_g": 5.0,
+    "calorias_kcal": 34.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)",
@@ -1569,6 +1631,7 @@
     "fosforo_mg": 95,
     "sodio_mg": 46,
     "carbohidratos_g": 4.7,
+    "calorias_kcal": 61.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Yogurt, plain, whole milk",
@@ -1588,6 +1651,7 @@
     "fosforo_mg": 385,
     "sodio_mg": 751,
     "carbohidratos_g": 3.0,
+    "calorias_kcal": 299.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cheese, fresh, queso fresco",
@@ -1607,6 +1671,7 @@
     "fosforo_mg": 455,
     "sodio_mg": 653,
     "carbohidratos_g": 3.4,
+    "calorias_kcal": 403.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cheese, cheddar (Includes foods for USDA's Food Distribution Program)",
@@ -1626,6 +1691,7 @@
     "fosforo_mg": 107,
     "sodio_mg": 314,
     "carbohidratos_g": 5.5,
+    "calorias_kcal": 350.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cheese, cream",
@@ -1646,6 +1712,7 @@
     "fosforo_mg": 24,
     "sodio_mg": 643,
     "carbohidratos_g": 0.1,
+    "calorias_kcal": 717.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Butter, salted",
@@ -1666,6 +1733,7 @@
     "fosforo_mg": 228,
     "sodio_mg": 74,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 165.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
@@ -1686,6 +1754,7 @@
     "fosforo_mg": 198,
     "sodio_mg": 72,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 250.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beef, ground, 85% lean meat / 15% fat, patty, cooked, broiled",
@@ -1707,6 +1776,7 @@
     "fosforo_mg": 171,
     "sodio_mg": 66,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 215.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beef, ground, 85% lean meat / 15% fat, raw (Includes foods for USDA's Food Distribution Program)",
@@ -1728,6 +1798,7 @@
     "fosforo_mg": 228,
     "sodio_mg": 56,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 180.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pork, fresh, loin, center loin (chops), bone-in, separable lean only, cooked, broiled",
@@ -1747,6 +1818,7 @@
     "fosforo_mg": 252,
     "sodio_mg": 61,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 206.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
@@ -1766,6 +1838,7 @@
     "fosforo_mg": 139,
     "sodio_mg": 247,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 86.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)",
@@ -1787,6 +1860,7 @@
     "fosforo_mg": 198,
     "sodio_mg": 142,
     "carbohidratos_g": 0.7,
+    "calorias_kcal": 143.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Egg, whole, raw, fresh",
@@ -1808,6 +1882,7 @@
     "fosforo_mg": 237,
     "sodio_mg": 111,
     "carbohidratos_g": 0.2,
+    "calorias_kcal": 99.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Crustaceans, shrimp, cooked",
@@ -1827,6 +1902,7 @@
     "fosforo_mg": 255,
     "sodio_mg": 238,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 127.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Turkey, breast, from whole bird, meat only, with added solution, roasted",
@@ -1844,6 +1920,7 @@
     "fosforo_mg": 190,
     "sodio_mg": 14,
     "carbohidratos_g": 2.8,
+    "calorias_kcal": 144.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tofu, raw, firm, prepared with calcium sulfate",
@@ -1863,6 +1940,7 @@
     "fosforo_mg": 481,
     "sodio_mg": 1,
     "carbohidratos_g": 21.6,
+    "calorias_kcal": 579.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Nuts, almonds",
@@ -1882,6 +1960,7 @@
     "fosforo_mg": 346,
     "sodio_mg": 2,
     "carbohidratos_g": 13.7,
+    "calorias_kcal": 654.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Nuts, walnuts, english",
@@ -1903,6 +1982,7 @@
     "fosforo_mg": 376,
     "sodio_mg": 18,
     "carbohidratos_g": 16.1,
+    "calorias_kcal": 567.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Peanuts, all types, raw",
@@ -1922,6 +2002,7 @@
     "fosforo_mg": 660,
     "sodio_mg": 9,
     "carbohidratos_g": 20.0,
+    "calorias_kcal": 584.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Seeds, sunflower seed kernels, dried",
@@ -1941,6 +2022,7 @@
     "fosforo_mg": 860,
     "sodio_mg": 16,
     "carbohidratos_g": 42.1,
+    "calorias_kcal": 486.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Seeds, chia seeds, dried",
@@ -1960,6 +2042,7 @@
     "fosforo_mg": 101,
     "sodio_mg": 494,
     "carbohidratos_g": 50.1,
+    "calorias_kcal": 279.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Rolls, hamburger or hotdog, plain",
@@ -1990,6 +2073,7 @@
     "fosforo_mg": 153,
     "sodio_mg": 527,
     "carbohidratos_g": 53.8,
+    "calorias_kcal": 532.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Snacks, potato chips, plain, salted",
@@ -2019,6 +2103,7 @@
     "fosforo_mg": 153,
     "sodio_mg": 814,
     "carbohidratos_g": 3.6,
+    "calorias_kcal": 164.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Ham, sliced, regular (approximately 11% fat)",
@@ -2039,6 +2124,7 @@
     "fosforo_mg": 506,
     "sodio_mg": 2193,
     "carbohidratos_g": 1.4,
+    "calorias_kcal": 548.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pork, cured, bacon, cooked, baked",
@@ -2060,6 +2146,7 @@
     "fosforo_mg": 134,
     "sodio_mg": 865,
     "carbohidratos_g": 3.0,
+    "calorias_kcal": 315.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Frankfurter, beef, unheated",
@@ -2081,6 +2168,7 @@
     "fosforo_mg": 641,
     "sodio_mg": 1671,
     "carbohidratos_g": 4.8,
+    "calorias_kcal": 366.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cheese, pasteurized process, American, fortified with vitamin D",
@@ -2101,6 +2189,7 @@
     "fosforo_mg": 130,
     "sodio_mg": 5586,
     "carbohidratos_g": 5.6,
+    "calorias_kcal": 60.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Soy sauce made from soy (tamari)",
@@ -2120,6 +2209,7 @@
     "fosforo_mg": 0,
     "sodio_mg": 38758,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 0.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Salt, table",
@@ -2139,6 +2229,7 @@
     "fosforo_mg": 225,
     "sodio_mg": 24000,
     "carbohidratos_g": 16.1,
+    "calorias_kcal": 170.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Soup, beef broth, cubed, dry",
@@ -2161,6 +2252,7 @@
     "fosforo_mg": 9,
     "sodio_mg": 3,
     "carbohidratos_g": 10.4,
+    "calorias_kcal": 42.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beverages, carbonated, cola, regular",
@@ -2190,6 +2282,7 @@
     "fosforo_mg": 17,
     "sodio_mg": 2,
     "carbohidratos_g": 11.5,
+    "calorias_kcal": 49.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Orange juice, chilled, includes from concentrate",
@@ -2218,6 +2311,7 @@
     "fosforo_mg": 308,
     "sodio_mg": 20,
     "carbohidratos_g": 45.9,
+    "calorias_kcal": 598.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Chocolate, dark, 70-85% cacao solids",
@@ -2246,6 +2340,7 @@
     "fosforo_mg": 99,
     "sodio_mg": 385,
     "carbohidratos_g": 67.3,
+    "calorias_kcal": 464.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Cookies, sugar, commercially prepared, regular (includes vanilla)",
@@ -2264,6 +2359,7 @@
     "fosforo_mg": 179,
     "sodio_mg": 447,
     "carbohidratos_g": 29.0,
+    "calorias_kcal": 268.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pizza, cheese topping, regular crust, frozen, cooked",
@@ -2293,6 +2389,7 @@
     "fosforo_mg": 3,
     "sodio_mg": 2,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 1.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beverages, coffee, brewed, prepared with tap water",
@@ -2312,6 +2409,7 @@
     "fosforo_mg": 1,
     "sodio_mg": 3,
     "carbohidratos_g": 0.3,
+    "calorias_kcal": 1.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beverages, tea, black, brewed, prepared with tap water",
@@ -2331,6 +2429,7 @@
     "fosforo_mg": 20,
     "sodio_mg": 105,
     "carbohidratos_g": 3.7,
+    "calorias_kcal": 19.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Nuts, coconut water (liquid from coconuts)",
@@ -2350,6 +2449,7 @@
     "fosforo_mg": 14,
     "sodio_mg": 4,
     "carbohidratos_g": 3.5,
+    "calorias_kcal": 43.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Alcoholic beverage, beer, regular, all",
@@ -2379,6 +2479,7 @@
     "fosforo_mg": 23,
     "sodio_mg": 4,
     "carbohidratos_g": 2.6,
+    "calorias_kcal": 85.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Alcoholic beverage, wine, table, red",
@@ -2398,6 +2499,7 @@
     "fosforo_mg": 9,
     "sodio_mg": 72,
     "carbohidratos_g": 1.3,
+    "calorias_kcal": 15.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beverages, almond milk, unsweetened, shelf stable",
@@ -2417,6 +2519,7 @@
     "fosforo_mg": 19,
     "sodio_mg": 253,
     "carbohidratos_g": 3.5,
+    "calorias_kcal": 17.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Tomato juice, canned, with salt added",
@@ -2437,6 +2540,7 @@
     "fosforo_mg": 26,
     "sodio_mg": 907,
     "carbohidratos_g": 27.4,
+    "calorias_kcal": 101.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Catsup",
@@ -2456,6 +2560,7 @@
     "fosforo_mg": 108,
     "sodio_mg": 1104,
     "carbohidratos_g": 5.8,
+    "calorias_kcal": 60.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Mustard, prepared, yellow",
@@ -2476,6 +2581,7 @@
     "fosforo_mg": 21,
     "sodio_mg": 635,
     "carbohidratos_g": 0.6,
+    "calorias_kcal": 680.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Salad dressing, mayonnaise, regular",
@@ -2497,6 +2603,7 @@
     "fosforo_mg": 67,
     "sodio_mg": 466,
     "carbohidratos_g": 47.3,
+    "calorias_kcal": 225.7,
     "aditivos_fosfato": "posible",
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2528,6 +2635,7 @@
     "fosforo_mg": 96,
     "sodio_mg": 587,
     "carbohidratos_g": 44.7,
+    "calorias_kcal": 283.9,
     "aditivos_fosfato": "posible",
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2561,6 +2669,7 @@
     "fosforo_mg": 57,
     "sodio_mg": 389,
     "carbohidratos_g": 35.6,
+    "calorias_kcal": 295.0,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2586,6 +2695,7 @@
     "fosforo_mg": 102,
     "sodio_mg": 489,
     "carbohidratos_g": 28.2,
+    "calorias_kcal": 255.0,
     "aditivos_fosfato": "posible",
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2613,6 +2723,7 @@
     "fosforo_mg": 183,
     "sodio_mg": 601,
     "carbohidratos_g": 29.6,
+    "calorias_kcal": 337.0,
     "aditivos_fosfato": "posible",
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2638,6 +2749,7 @@
     "fosforo_mg": 97,
     "sodio_mg": 611,
     "carbohidratos_g": 20.5,
+    "calorias_kcal": 203.7,
     "aditivos_fosfato": "alto",
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2664,6 +2776,7 @@
     "fosforo_mg": 172,
     "sodio_mg": 535,
     "carbohidratos_g": 20.1,
+    "calorias_kcal": 229.9,
     "aditivos_fosfato": "posible",
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2688,6 +2801,7 @@
     "fosforo_mg": 55,
     "sodio_mg": 282,
     "carbohidratos_g": 8.8,
+    "calorias_kcal": 69.0,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2715,6 +2829,7 @@
     "fosforo_mg": 50,
     "sodio_mg": 285,
     "carbohidratos_g": 8.8,
+    "calorias_kcal": 57.1,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2742,6 +2857,7 @@
     "fosforo_mg": 55,
     "sodio_mg": 320,
     "carbohidratos_g": 10.1,
+    "calorias_kcal": 100.2,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2778,6 +2894,7 @@
     "fosforo_mg": 68,
     "sodio_mg": 311,
     "carbohidratos_g": 13.1,
+    "calorias_kcal": 93.6,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2813,6 +2930,7 @@
     "fosforo_mg": 93,
     "sodio_mg": 371,
     "carbohidratos_g": 14.4,
+    "calorias_kcal": 113.7,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2840,6 +2958,7 @@
     "fosforo_mg": 60,
     "sodio_mg": 353,
     "carbohidratos_g": 15.3,
+    "calorias_kcal": 117.1,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2865,6 +2984,7 @@
     "fosforo_mg": 54,
     "sodio_mg": 286,
     "carbohidratos_g": 9.4,
+    "calorias_kcal": 65.9,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2893,6 +3013,7 @@
     "fosforo_mg": 116,
     "sodio_mg": 316,
     "carbohidratos_g": 13.8,
+    "calorias_kcal": 104.1,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2927,6 +3048,7 @@
     "fosforo_mg": 68,
     "sodio_mg": 331,
     "carbohidratos_g": 21.8,
+    "calorias_kcal": 94.5,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2954,6 +3076,7 @@
     "fosforo_mg": 66,
     "sodio_mg": 314,
     "carbohidratos_g": 24.1,
+    "calorias_kcal": 81.7,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -2988,6 +3111,7 @@
     "fosforo_mg": 42,
     "sodio_mg": 313,
     "carbohidratos_g": 15.1,
+    "calorias_kcal": 106.3,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3021,6 +3145,7 @@
     "fosforo_mg": 23,
     "sodio_mg": 237,
     "carbohidratos_g": 5.0,
+    "calorias_kcal": 66.6,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3045,6 +3170,7 @@
     "fosforo_mg": 24,
     "sodio_mg": 473,
     "carbohidratos_g": 4.9,
+    "calorias_kcal": 93.1,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3071,6 +3197,7 @@
     "fosforo_mg": 39,
     "sodio_mg": 160,
     "carbohidratos_g": 19.6,
+    "calorias_kcal": 84.3,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3102,6 +3229,7 @@
     "fosforo_mg": 48,
     "sodio_mg": 276,
     "carbohidratos_g": 14.9,
+    "calorias_kcal": 136.2,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3134,6 +3262,7 @@
     "fosforo_mg": 179,
     "sodio_mg": 467,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 178.3,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3157,6 +3286,7 @@
     "fosforo_mg": 202,
     "sodio_mg": 480,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 192.1,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3181,6 +3311,7 @@
     "fosforo_mg": 159,
     "sodio_mg": 389,
     "carbohidratos_g": 6.1,
+    "calorias_kcal": 201.8,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3205,6 +3336,7 @@
     "fosforo_mg": 197,
     "sodio_mg": 246,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 87.3,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3227,6 +3359,7 @@
     "fosforo_mg": 98,
     "sodio_mg": 420,
     "carbohidratos_g": 8.7,
+    "calorias_kcal": 186.8,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3253,6 +3386,7 @@
     "fosforo_mg": 68,
     "sodio_mg": 27,
     "carbohidratos_g": 24.2,
+    "calorias_kcal": 94.7,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3286,6 +3420,7 @@
     "fosforo_mg": 91,
     "sodio_mg": 54,
     "carbohidratos_g": 17.3,
+    "calorias_kcal": 120.2,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3309,6 +3444,7 @@
     "fosforo_mg": 63,
     "sodio_mg": 1,
     "carbohidratos_g": 21.5,
+    "calorias_kcal": 89.8,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3332,6 +3468,7 @@
     "fosforo_mg": 32,
     "sodio_mg": 366,
     "carbohidratos_g": 4.0,
+    "calorias_kcal": 36.9,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3355,6 +3492,7 @@
     "fosforo_mg": 173,
     "sodio_mg": 899,
     "carbohidratos_g": 0.3,
+    "calorias_kcal": 249.8,
     "aditivos_fosfato": "alto",
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3380,6 +3518,7 @@
     "fosforo_mg": 546,
     "sodio_mg": 819,
     "carbohidratos_g": 2.2,
+    "calorias_kcal": 356.0,
     "aditivos_fosfato": "posible",
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3402,6 +3541,7 @@
     "fosforo_mg": 48,
     "sodio_mg": 239,
     "carbohidratos_g": 7.8,
+    "calorias_kcal": 147.2,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3424,6 +3564,7 @@
     "fosforo_mg": 21,
     "sodio_mg": 11,
     "carbohidratos_g": 6.2,
+    "calorias_kcal": 34.6,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
@@ -3447,6 +3588,7 @@
     "fosforo_mg": 301,
     "sodio_mg": 379,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 156.0,
     "aditivos_fosfato": "posible",
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
@@ -3466,6 +3608,7 @@
     "fosforo_mg": 490,
     "sodio_mg": 307,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 208.0,
     "aditivos_fosfato": "posible",
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
@@ -3485,6 +3628,7 @@
     "fosforo_mg": 154,
     "sodio_mg": 1013,
     "carbohidratos_g": 4.3,
+    "calorias_kcal": 299.0,
     "aditivos_fosfato": "alto",
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
@@ -3504,6 +3648,7 @@
     "fosforo_mg": 200,
     "sodio_mg": 697,
     "carbohidratos_g": 1.5,
+    "calorias_kcal": 319.0,
     "aditivos_fosfato": "posible",
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
@@ -3523,6 +3668,7 @@
     "fosforo_mg": 5,
     "sodio_mg": 657,
     "carbohidratos_g": 0.8,
+    "calorias_kcal": 713.0,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
@@ -3543,6 +3689,7 @@
     "fosforo_mg": 193,
     "sodio_mg": 129,
     "carbohidratos_g": 55.4,
+    "calorias_kcal": 315.0,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
@@ -3563,6 +3710,7 @@
     "fosforo_mg": 19,
     "sodio_mg": 32,
     "carbohidratos_g": 68.9,
+    "calorias_kcal": 278.0,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
@@ -3582,6 +3730,7 @@
     "fosforo_mg": 4,
     "sodio_mg": 4,
     "carbohidratos_g": 82.4,
+    "calorias_kcal": 304.0,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
@@ -3610,6 +3759,7 @@
     "fosforo_mg": 109,
     "sodio_mg": 53,
     "carbohidratos_g": 18.6,
+    "calorias_kcal": 99.0,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
@@ -3631,6 +3781,7 @@
     "fosforo_mg": 0,
     "sodio_mg": 10,
     "carbohidratos_g": 10.4,
+    "calorias_kcal": 41.0,
     "aditivos_fosfato": "posible",
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
@@ -3661,6 +3812,7 @@
     "fosforo_mg": 221,
     "sodio_mg": 52,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 124.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0\" fat, choice, raw",
@@ -3682,6 +3834,7 @@
     "fosforo_mg": 167,
     "sodio_mg": 75,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 240.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beef, chuck, short ribs, boneless, separable lean and fat, trimmed to 0\" fat, choice, raw",
@@ -3703,6 +3856,7 @@
     "fosforo_mg": 204,
     "sodio_mg": 57,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 149.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beef, flank, steak, separable lean only, trimmed to 0\" fat, choice, raw",
@@ -3718,12 +3872,14 @@
     "categoria": "Carne",
     "alias": [
       "lomo liso",
-      "top loin", "new york"
+      "top loin",
+      "new york"
     ],
     "potasio_mg": 283,
     "fosforo_mg": 205,
     "sodio_mg": 46,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 149.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beef, loin, top loin steak, boneless, lip off, separable lean only, trimmed to 0\" fat, choice, raw",
@@ -3739,12 +3895,14 @@
     "categoria": "Carne",
     "alias": [
       "filete",
-      "lomo fino", "tenderloin"
+      "lomo fino",
+      "tenderloin"
     ],
     "potasio_mg": 284,
     "fosforo_mg": 212,
     "sodio_mg": 45,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 143.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0\" fat, choice, raw",
@@ -3766,6 +3924,7 @@
     "fosforo_mg": 201,
     "sodio_mg": 74,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 139.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beef, chuck, arm pot roast, separable lean only, trimmed to 1/8\" fat, choice, raw",
@@ -3787,6 +3946,7 @@
     "fosforo_mg": 215,
     "sodio_mg": 56,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 140.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Beef, round, bottom round, roast, separable lean only, trimmed to 1/8\" fat, choice, raw",
@@ -3808,6 +3968,7 @@
     "fosforo_mg": 213,
     "sodio_mg": 45,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 120.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
@@ -3823,12 +3984,14 @@
     "categoria": "Carne",
     "alias": [
       "trutro",
-      "chicken leg", "muslo y contramuslo"
+      "chicken leg",
+      "muslo y contramuslo"
     ],
     "potasio_mg": 203,
     "fosforo_mg": 155,
     "sodio_mg": 84,
     "carbohidratos_g": 0.17,
+    "calorias_kcal": 214.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Chicken, broilers or fryers, leg, meat and skin, raw",
@@ -3850,6 +4013,7 @@
     "fosforo_mg": 123,
     "sodio_mg": 84,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 191.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Chicken, broilers or fryers, wing, meat and skin, raw",
@@ -3865,12 +4029,14 @@
     "categoria": "Pescado",
     "alias": [
       "merluza",
-      "hake", "pescada"
+      "hake",
+      "pescada"
     ],
     "potasio_mg": 249,
     "fosforo_mg": 222,
     "sodio_mg": 72,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 90.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Fish, whiting, mixed species, raw",
@@ -3892,6 +4058,7 @@
     "fosforo_mg": 209,
     "sodio_mg": 55,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 170.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pork, fresh, loin, center loin (chops), bone-in, separable lean and fat, raw",
@@ -3913,6 +4080,7 @@
     "fosforo_mg": 141,
     "sodio_mg": 81,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 277.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pork, fresh, spareribs, separable lean and fat, raw",
@@ -3934,6 +4102,7 @@
     "fosforo_mg": 229,
     "sodio_mg": 55,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 136.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pork, fresh, leg (ham), whole, separable lean only, raw",
@@ -3955,6 +4124,7 @@
     "fosforo_mg": 108,
     "sodio_mg": 32,
     "carbohidratos_g": 0.0,
+    "calorias_kcal": 518.0,
     "fuente": {
       "base": "USDA SR Legacy 2018-04",
       "descripcion": "Pork, fresh, belly, raw",
