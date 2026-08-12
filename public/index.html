@@ -39,9 +39,7 @@
         </div>
       </div>
       <div class="topbar-actions">
-        <button id="editar-clinico-btn" class="icon-btn" aria-label="Editar tus datos clínicos" hidden>
-          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-        </button>
+        <button id="etapa-badge-btn" class="icon-btn" aria-label="Editar tus datos clínicos"></button>
         <button id="about-btn" class="icon-btn" aria-label="Acerca de KidneyChef">
           <img src="icons/about-kidney.png" alt="" width="30" height="30">
         </button>
@@ -179,119 +177,43 @@
       <div id="history-list" class="history-list"></div>
     </section>
 
-    <section class="card perfil-card" data-tab="clinico">
-      <h2>Tu perfil</h2>
-      <p class="clinical-note">Se guarda solo en este dispositivo.</p>
-
-      <div class="clinical-field">
-        <label for="perfil-nombre">Nombre</label>
-        <input type="text" id="perfil-nombre" placeholder="Tu nombre" autocomplete="name">
-      </div>
-      <div class="clinical-field">
-        <label for="perfil-fecha-nacimiento">Fecha de nacimiento</label>
-        <input type="date" id="perfil-fecha-nacimiento">
-        <small class="campo-ayuda" id="perfil-edad-calculada"></small>
-      </div>
-    </section>
-
-    <section class="card clinical-card" data-tab="clinico">
-      <h2>Tus antecedentes clínicos</h2>
-      <p class="clinical-note">Ayudan a tu equipo tratante a ajustar tu Plan Clínico. Se guardan solo en este dispositivo.</p>
-
-      <div class="clinical-field">
-        <label for="en-dialisis">¿Estás en diálisis?</label>
-        <select id="en-dialisis">
-          <option value="">No</option>
-          <option value="hemodialisis">Sí, hemodiálisis</option>
-          <option value="peritoneal">Sí, diálisis peritoneal</option>
-        </select>
-      </div>
-
-      <div id="bloque-etapa">
-        <div class="clinical-field">
-          <label>¿Cómo quieres registrar tu etapa?</label>
-          <div class="clinical-checks">
-            <label class="clinical-check"><input type="radio" name="modo-etapa" id="modo-etapa-calculada" value="calculada"> Calcular con mis exámenes</label>
-            <label class="clinical-check"><input type="radio" name="modo-etapa" id="modo-etapa-manual" value="manual"> Declararla directamente</label>
-          </div>
-        </div>
-
-        <div id="calculadora-egfr">
-          <p class="clinical-note">
-            Calcula tu tasa de filtración glomerular estimada (eGFR) con la ecuación
-            CKD-EPI 2021. Usa tu creatinina, tu cistatina C, o ambas (más precisa si
-            tienes las dos). Es una estimación: la confirmación diagnóstica la hace
-            tu equipo tratante. Usa la edad calculada desde tu fecha de nacimiento en
-            "Tu perfil", arriba.
-          </p>
-          <div class="clinical-field">
-            <label for="egfr-sexo">Sexo biológico</label>
-            <select id="egfr-sexo">
-              <option value="">Selecciona</option>
-              <option value="F">Femenino</option>
-              <option value="M">Masculino</option>
-            </select>
-            <small class="campo-ayuda">La ecuación CKD-EPI usa el sexo biológico como variable de cálculo, no la identidad de género.</small>
-          </div>
-          <div class="clinical-field">
-            <label for="egfr-creatinina">Creatinina plasmática (mg/dL)</label>
-            <input type="number" id="egfr-creatinina" min="0" step="0.01" placeholder="Ej: 2.1">
-          </div>
-          <div class="clinical-field">
-            <label for="egfr-cistatina">Cistatina C (mg/L)</label>
-            <input type="number" id="egfr-cistatina" min="0" step="0.01" placeholder="Ej: 1.8 (opcional)">
-          </div>
-          <p id="egfr-resultado" class="egfr-resultado"></p>
-        </div>
-
-        <div class="clinical-field" id="etapa-manual-campo">
-          <label for="etapa-erc">Tu etapa ERC</label>
-          <select id="etapa-erc">
-            <option value="" disabled selected>Selecciona tu etapa</option>
-            <option value="3a">ERC etapa 3a</option>
-            <option value="3b">ERC etapa 3b</option>
-            <option value="4">ERC etapa 4</option>
-            <option value="5">ERC etapa 5 (sin diálisis)</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="etapa-sello" class="etapa-sello etapa-sello-vacio">
-        <div class="etapa-circulo">
-          <span class="etapa-circulo-superior" id="etapa-circulo-superior"></span>
-          <span class="etapa-circulo-valor" id="etapa-circulo-valor">—</span>
-        </div>
-        <span class="etapa-sello-label" id="etapa-sello-label">Sin etapa registrada</span>
-      </div>
-
-      <div class="clinical-field" id="campo-diuresis" hidden>
-        <label for="dato-diuresis">¿Cuánto orinas al día, aproximadamente?</label>
-        <input type="number" id="dato-diuresis" min="0" max="4000" step="50" placeholder="Ej: 800">
-        <small class="campo-ayuda">En mililitros. De aquí sale tu límite de líquidos: lo que orinas más 500 ml. Si no lo sabes, pregúntale a tu equipo tratante.</small>
-      </div>
-      <div class="clinical-checks">
-        <label class="clinical-check"><input type="checkbox" id="dato-diabetes"> Diabetes</label>
-        <label class="clinical-check"><input type="checkbox" id="dato-hipertension"> Hipertensión</label>
-        <label class="clinical-check"><input type="checkbox" id="dato-cardiovascular"> Enfermedad cardiovascular</label>
-        <label class="clinical-check"><input type="checkbox" id="dato-dislipidemia"> Dislipidemia</label>
-        <label class="clinical-check"><input type="checkbox" id="dato-gota"> Gota / hiperuricemia</label>
-        <label class="clinical-check"><input type="checkbox" id="dato-anemia"> Anemia</label>
-        <label class="clinical-check"><input type="checkbox" id="dato-trasplante"> Trasplante renal previo</label>
-      </div>
-      <label class="clinical-check clinical-check-ancho">
-        <input type="checkbox" id="dato-farmacos-k">
-        <span>
-          Tomo alguno de estos medicamentos
-          <small>Espironolactona, eplerenona, finerenona, enalapril, losartán u otros IECA, ARA-II o inhibidores de renina. Elevan el potasio en la sangre.</small>
-        </span>
-      </label>
-      <button id="confirmar-clinico-btn" class="btn btn-primary confirmar-clinico-btn">Confirmar</button>
-      <p class="clinical-note clinico-confirmado-nota" id="clinico-confirmado-nota" hidden>
-        Datos confirmados. Si tus exámenes cambian, edítalos con el ícono ✏️ de arriba.
+    <section class="card tratante-card" data-tab="tratante">
+      <h2>Equipo tratante</h2>
+      <p class="clinical-note">
+        Vincula tu celular con tu nefrólogo(a) o nutricionista para que ajuste
+        tus metas de potasio y fósforo a distancia. No ve ningún dato tuyo
+        hasta que tú aceptas la solicitud de vínculo, acá mismo.
       </p>
+
+      <label class="clinical-check clinical-check-ancho">
+        <input type="checkbox" id="activar-plan-clinico">
+        <span>Activar Plan Clínico</span>
+      </label>
+
+      <div id="codigo-cliente-bloque" class="clinical-field" hidden>
+        <label>Tu código de cliente</label>
+        <div class="codigo-cliente-fila">
+          <span id="codigo-cliente-valor" class="codigo-cliente-valor">—</span>
+          <button type="button" id="copiar-codigo-btn" class="btn btn-ghost">Copiar</button>
+        </div>
+        <small class="campo-ayuda">Compártelo con tu equipo tratante para que se vincule contigo.</small>
+      </div>
+
+      <div id="vinculos-pendientes" class="vinculos-lista"></div>
+      <div id="vinculos-activos" class="vinculos-lista"></div>
+
+      <div id="metas-sincronizadas" class="clinical-field" hidden>
+        <label>Metas fijadas por tu equipo tratante</label>
+        <p class="metas-sincronizadas-fila">
+          Potasio: <strong id="meta-potasio-valor">—</strong>
+        </p>
+        <p class="metas-sincronizadas-fila">
+          Fósforo: <strong id="meta-fosforo-valor">—</strong>
+        </p>
+      </div>
     </section>
 
-    <section id="plan-upsell" class="card plan-upsell-card" data-tab="clinico" hidden>
+    <section id="plan-upsell" class="card plan-upsell-card" data-tab="tratante" hidden>
       <span class="plan-upsell-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="4.2"/></svg>
       </span>
@@ -382,9 +304,9 @@
       <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1V10.5Z"/></svg>
       <span>Hoy</span>
     </button>
-    <button class="tab-btn" data-tab-target="clinico" role="tab" aria-selected="false">
+    <button id="tab-tratante-btn" class="tab-btn" data-tab-target="tratante" role="tab" aria-selected="false">
       <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 8.3C20 5.9 18 4 15.6 4c-1.5 0-2.8.7-3.6 1.9C11.2 4.7 9.9 4 8.4 4 6 4 4 5.9 4 8.3c0 4.6 8 11.2 8 11.2s8-6.6 8-11.2Z"/><path d="M5.5 10h2.3l1.4-2.4 1.8 4.8 1.2-2.4h4.3"/></svg>
-      <span>Clínico</span>
+      <span>Tratante</span>
     </button>
     <button class="tab-btn" data-tab-target="refrigerador" role="tab" aria-selected="false">
       <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="1.6"/><path d="M6 9.5h12"/><path d="M9 5v2.2M9 12v2.2"/></svg>
@@ -478,6 +400,122 @@
       <p class="paywall-precio" id="paywall-precio">$9.990 CLP / mes</p>
       <button id="paywall-suscribir-btn" class="btn btn-primary paywall-btn">Suscribirme</button>
       <p class="paywall-msg" id="paywall-msg" hidden></p>
+    </div>
+  </div>
+
+  <div id="editar-clinico-overlay" class="sheet-overlay" hidden>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h2>Tu perfil y antecedentes clínicos</h2>
+        <button id="cerrar-clinico-btn" class="icon-btn" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <h3>Tu perfil</h3>
+      <p class="clinical-note">Se guarda solo en este dispositivo.</p>
+      <div class="clinical-field">
+        <label for="perfil-nombre">Nombre</label>
+        <input type="text" id="perfil-nombre" placeholder="Tu nombre" autocomplete="name">
+      </div>
+      <div class="clinical-field">
+        <label for="perfil-fecha-nacimiento">Fecha de nacimiento</label>
+        <input type="date" id="perfil-fecha-nacimiento">
+        <small class="campo-ayuda" id="perfil-edad-calculada"></small>
+      </div>
+
+      <h3>Tus antecedentes clínicos</h3>
+      <p class="clinical-note">Ayudan a tu equipo tratante a ajustar tu Plan Clínico.</p>
+
+      <div class="clinical-field">
+        <label for="en-dialisis">¿Estás en diálisis?</label>
+        <select id="en-dialisis">
+          <option value="">No</option>
+          <option value="hemodialisis">Sí, hemodiálisis</option>
+          <option value="peritoneal">Sí, diálisis peritoneal</option>
+        </select>
+      </div>
+
+      <div id="bloque-etapa">
+        <div class="clinical-field">
+          <label>¿Cómo quieres registrar tu etapa?</label>
+          <div class="clinical-checks">
+            <label class="clinical-check"><input type="radio" name="modo-etapa" id="modo-etapa-calculada" value="calculada"> Calcular con mis exámenes</label>
+            <label class="clinical-check"><input type="radio" name="modo-etapa" id="modo-etapa-manual" value="manual"> Declararla directamente</label>
+          </div>
+        </div>
+
+        <div id="calculadora-egfr">
+          <p class="clinical-note">
+            Calcula tu tasa de filtración glomerular estimada (eGFR) con la ecuación
+            CKD-EPI 2021. Usa tu creatinina, tu cistatina C, o ambas (más precisa si
+            tienes las dos). Es una estimación: la confirmación diagnóstica la hace
+            tu equipo tratante. Usa la edad calculada desde tu fecha de nacimiento en
+            "Tu perfil", arriba.
+          </p>
+          <div class="clinical-field">
+            <label for="egfr-sexo">Sexo biológico</label>
+            <select id="egfr-sexo">
+              <option value="">Selecciona</option>
+              <option value="F">Femenino</option>
+              <option value="M">Masculino</option>
+            </select>
+            <small class="campo-ayuda">La ecuación CKD-EPI usa el sexo biológico como variable de cálculo, no la identidad de género.</small>
+          </div>
+          <div class="clinical-field">
+            <label for="egfr-creatinina">Creatinina plasmática (mg/dL)</label>
+            <input type="number" id="egfr-creatinina" min="0" step="0.01" placeholder="Ej: 2.1">
+          </div>
+          <div class="clinical-field">
+            <label for="egfr-cistatina">Cistatina C (mg/L)</label>
+            <input type="number" id="egfr-cistatina" min="0" step="0.01" placeholder="Ej: 1.8 (opcional)">
+          </div>
+          <p id="egfr-resultado" class="egfr-resultado"></p>
+        </div>
+
+        <div class="clinical-field" id="etapa-manual-campo">
+          <label for="etapa-erc">Tu etapa ERC</label>
+          <select id="etapa-erc">
+            <option value="" disabled selected>Selecciona tu etapa</option>
+            <option value="3a">ERC etapa 3a</option>
+            <option value="3b">ERC etapa 3b</option>
+            <option value="4">ERC etapa 4</option>
+            <option value="5">ERC etapa 5 (sin diálisis)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="etapa-sello" class="etapa-sello etapa-sello-vacio">
+        <div class="etapa-circulo">
+          <span class="etapa-circulo-superior" id="etapa-circulo-superior"></span>
+          <span class="etapa-circulo-valor" id="etapa-circulo-valor">—</span>
+        </div>
+        <span class="etapa-sello-label" id="etapa-sello-label">Sin etapa registrada</span>
+      </div>
+
+      <div class="clinical-field" id="campo-diuresis" hidden>
+        <label for="dato-diuresis">¿Cuánto orinas al día, aproximadamente?</label>
+        <input type="number" id="dato-diuresis" min="0" max="4000" step="50" placeholder="Ej: 800">
+        <small class="campo-ayuda">En mililitros. De aquí sale tu límite de líquidos: lo que orinas más 500 ml. Si no lo sabes, pregúntale a tu equipo tratante.</small>
+      </div>
+      <div class="clinical-checks">
+        <label class="clinical-check"><input type="checkbox" id="dato-diabetes"> Diabetes</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-hipertension"> Hipertensión</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-cardiovascular"> Enfermedad cardiovascular</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-dislipidemia"> Dislipidemia</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-gota"> Gota / hiperuricemia</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-anemia"> Anemia</label>
+        <label class="clinical-check"><input type="checkbox" id="dato-trasplante"> Trasplante renal previo</label>
+      </div>
+      <label class="clinical-check clinical-check-ancho">
+        <input type="checkbox" id="dato-farmacos-k">
+        <span>
+          Tomo alguno de estos medicamentos
+          <small>Espironolactona, eplerenona, finerenona, enalapril, losartán u otros IECA, ARA-II o inhibidores de renina. Elevan el potasio en la sangre.</small>
+        </span>
+      </label>
+      <button id="confirmar-clinico-btn" class="btn btn-primary confirmar-clinico-btn">Confirmar</button>
     </div>
   </div>
 

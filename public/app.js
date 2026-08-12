@@ -318,45 +318,44 @@ function continuarPerfilOverlay() {
   renderPerfilOverlay();
 }
 
-// Una vez confirmados, "Tu perfil" y "Tus antecedentes clínicos" quedan como
-// vista fija (campos deshabilitados) en vez de un formulario siempre abierto
-// — evita ediciones accidentales al mirar los datos. Se reabren solo desde
-// el ícono de lápiz en la esquina superior, pensado para cuando cambien los
-// exámenes y haya que declarar una etapa ERC nueva; al terminar se vuelve a
-// confirmar, y así sucesivamente.
-const CAMPOS_CLINICOS_BLOQUEABLES = [
-  "perfilNombre", "perfilFechaNacimiento",
-  "enDialisis", "modoEtapaCalculada", "modoEtapaManual", "etapaERC",
-  "egfrSexo", "egfrCreatinina", "egfrCistatina", "datoDiuresis",
-  "diabetes", "hipertension", "cardiovascular", "dislipidemia", "gota", "anemia", "trasplanteRenal",
-  "farmacosK",
-];
+// Tu perfil y Tus antecedentes clínicos viven en una hoja modal aparte (no en
+// una pestaña propia): se abre desde el badge de la esquina superior, que
+// muestra un lápiz mientras no se ha confirmado nunca, y la etapa ERC corta
+// (ej. "3B", "HD") una vez confirmada. Al confirmar se cierra la hoja y se
+// vuelve a Hoy; para actualizar la etapa cuando cambien los exámenes se
+// vuelve a tocar el badge, y así sucesivamente.
+const PENCIL_SVG = `<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`;
 
 function datosClinicosConfirmados() {
   return ensurePerfil().confirmacionClinica.confirmado;
 }
 
-function renderModoClinico() {
-  const confirmado = datosClinicosConfirmados();
-  CAMPOS_CLINICOS_BLOQUEABLES.forEach((campo) => { els[campo].disabled = confirmado; });
-  els.confirmarClinicoBtn.hidden = confirmado;
-  els.clinicoConfirmadoNota.hidden = !confirmado;
-  els.editarClinicoBtn.hidden = !confirmado;
+function renderEtapaBadge() {
+  if (!datosClinicosConfirmados()) {
+    els.etapaBadgeBtn.classList.remove("etapa-badge-btn");
+    els.etapaBadgeBtn.innerHTML = PENCIL_SVG;
+    return;
+  }
+  const datos = datosSelloEtapa();
+  els.etapaBadgeBtn.classList.add("etapa-badge-btn");
+  els.etapaBadgeBtn.textContent = datos ? datos.valor : "✓";
+}
+
+function abrirEdicionClinica() {
+  els.editarClinicoOverlay.hidden = false;
+}
+
+function cerrarEdicionClinica() {
+  els.editarClinicoOverlay.hidden = true;
 }
 
 function confirmarDatosClinicos() {
   const perfil = ensurePerfil();
   perfil.confirmacionClinica = { confirmado: true, confirmadoEn: new Date().toISOString() };
   guardarPerfil(perfil);
-  renderModoClinico();
-}
-
-function habilitarEdicionClinica() {
-  const perfil = ensurePerfil();
-  perfil.confirmacionClinica = { confirmado: false, confirmadoEn: null };
-  guardarPerfil(perfil);
-  renderModoClinico();
-  irATab("clinico");
+  els.editarClinicoOverlay.hidden = true;
+  renderEtapaBadge();
+  irATab("hoy");
 }
 
 // Suscripción: toda la app es gratis por TRIAL_DIAS desde la primera vez que
@@ -786,6 +785,16 @@ function renderPlanUpsell() {
 // 'pendiente' hasta que el propio paciente lo acepta ACÁ — es el paso de
 // confirmación legal (Ley 20.584): sin esto, el tratante nunca ve datos
 // clínicos de este paciente.
+//
+// Solo visible en la pestaña "Tratante" (interruptor manual abajo) mientras
+// se sigue probando — Camilo la quita (MOSTRAR_TAB_TRATANTE = false) antes de
+// subir la versión que va a producción/App Store.
+const MOSTRAR_TAB_TRATANTE = true;
+
+// Sin infraestructura de push, se refresca por polling mientras la app está
+// abierta — así una solicitud de vínculo nueva aparece sin que el paciente
+// tenga que cerrar y volver a abrir la app.
+const VINCULOS_POLL_MS = 60000;
 
 function authHeadersPaciente() {
   const perfil = ensurePerfil();
@@ -1044,8 +1053,19 @@ const els = {
   perfilOverlayFechaNacimiento: document.getElementById("perfil-overlay-fecha-nacimiento"),
   perfilOverlayContinuarBtn: document.getElementById("perfil-overlay-continuar-btn"),
   confirmarClinicoBtn: document.getElementById("confirmar-clinico-btn"),
-  clinicoConfirmadoNota: document.getElementById("clinico-confirmado-nota"),
-  editarClinicoBtn: document.getElementById("editar-clinico-btn"),
+  etapaBadgeBtn: document.getElementById("etapa-badge-btn"),
+  editarClinicoOverlay: document.getElementById("editar-clinico-overlay"),
+  cerrarClinicoBtn: document.getElementById("cerrar-clinico-btn"),
+  tabTratanteBtn: document.getElementById("tab-tratante-btn"),
+  activarPlanClinico: document.getElementById("activar-plan-clinico"),
+  codigoClienteBloque: document.getElementById("codigo-cliente-bloque"),
+  codigoClienteValor: document.getElementById("codigo-cliente-valor"),
+  copiarCodigoBtn: document.getElementById("copiar-codigo-btn"),
+  vinculosPendientes: document.getElementById("vinculos-pendientes"),
+  vinculosActivos: document.getElementById("vinculos-activos"),
+  metasSincronizadas: document.getElementById("metas-sincronizadas"),
+  metaPotasioValor: document.getElementById("meta-potasio-valor"),
+  metaFosforoValor: document.getElementById("meta-fosforo-valor"),
   refrigeradorChecklist: document.getElementById("refrigerador-checklist"),
   refrigeradorBuscarBtn: document.getElementById("refrigerador-buscar-btn"),
   refrigeradorResultados: document.getElementById("refrigerador-resultados"),
@@ -1112,13 +1132,18 @@ async function init() {
   renderPlan();
   renderDatosPersonales();
   renderDatosClinicos();
-  renderModoClinico();
+  renderEtapaBadge();
   renderTerminos();
   renderPerfilOverlay();
   renderSuscripcion();
   initRevenueCat();
+  els.tabTratanteBtn.hidden = !MOSTRAR_TAB_TRATANTE;
   initTabs();
   renderRecetasGuardadas();
+  renderVinculacion();
+  refrescarVinculos();
+  refrescarMetasSincronizadas();
+  setInterval(refrescarVinculos, VINCULOS_POLL_MS);
 
   els.cameraInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
   els.analyzeBtn.addEventListener("click", analyzeImage);
@@ -1154,7 +1179,13 @@ async function init() {
   els.perfilOverlayFechaNacimiento.addEventListener("input", actualizarBotonPerfilOverlay);
   els.perfilOverlayContinuarBtn.addEventListener("click", continuarPerfilOverlay);
   els.confirmarClinicoBtn.addEventListener("click", confirmarDatosClinicos);
-  els.editarClinicoBtn.addEventListener("click", habilitarEdicionClinica);
+  els.etapaBadgeBtn.addEventListener("click", abrirEdicionClinica);
+  els.cerrarClinicoBtn.addEventListener("click", cerrarEdicionClinica);
+  els.editarClinicoOverlay.addEventListener("click", (e) => {
+    if (e.target === els.editarClinicoOverlay) cerrarEdicionClinica();
+  });
+  els.activarPlanClinico.addEventListener("change", activarPlanClinico);
+  els.copiarCodigoBtn.addEventListener("click", copiarCodigoCliente);
   els.refrigeradorBuscarBtn.addEventListener("click", buscarRecetasRefrigerador);
   els.refrigeradorCameraInput.addEventListener("change", (e) => handleRefrigeradorFileSelected(e.target.files[0]));
   els.refrigeradorIdentificarBtn.addEventListener("click", identificarIngredientesRefrigerador);
@@ -1185,7 +1216,9 @@ const TAB_STORAGE_KEY = "kidneyChefTabActiva";
 
 function initTabs() {
   const tabGuardada = localStorage.getItem(TAB_STORAGE_KEY);
-  const tabs = Array.from(els.tabBar.querySelectorAll(".tab-btn")).map((btn) => btn.dataset.tabTarget);
+  const tabs = Array.from(els.tabBar.querySelectorAll(".tab-btn"))
+    .filter((btn) => !btn.hidden)
+    .map((btn) => btn.dataset.tabTarget);
   irATab(tabGuardada && tabs.includes(tabGuardada) ? tabGuardada : "hoy");
 
   els.tabBar.querySelectorAll(".tab-btn").forEach((btn) => {
