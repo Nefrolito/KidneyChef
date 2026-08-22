@@ -1128,10 +1128,67 @@ h1, h2, h3 {
 }
 .paywall-card h2 { margin: 0 0 0.6rem; font-size: 1.15rem; color: var(--brand-dark); }
 .paywall-card p { margin: 0 0 0.75rem; font-size: 0.9rem; color: var(--text); line-height: 1.5; }
-.paywall-precio { font-size: 1.4rem; font-weight: 800; color: var(--brand-dark); }
-.paywall-btn { width: 100%; margin-top: 0.4rem; }
+.paywall-btn { width: 100%; margin-top: 0.9rem; }
 .paywall-msg { margin-top: 0.85rem; font-size: 0.82rem; color: var(--muted); }
 .paywall-msg[hidden] { display: none; }
+
+.paywall-card-niveles { max-width: 440px; }
+
+.paywall-periodo-toggle {
+  display: inline-flex;
+  padding: 0.25rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  margin-bottom: 1.1rem;
+}
+.paywall-periodo-btn {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.paywall-periodo-btn.activo { background: var(--brand-dark); color: white; }
+
+.paywall-niveles { display: flex; flex-direction: column; gap: 0.65rem; text-align: left; }
+.paywall-nivel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-alt);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.paywall-nivel.seleccionado { border-color: var(--brand); background: var(--brand-50); }
+.paywall-nivel-badge {
+  position: absolute;
+  top: -0.6rem;
+  right: 0.9rem;
+  background: var(--brand);
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+.paywall-nivel-nombre { font-size: 0.98rem; font-weight: 800; color: var(--brand-dark); }
+.paywall-nivel-precio { font-size: 1.1rem; font-weight: 800; color: var(--text); }
+.paywall-nivel-precio small { font-size: 0.75rem; font-weight: 600; color: var(--muted); margin-left: 0.15rem; }
+.paywall-nivel-features { margin: 0.3rem 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.25rem; }
+.paywall-nivel-features li { font-size: 0.8rem; color: var(--muted); padding-left: 1.1rem; position: relative; }
+.paywall-nivel-features li::before { content: "✓"; position: absolute; left: 0; color: var(--verde); font-weight: 800; }
 
 /* --- Navegación por pestañas --- */
 .tab-bar {
