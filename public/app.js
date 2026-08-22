@@ -45,6 +45,41 @@ const REVENUECAT_API_KEY_ANDROID = "";
 const NIVELES_SUSCRIPCION = ["diamond", "platinum", "gold"];
 const RANGO_NIVEL = { gold: 1, platinum: 2, diamond: 3 };
 
+// Copy y precios de referencia para el selector de niveles del paywall — se
+// muestran mientras no haya una oferta real de RevenueCat cargada (hoy
+// siempre, porque las API keys de arriba están vacías). Los precios deben
+// coincidir con los configurados en App Store Connect / Google Play.
+const NIVELES_INFO = {
+  gold: {
+    nombre: "Gold",
+    precioMensualClp: 5990,
+    precioAnualClp: 49990,
+    features: [
+      "Semáforo de sodio, potasio, fósforo y carbohidratos",
+      "Plan Clínico: vínculo con tu nefrólogo(a) o nutricionista",
+    ],
+  },
+  platinum: {
+    nombre: "Platinum",
+    precioMensualClp: 7990,
+    precioAnualClp: 69990,
+    features: [
+      "Todo lo de Gold",
+      "Recetas generadas con IA desde fotos de tu refrigerador",
+      "Pestaña Súper: cortes reales y precios de supermercados",
+    ],
+  },
+  diamond: {
+    nombre: "Diamond",
+    precioMensualClp: 9990,
+    precioAnualClp: 89990,
+    features: [
+      "Todo lo de Platinum",
+      "Integración con Cookidoo (próximamente)",
+    ],
+  },
+};
+
 async function initRevenueCat() {
   if (!esAppNativa()) return;
   const platform = window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : null;
@@ -59,6 +94,19 @@ async function initRevenueCat() {
   }
 }
 
+// Nivel y periodo elegidos en el selector del paywall — ver renderPaywallNiveles().
+let paywallNivelSeleccionado = "platinum";
+let paywallPeriodoSeleccionado = "mensual"; // "mensual" | "anual"
+
+// Product ID real en App Store Connect / Google Play para el nivel+periodo
+// elegidos (com.kidneychef.app.<nivel> mensual, .<nivel>.annual anual).
+function productIdSeleccionado() {
+  const sufijo = paywallPeriodoSeleccionado === "anual"
+    ? `${paywallNivelSeleccionado}.annual`
+    : paywallNivelSeleccionado;
+  return `com.kidneychef.app.${sufijo}`;
+}
+
 // Dispara la compra real si RevenueCat ya está configurado (requiere las API
 // keys de arriba y el producto ya creado en las tiendas); si no, deja un
 // mensaje de que todavía no está disponible en vez de romper la app.
@@ -69,7 +117,8 @@ async function comprarSuscripcion() {
     try {
       const Purchases = window.Capacitor.Plugins.Purchases;
       const { current } = await Purchases.getOfferings();
-      const paquete = current?.availablePackages?.[0];
+      const idProducto = productIdSeleccionado();
+      const paquete = current?.availablePackages?.find((pkg) => pkg.product?.identifier === idProducto);
       if (paquete) {
         await Purchases.purchasePackage({ aPackage: paquete });
         await sincronizarSuscripcionRevenueCat();
@@ -388,12 +437,9 @@ function confirmarDatosClinicos() {
 // Suscripción: toda la app es gratis por TRIAL_DIAS desde la primera vez que
 // se abre (perfil.creadoEn), y de ahí en adelante requiere perfil.suscripcion.nivel
 // (hoy siempre null — se completa cuando se conecte el SDK de compras real).
-// 3 niveles con precio fijo (Gold/Platinum/Diamond) en vez de un SKU único
-// cuyo precio sube con el tiempo. El paywall de abajo todavía solo muestra
-// un precio y compra un único paquete (el de Diamond, PRECIO_SUSCRIPCION_CLP)
-// — falta rediseñarlo como selector de los 3 niveles.
+// 3 niveles con precio fijo (Gold/Platinum/Diamond, ver NIVELES_INFO) en vez
+// de un SKU único cuyo precio sube con el tiempo.
 const TRIAL_DIAS = 30;
-const PRECIO_SUSCRIPCION_CLP = 9990;
 
 function estadoSuscripcion() {
   const perfil = ensurePerfil();
@@ -410,7 +456,7 @@ function renderSuscripcion() {
   const { diasRestantes, enTrial, bloqueado } = estadoSuscripcion();
 
   els.paywallOverlay.hidden = !bloqueado;
-  els.paywallPrecio.textContent = `$${PRECIO_SUSCRIPCION_CLP.toLocaleString("es-CL")} CLP / mes`;
+  if (bloqueado) renderPaywallNiveles();
 
   els.trialBanner.hidden = !enTrial || bloqueado;
   if (enTrial) {
@@ -419,6 +465,39 @@ function renderSuscripcion() {
         ? "Te queda 1 día de prueba gratis"
         : `Te quedan ${diasRestantes} días de prueba gratis`;
   }
+}
+
+// Dibuja el toggle mensual/anual y las 3 tarjetas de nivel del paywall según
+// paywallNivelSeleccionado / paywallPeriodoSeleccionado, y actualiza el botón
+// de suscribirse con el nivel y precio elegidos.
+function renderPaywallNiveles() {
+  els.paywallPeriodoToggle.querySelectorAll(".paywall-periodo-btn").forEach((btn) => {
+    const activo = btn.dataset.periodo === paywallPeriodoSeleccionado;
+    btn.classList.toggle("activo", activo);
+    btn.setAttribute("aria-pressed", String(activo));
+  });
+
+  els.paywallNiveles.innerHTML = Object.entries(NIVELES_INFO)
+    .map(([id, info]) => {
+      const precio = paywallPeriodoSeleccionado === "anual" ? info.precioAnualClp : info.precioMensualClp;
+      const sufijo = paywallPeriodoSeleccionado === "anual" ? "/año" : "/mes";
+      const seleccionado = id === paywallNivelSeleccionado;
+      return `
+        <button type="button" class="paywall-nivel${seleccionado ? " seleccionado" : ""}" data-nivel="${id}" aria-pressed="${seleccionado}">
+          ${id === "platinum" ? '<span class="paywall-nivel-badge">Recomendado</span>' : ""}
+          <span class="paywall-nivel-nombre">${info.nombre}</span>
+          <span class="paywall-nivel-precio">$${precio.toLocaleString("es-CL")}<small>${sufijo}</small></span>
+          <ul class="paywall-nivel-features">${info.features.map((f) => `<li>${escapeHtml(f)}</li>`).join("")}</ul>
+        </button>
+      `;
+    })
+    .join("");
+
+  const infoSeleccionado = NIVELES_INFO[paywallNivelSeleccionado];
+  const precioSeleccionado = paywallPeriodoSeleccionado === "anual" ? infoSeleccionado.precioAnualClp : infoSeleccionado.precioMensualClp;
+  const sufijoBtn = paywallPeriodoSeleccionado === "anual" ? "/año" : "/mes";
+  els.paywallSuscribirBtn.textContent =
+    `Suscribirme a ${infoSeleccionado.nombre} — $${precioSeleccionado.toLocaleString("es-CL")} CLP ${sufijoBtn}`;
 }
 
 function datosClinicosPorDefecto() {
@@ -1126,7 +1205,8 @@ const els = {
   trialBanner: document.getElementById("trial-banner"),
   trialBannerText: document.getElementById("trial-banner-text"),
   paywallOverlay: document.getElementById("paywall-overlay"),
-  paywallPrecio: document.getElementById("paywall-precio"),
+  paywallPeriodoToggle: document.getElementById("paywall-periodo-toggle"),
+  paywallNiveles: document.getElementById("paywall-niveles"),
   paywallSuscribirBtn: document.getElementById("paywall-suscribir-btn"),
   paywallMsg: document.getElementById("paywall-msg"),
   terminosOverlay: document.getElementById("terminos-overlay"),
@@ -1255,6 +1335,18 @@ async function init() {
   els.egfrCreatinina.addEventListener("input", guardarDatosClinicos);
   els.egfrCistatina.addEventListener("input", guardarDatosClinicos);
   els.paywallSuscribirBtn.addEventListener("click", comprarSuscripcion);
+  els.paywallPeriodoToggle.addEventListener("click", (e) => {
+    const btn = e.target.closest(".paywall-periodo-btn");
+    if (!btn) return;
+    paywallPeriodoSeleccionado = btn.dataset.periodo;
+    renderPaywallNiveles();
+  });
+  els.paywallNiveles.addEventListener("click", (e) => {
+    const btn = e.target.closest(".paywall-nivel");
+    if (!btn) return;
+    paywallNivelSeleccionado = btn.dataset.nivel;
+    renderPaywallNiveles();
+  });
   els.terminosCheckbox.addEventListener("change", () => {
     els.terminosAceptarBtn.disabled = !els.terminosCheckbox.checked;
   });
