@@ -149,6 +149,41 @@
       </div>
     </section>
 
+    <!-- Revisar una receta de terceros (nivel Diamond). De la receta ajena solo
+         se toma la lista de ingredientes con sus cantidades: el texto de
+         preparación no se pide, no se guarda y no se muestra, porque sería
+         republicar contenido con derechos de otro (Cookidoo es contenido pagado
+         de Vorwerk) y no aporta nada al cálculo. -->
+    <section id="revisar-receta-card" class="card revisar-receta-card" data-tab="refrigerador" hidden>
+      <h2>Revisa una receta</h2>
+      <p class="clinical-note">
+        ¿Encontraste una receta en Cookidoo, en la app de tu robot o en un libro?
+        Fotografíala o pega su lista de ingredientes, y te decimos cómo le queda
+        el semáforo — y qué cambiar para bajarlo.
+      </p>
+
+      <div id="receta-externa-preview-wrap" class="preview-wrap preview-wrap-chica" hidden>
+        <img id="receta-externa-preview" alt="Vista previa de la receta">
+      </div>
+      <div class="capture-actions">
+        <label class="btn btn-secondary btn-stacked">
+          <svg class="btn-icon-bare" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h2.5l1.2-2h8.6l1.2 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.6"/></svg>
+          <span class="btn-text"><strong>Fotografiar la receta</strong><small>Pantalla, libro o cuaderno</small></span>
+          <input id="receta-externa-camera-input" type="file" accept="image/*" hidden>
+        </label>
+      </div>
+
+      <details class="refrigerador-manual">
+        <summary>O pega el texto de la receta</summary>
+        <textarea id="receta-externa-texto" rows="6" placeholder="Pega acá la lista de ingredientes con sus cantidades…"></textarea>
+        <button id="receta-externa-leer-btn" class="btn btn-secondary" style="width:100%;margin-top:0.5rem;">Leer esta receta</button>
+      </details>
+
+      <p id="receta-externa-status" class="status" role="status" aria-live="polite"></p>
+      <div id="receta-externa-transcripcion" hidden></div>
+      <div id="receta-externa-analisis" hidden></div>
+    </section>
+
     <section class="card calculadora-card" data-tab="hoy">
       <h2>Tu día de hoy</h2>
       <div id="calculadora"></div>

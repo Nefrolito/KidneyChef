@@ -304,6 +304,164 @@ def call_claude_vision_ingredientes(data_url):
     return _call_claude_vision_con_prompt(data_url, PROMPT_INGREDIENTES)
 
 
+# --- Lectura de recetas de terceros ------------------------------------
+# El paciente trae una receta que ya tiene (Cookidoo, la app de su robot, un
+# libro, la libreta de su mamá) y la app le calcula el semáforo renal.
+#
+# Deliberadamente NO se guarda ni se devuelve el texto de preparación: de esas
+# recetas solo se extrae la lista de ingredientes con sus cantidades, que es lo
+# único que la app necesita para calcular. Copiar las instrucciones de una
+# receta ajena sería republicar contenido con derechos de otro (Cookidoo es
+# contenido pagado de Vorwerk), y no aporta nada al análisis.
+#
+# El modelo solo TRANSCRIBE y convierte a gramos. Los valores de potasio,
+# fósforo y sodio salen después de nutrientes.json en el cliente, nunca de lo
+# que el modelo sepa o crea sobre un alimento.
+
+def _build_prompt_leer_receta(texto=None):
+    origen = (
+        "La receta viene en la imagen adjunta: puede ser la pantalla de Cookidoo o de la "
+        "app de un robot de cocina, la página de un libro, o una receta escrita a mano."
+        if texto is None else
+        f"La receta es esta:\n\n{texto}"
+    )
+
+    return f"""Eres un asistente que TRANSCRIBE una receta para una app de nutrición renal \
+usada por pacientes con enfermedad renal crónica.
+
+Tu única tarea es extraer los ingredientes con su cantidad en gramos. NO evalúes si la \
+receta es sana, NO propongas cambios y NO copies las instrucciones de preparación: el \
+análisis lo hace la app con su propia base de datos auditada.
+
+{origen}
+
+Responde EXCLUSIVAMENTE con un JSON válido (sin texto adicional, sin bloques de código \
+markdown), con esta forma:
+
+{{"nombre": "nombre de la receta", "porciones": numero o null, \
+"ingredientes": [{{"texto": "la línea tal como aparece en la receta", \
+"alimento": "nombre de la lista conocida o null", "gramos": numero o null}}]}}
+
+Reglas:
+- "alimento": si el ingrediente corresponde razonablemente a uno de esta lista conocida, \
+usa EXACTAMENTE ese nombre (coincidencia exacta de texto): {KNOWN_FOODS_LIST}
+- Si un ingrediente NO corresponde a ninguno de la lista, deja "alimento" en null. Es \
+mucho mejor que forzar una equivalencia dudosa: la app le avisa al paciente qué \
+ingredientes no pudo contar, pero no puede detectar una equivalencia mal hecha.
+- "gramos": convierte la cantidad de la receta a gramos usando equivalencias caseras \
+estándar (por ejemplo "2 cebollas" ≈ 300 g, "1 taza de arroz" ≈ 185 g, "1 cucharadita de \
+sal" ≈ 6 g). Si la receta no indica cantidad, deja null.
+- No omitas la sal, los caldos concentrados, la salsa de soya ni los embutidos aunque \
+aparezcan en cantidades chicas: son justo los que más sodio aportan.
+- No incluyas el agua ni el hielo.
+- "texto": copia la línea del ingrediente tal cual, para que el paciente pueda revisarla \
+y corregirla en la app.
+- "porciones": cuántas porciones rinde, solo si la receta lo dice. Si no lo dice, null.
+- Máximo 25 ingredientes."""
+
+
+def _parsear_respuesta_receta(payload):
+    text = "".join(
+        block.get("text", "") for block in payload.get("content", []) if block.get("type") == "text"
+    ).strip()
+    text = re.sub(r"^```(?:json)?|```$", "", text.strip(), flags=re.MULTILINE).strip()
+    try:
+        datos = json.loads(text)
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"No se pudo interpretar la respuesta de la IA: {text[:300]}") from e
+    if not isinstance(datos, dict) or not isinstance(datos.get("ingredientes"), list):
+        raise RuntimeError("La IA no devolvió una receta con el formato esperado")
+    return datos
+
+
+def call_claude_leer_receta(imagen=None, texto=None):
+    """Transcribe una receta (foto o texto pegado) a ingredientes con gramos.
+
+    Devuelve cada ingrediente ya resuelto contra nutrientes.json cuando se pudo
+    (`id`), o con `id: null` cuando no hay equivalente confiable — el cliente
+    usa esa distinción para no dar nunca un semáforo verde sobre datos
+    incompletos."""
+    if not imagen and not (texto or "").strip():
+        raise ValueError("Hay que mandar una foto de la receta o su texto")
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "Falta ANTHROPIC_API_KEY. Crea un archivo .env en la raíz del proyecto "
+            "con la línea: ANTHROPIC_API_KEY=tu_api_key"
+        )
+
+    prompt = _build_prompt_leer_receta(None if imagen else texto)
+
+    if imagen:
+        match = re.match(r"^data:(image/\w+);base64,(.+)$", imagen, re.DOTALL)
+        if not match:
+            raise ValueError("Formato de imagen inválido")
+        contenido = [
+            {"type": "image", "source": {"type": "base64",
+                                         "media_type": match.group(1), "data": match.group(2)}},
+            {"type": "text", "text": prompt},
+        ]
+    else:
+        contenido = prompt
+
+    body = json.dumps({
+        "model": ANTHROPIC_MODEL,
+        "max_tokens": 3072,
+        "output_config": {"effort": "low"},
+        "messages": [{"role": "user", "content": contenido}],
+    }).encode("utf-8")
+
+    req = urllib.request.Request(ANTHROPIC_URL, data=body, method="POST", headers={
+        "x-api-key": api_key,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=90) as resp:
+            datos = _parsear_respuesta_receta(json.loads(resp.read().decode("utf-8")))
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Error de la API de Claude ({e.code}): {detail}") from e
+
+    # El nombre que da el modelo se resuelve acá contra nutrientes.json: al
+    # cliente le llega el id exacto o null, no un nombre suelto que tendría que
+    # volver a adivinar.
+    por_nombre = {f["nombre"].strip().lower(): f["id"] for f in KNOWN_FOODS}
+    ingredientes = []
+    for item in datos["ingredientes"][:25]:
+        if not isinstance(item, dict):
+            continue
+        nombre = str(item.get("alimento") or "").strip()
+        fid = por_nombre.get(nombre.lower())
+        try:
+            gramos = float(item.get("gramos"))
+            gramos = round(gramos) if gramos > 0 else None
+        except (TypeError, ValueError):
+            gramos = None
+        ingredientes.append({
+            "texto": str(item.get("texto") or nombre or "").strip()[:120],
+            "id": fid,
+            "nombre": KNOWN_FOODS_BY_ID[fid]["nombre"] if fid else None,
+            "gramos": gramos,
+        })
+
+    if not ingredientes:
+        raise RuntimeError("No se pudo leer ningún ingrediente de la receta")
+
+    try:
+        porciones = int(datos.get("porciones"))
+        porciones = porciones if 1 <= porciones <= 30 else None
+    except (TypeError, ValueError):
+        porciones = None
+
+    return {
+        "nombre": str(datos.get("nombre") or "Receta").strip()[:120],
+        "porciones": porciones,
+        "ingredientes": ingredientes,
+    }
+
+
 NUTRIENTE_UNIDAD = {"potasio_mg": "mg", "fosforo_mg": "mg", "sodio_mg": "mg", "carbohidratos_g": "g"}
 NUTRIENTE_NOMBRE = {"potasio_mg": "potasio", "fosforo_mg": "fósforo", "sodio_mg": "sodio", "carbohidratos_g": "carbohidratos"}
 
@@ -920,6 +1078,50 @@ def handle_generar_receta(handler):
         handler._send_json(500, {"error": f"Error inesperado: {e}"})
 
 
+def handle_leer_receta(handler):
+    """POST /api/leer-receta — transcribe una receta que el paciente ya tiene
+    (foto o texto pegado) a ingredientes con gramos. Mismas guardas que el
+    resto de los endpoints que llaman a Claude: clave de app y cupo de uso."""
+    if APP_KEY:
+        provided = handler.headers.get("X-App-Key", "")
+        if not hmac.compare_digest(provided, APP_KEY):
+            print(f"[auth] rechazado ip={handler._client_ip()}", flush=True)
+            handler._send_json(401, {"error": "Acceso no autorizado a la API."})
+            return
+
+    body = _leer_body_json(handler)
+    if body is None:
+        return
+
+    imagen = body.get("imagen") if isinstance(body.get("imagen"), str) else None
+    texto = body.get("texto") if isinstance(body.get("texto"), str) else None
+    if not imagen and not (texto or "").strip():
+        handler._send_json(400, {"error": "Falta la foto o el texto de la receta"})
+        return
+
+    ip = handler._client_ip()
+    permitido, retry_after, motivo = RATE_LIMITER.check(ip)
+    if not permitido:
+        print(f"[rate-limit] bloqueado ip={ip} motivo={motivo} retry_after={retry_after}s", flush=True)
+        espera = format_espera(retry_after)
+        mensaje = (
+            f"La app alcanzó su límite de lecturas de receta por hoy. Vuelve a intentarlo en {espera}."
+            if motivo == "global" else
+            f"Hiciste muchas solicitudes en poco tiempo. Vuelve a intentarlo en {espera}."
+        )
+        handler._send_json(429, {"error": mensaje}, {"Retry-After": str(retry_after)})
+        return
+
+    try:
+        handler._send_json(200, call_claude_leer_receta(imagen, texto))
+    except ValueError as e:
+        handler._send_json(400, {"error": str(e)})
+    except RuntimeError as e:
+        handler._send_json(500, {"error": str(e)})
+    except Exception as e:
+        handler._send_json(500, {"error": f"Error inesperado: {e}"})
+
+
 def _leer_body_json(handler):
     """Lee y parsea el body como JSON. Si hay un error de formato, ya responde
     (400/413) y devuelve None — el llamador debe cortar ahí con `if body is
@@ -1296,6 +1498,7 @@ ROUTES = [
     ("POST", re.compile(r"^/api/analyze$"), handle_analyze),
     ("POST", re.compile(r"^/api/identificar-ingredientes$"), handle_identificar_ingredientes),
     ("POST", re.compile(r"^/api/generar-receta$"), handle_generar_receta),
+    ("POST", re.compile(r"^/api/leer-receta$"), handle_leer_receta),
     ("POST", re.compile(r"^/api/pacientes$"), handle_crear_paciente),
     ("GET", re.compile(r"^/api/pacientes/me$"), handle_get_paciente_me),
     ("GET", re.compile(r"^/api/pacientes/me/vinculos$"), handle_get_vinculos_paciente),

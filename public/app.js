@@ -86,6 +86,7 @@ const NIVELES_INFO = {
       "Todo lo de Platinum",
       "Modo robot de cocina: cada receta con la velocidad, temperatura y tiempo de tu máquina",
       "Compatible con Thermomix, Cecotec Mambo, MyCook, Monsieur Cuisine y otros",
+      "Revisa cualquier receta que encuentres: semáforo, alarma y qué cambiar para bajarla",
     ],
   },
 };
@@ -158,9 +159,10 @@ async function sincronizarSuscripcionRevenueCat() {
     guardarPerfil(perfil);
     renderSuscripcion();
     renderPlan();
-    // El modo robot es de Diamond: si el nivel acaba de cambiar, el selector
-    // tiene que aparecer (o desaparecer) sin que el paciente reinicie la app.
+    // Las funciones de Diamond tienen que aparecer (o desaparecer) sin que el
+    // paciente reinicie la app cuando el nivel acaba de cambiar.
     renderRobotSelector();
+    renderRevisarReceta();
   } catch (e) {
     console.warn("No se pudo sincronizar el estado de suscripción de RevenueCat", e);
   }
@@ -1270,6 +1272,15 @@ const els = {
   robotSelectorWrap: document.getElementById("robot-selector-wrap"),
   robotSelector: document.getElementById("robot-selector"),
   robotSelectorNota: document.getElementById("robot-selector-nota"),
+  revisarRecetaCard: document.getElementById("revisar-receta-card"),
+  recetaExternaCameraInput: document.getElementById("receta-externa-camera-input"),
+  recetaExternaPreview: document.getElementById("receta-externa-preview"),
+  recetaExternaPreviewWrap: document.getElementById("receta-externa-preview-wrap"),
+  recetaExternaTexto: document.getElementById("receta-externa-texto"),
+  recetaExternaLeerBtn: document.getElementById("receta-externa-leer-btn"),
+  recetaExternaStatus: document.getElementById("receta-externa-status"),
+  recetaExternaTranscripcion: document.getElementById("receta-externa-transcripcion"),
+  recetaExternaAnalisis: document.getElementById("receta-externa-analisis"),
   refrigeradorLimpiarBtn: document.getElementById("refrigerador-limpiar-btn"),
   recetasGuardadasWrap: document.getElementById("recetas-guardadas-wrap"),
   recetasGuardadasList: document.getElementById("recetas-guardadas-list"),
@@ -1342,6 +1353,11 @@ async function init() {
   renderRecetasGuardadas();
   renderRobotSelector();
   els.robotSelector.addEventListener("change", guardarRobotCocina);
+  renderRevisarReceta();
+  els.recetaExternaCameraInput.addEventListener("change", (e) =>
+    handleRecetaExternaFoto(e.target.files[0])
+  );
+  els.recetaExternaLeerBtn.addEventListener("click", leerRecetaExternaTexto);
   renderVinculacion();
   refrescarVinculos();
   refrescarMetasSincronizadas();
@@ -2655,6 +2671,417 @@ function mostrarRecetaParaCopiarAMano(texto, btn) {
   bloque.appendChild(wrap);
   area.focus();
   area.select();
+}
+
+
+// --- Revisar una receta de terceros (nivel Diamond) --------------------
+// El paciente trae una receta que ya tiene (Cookidoo, la app de su robot, un
+// libro) y la app le calcula el semáforo renal.
+//
+// De esa receta se toma SOLO la lista de ingredientes con sus cantidades. El
+// texto de preparación no se pide, no se guarda y no se muestra: republicarlo
+// sería redistribuir contenido con derechos de otro —Cookidoo es contenido
+// pagado de Vorwerk— y no aporta nada al cálculo.
+//
+// La IA solo transcribe y convierte a gramos. Todo el análisis (totales,
+// semáforo, alarma, sugerencias) se calcula acá con nutrientes.json y con
+// clasificar(), la misma función validada clínicamente que usa el resto de la
+// app. Ninguna cifra viene de lo que el modelo crea sobre un alimento.
+
+// Orden de gravedad pedido: primero potasio (una hiperkalemia es aguda y
+// puede ser mortal), después fósforo, después sodio.
+const NUTRIENTES_ALARMA = ["potasio_mg", "fosforo_mg", "sodio_mg"];
+
+// Alimentos donde la doble cocción sirve de verdad: se remojan en trozos y se
+// cuecen en agua nueva, botando el agua, y eso lixivia parte del potasio. Es
+// el mismo conjunto que ya usa el generador de recetas del backend.
+const LIXIVIABLES = new Set([
+  "papa", "papas_cocidas", "papas_duquesa", "pure_papas",
+  "zanahoria", "calabaza", "remolacha",
+  "lenteja", "lentejas_guisadas", "garbanzo", "frijol_negro",
+  "guisante", "haba", "porotos_granados",
+]);
+
+let recetaExterna = null;
+let recetaExternaImagen = null;
+
+function renderRevisarReceta() {
+  if (!els.revisarRecetaCard) return;
+  els.revisarRecetaCard.hidden = !nivelSuficiente("diamond");
+}
+
+function setRecetaExternaStatus(msg, esError = false, cargando = false) {
+  els.recetaExternaStatus.textContent = msg;
+  els.recetaExternaStatus.className = `status${esError ? " error" : ""}${cargando ? " loading" : ""}`;
+}
+
+async function pedirLecturaReceta(payload) {
+  setRecetaExternaStatus("Leyendo la receta…", false, true);
+  els.recetaExternaTranscripcion.hidden = true;
+  els.recetaExternaAnalisis.hidden = true;
+  try {
+    const res = await fetch(`${API_BASE}/api/leer-receta`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Error desconocido");
+    recetaExterna = data;
+    setRecetaExternaStatus("");
+    renderTranscripcionReceta();
+  } catch (err) {
+    setRecetaExternaStatus(err.message, true);
+  }
+}
+
+function handleRecetaExternaFoto(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    recetaExternaImagen = reader.result;
+    els.recetaExternaPreview.src = recetaExternaImagen;
+    els.recetaExternaPreviewWrap.hidden = false;
+    pedirLecturaReceta({ imagen: recetaExternaImagen });
+  };
+  reader.readAsDataURL(file);
+}
+
+function leerRecetaExternaTexto() {
+  const texto = els.recetaExternaTexto.value.trim();
+  if (!texto) {
+    setRecetaExternaStatus("Pega primero la lista de ingredientes de la receta.", true);
+    return;
+  }
+  els.recetaExternaPreviewWrap.hidden = true;
+  pedirLecturaReceta({ texto });
+}
+
+// La transcripción es editable a propósito: la IA convierte "2 cebollas" a
+// gramos con equivalencias caseras, y el paciente es quien sabe si sus cebollas
+// eran grandes o chicas. También puede corregir un ingrediente mal reconocido.
+function renderTranscripcionReceta() {
+  if (!recetaExterna) return;
+  const filas = recetaExterna.ingredientes
+    .map((ing, i) => {
+      const sinDato = !ing.id;
+      return `
+      <div class="receta-ext-fila${sinDato ? " sin-dato" : ""}">
+        <span class="receta-ext-original">${escapeHtml(ing.texto || "")}</span>
+        <div class="receta-ext-campos">
+          <input type="text" list="food-datalist" data-idx="${i}" data-campo="nombre"
+                 value="${escapeHtml(ing.nombre || "")}" placeholder="No está en la base"
+                 aria-label="Ingrediente ${i + 1}">
+          <input type="number" min="0" step="10" data-idx="${i}" data-campo="gramos"
+                 value="${ing.gramos == null ? "" : ing.gramos}" placeholder="g"
+                 aria-label="Gramos del ingrediente ${i + 1}">
+          <button class="super-item-quitar" data-idx="${i}" data-campo="quitar"
+                  aria-label="Quitar ingrediente ${i + 1}">✕</button>
+        </div>
+      </div>`;
+    })
+    .join("");
+
+  els.recetaExternaTranscripcion.hidden = false;
+  els.recetaExternaTranscripcion.innerHTML = `
+    <h3>${escapeHtml(recetaExterna.nombre || "Receta")}</h3>
+    <p class="clinical-note">
+      Revisa que los ingredientes y las cantidades estén bien antes de analizar.
+      Las cantidades se convirtieron a gramos con equivalencias caseras, así que
+      son aproximadas.
+    </p>
+    <div class="receta-ext-porciones">
+      <label for="receta-ext-porciones-input">Porciones que rinde</label>
+      <input id="receta-ext-porciones-input" type="number" min="1" max="30" step="1"
+             value="${recetaExterna.porciones || 4}">
+    </div>
+    <div class="receta-ext-lista">${filas}</div>
+    <button id="receta-ext-analizar-btn" class="btn btn-primary" style="width:100%;margin-top:0.7rem;">
+      Analizar esta receta
+    </button>`;
+
+  els.recetaExternaTranscripcion
+    .querySelectorAll("[data-campo]")
+    .forEach((el) => {
+      const evento = el.tagName === "BUTTON" ? "click" : "change";
+      el.addEventListener(evento, () => editarIngredienteReceta(el));
+    });
+  document
+    .getElementById("receta-ext-analizar-btn")
+    .addEventListener("click", analizarRecetaExterna);
+}
+
+function editarIngredienteReceta(el) {
+  const idx = Number(el.dataset.idx);
+  const campo = el.dataset.campo;
+  const ing = recetaExterna.ingredientes[idx];
+  if (!ing) return;
+
+  if (campo === "quitar") {
+    recetaExterna.ingredientes.splice(idx, 1);
+  } else if (campo === "gramos") {
+    const n = Number(el.value);
+    ing.gramos = Number.isFinite(n) && n > 0 ? Math.round(n) : null;
+  } else {
+    // matchFood ya resuelve nombres y alias contra nutrientes.json; si no
+    // encuentra nada exacto el ingrediente queda sin dato, que es justo lo que
+    // el análisis necesita saber para no dar un verde falso.
+    const texto = el.value.trim();
+    const food = texto ? FOODS.find((f) => normalize(f.nombre) === normalize(texto)) : null;
+    ing.id = food ? food.id : null;
+    ing.nombre = food ? food.nombre : null;
+  }
+  renderTranscripcionReceta();
+}
+
+// Suma los aportes reales de cada ingrediente reconocido. Los no reconocidos
+// se cuentan aparte: no se estiman ni se ignoran en silencio.
+function totalesRecetaExterna(porciones) {
+  const totales = { potasio_mg: 0, fosforo_mg: 0, sodio_mg: 0, carbohidratos_g: 0 };
+  const aportes = [];
+  const faltantes = [];
+  let totalGramos = 0;
+
+  recetaExterna.ingredientes.forEach((ing) => {
+    const food = ing.id ? FOODS.find((f) => f.id === ing.id) : null;
+    if (!food || !ing.gramos) {
+      faltantes.push(ing.texto || ing.nombre || "ingrediente sin nombre");
+      return;
+    }
+    const factor = ing.gramos / 100;
+    Object.keys(totales).forEach((n) => {
+      totales[n] += (food[n] || 0) * factor;
+    });
+    totalGramos += ing.gramos;
+    aportes.push({ food, gramos: ing.gramos });
+  });
+
+  const porPorcion = {};
+  Object.keys(totales).forEach((n) => {
+    porPorcion[n] = totales[n] / porciones;
+  });
+
+  return { totales, porPorcion, totalGramos, aportes, faltantes };
+}
+
+// Un verde calculado sobre ingredientes que no pudimos contar es una falsa
+// tranquilidad, y en potasio eso se paga caro. Con datos incompletos el verde
+// se degrada a "sin confirmar"; el ámbar y el rojo se mantienen, porque los
+// ingredientes que faltan solo pueden subir el total, nunca bajarlo.
+function badgeRecetaExterna(nutriente, valorPorcion, densidad100g, hayFaltantes) {
+  const { nivel, modo } = clasificar(nutriente, valorPorcion, densidad100g);
+  if (!nivel) return "";
+  if (hayFaltantes && nivel === "verde") {
+    return `
+      <div class="semaforo-badge nivel-incompleto">
+        <span class="label">${NUTRIENTE_LABEL[nutriente]}</span>
+        <span class="badge-icon-circle">${NUTRIENTE_ICON[nutriente]}</span>
+        <span class="value">${Math.round(valorPorcion)} mg</span>
+        <span class="tag-pill">Sin confirmar</span>
+      </div>`;
+  }
+  return badge(nutriente, Math.round(valorPorcion), densidad100g);
+}
+
+// Cuántos gramos hay que sacarle al ingrediente que más aporta para que el
+// nutriente vuelva a verde. Se resuelve distinto según cómo se esté evaluando:
+// contra el presupuesto del paciente (modo "meta") o contra la densidad del
+// plato (modo "contenido"), donde sacar gramos también baja el peso total.
+function gramosASacar(nutriente, modo, ctx, top) {
+  const valorPor100 = top.food[nutriente] || 0;
+  if (valorPor100 <= 0) return null;
+
+  if (modo === "meta") {
+    const meta = metaDiaria(nutriente);
+    if (meta == null || !LIMITES) return null;
+    const objetivo = umbralPorcion(meta).verde;
+    const excesoTotal = (ctx.porPorcion[nutriente] - objetivo) * ctx.porciones;
+    if (excesoTotal <= 0) return null;
+    return Math.ceil(excesoTotal / (valorPor100 / 100));
+  }
+
+  const cfg = nutriente === "potasio_mg" ? LIMITES && LIMITES.potasio
+            : nutriente === "fosforo_mg" ? LIMITES && LIMITES.fosforo : null;
+  if (!cfg) return null;
+  const c = (nutriente === "potasio_mg" && riesgoHiperkalemia() && cfg.clasificacion_contenido_estricta)
+    ? cfg.clasificacion_contenido_estricta
+    : cfg.clasificacion_contenido;
+  const objetivo = c.bajo_hasta;
+  if (valorPor100 <= objetivo) return null;
+  const g = (100 * ctx.totales[nutriente] - objetivo * ctx.totalGramos) / (valorPor100 - objetivo);
+  return g > 0 ? Math.ceil(g) : null;
+}
+
+// Categorías donde proponer un reemplazo no tiene sentido: nadie cambia el
+// caldo en cubo "por miel" aunque la miel tenga menos sodio. Para estas, el
+// consejo correcto es usar menos o no agregarlo.
+const CATEGORIAS_SIN_REEMPLAZO = new Set(["Condimento", "Bebida", "Postre", "Plato preparado"]);
+
+// Reemplazos posibles: alimentos de la MISMA categoría con bastante menos de
+// ese nutriente. Salen de nutrientes.json, así que la cifra que ve el paciente
+// es auditable.
+//
+// La regla clave es que un reemplazo NO puede empeorar ninguno de los otros
+// nutrientes vigilados. Sin eso, la primera versión llegó a proponer cambiar
+// papa (6 mg de sodio) por aceituna (735 mg) solo porque la aceituna tiene
+// menos potasio: bajaba un semáforo y disparaba otro.
+function alternativasMasBajas(nutriente, top, idsEnReceta) {
+  if (CATEGORIAS_SIN_REEMPLAZO.has(top.food.categoria)) return [];
+  const valorTop = top.food[nutriente] || 0;
+  const otros = NUTRIENTES_ALARMA.filter((n) => n !== nutriente);
+
+  return FOODS.filter((f) => {
+    if (f.categoria !== top.food.categoria || f.id === top.food.id) return false;
+    if (idsEnReceta.has(f.id)) return false;
+    if ((f[nutriente] || 0) > valorTop * 0.6) return false;
+    // Ni un miligramo peor en los otros dos: el paciente no puede evaluar el
+    // intercambio y confía en que la sugerencia lo deja mejor en todo.
+    if (!otros.every((n) => (f[n] || 0) <= (top.food[n] || 0))) return false;
+    // Tope calórico: el semáforo no mira grasas, así que sin esto la app
+    // llegaba a proponer panceta (518 kcal/100 g) en vez de carne de res (250)
+    // porque tiene menos fósforo. Correcto en el nutriente vigilado, mal
+    // consejo para un paciente con enfermedad renal crónica.
+    const kcalTop = top.food.calorias_kcal;
+    const kcalAlt = f.calorias_kcal;
+    if (kcalTop != null && kcalAlt != null && kcalAlt > kcalTop * 1.5) return false;
+    return true;
+  })
+    .sort((a, b) => (a[nutriente] || 0) - (b[nutriente] || 0))
+    .slice(0, 3);
+}
+
+function sugerenciasPara(nutriente, modo, ctx) {
+  const conAporte = ctx.aportes
+    .map((a) => ({ ...a, aporte: (a.food[nutriente] || 0) * (a.gramos / 100) }))
+    .sort((a, b) => b.aporte - a.aporte);
+  const top = conAporte[0];
+  if (!top || top.aporte <= 0) return [];
+
+  const nombreNutriente = NUTRIENTE_LABEL[nutriente].toLowerCase();
+  const pct = Math.round((top.aporte / ctx.totales[nutriente]) * 100);
+  const sugerencias = [
+    `<strong>${escapeHtml(top.food.nombre)}</strong> aporta el ${pct}% del ${nombreNutriente} de la receta (${Math.round(top.aporte)} mg de ${Math.round(ctx.totales[nutriente])} mg).`,
+  ];
+
+  const sacar = gramosASacar(nutriente, modo, ctx, top);
+  if (sacar != null && sacar < top.gramos) {
+    sugerencias.push(
+      `Baja ${escapeHtml(top.food.nombre.toLowerCase())} de ${top.gramos} g a unos <strong>${top.gramos - sacar} g</strong> y el ${nombreNutriente} vuelve a nivel bajo.`
+    );
+  } else if (sacar != null) {
+    sugerencias.push(
+      `Ni sacándolo por completo alcanza a bajar a nivel bajo: conviene reemplazarlo, o repartir la receta en más porciones.`
+    );
+  }
+
+  if (nutriente === "potasio_mg" && LIXIVIABLES.has(top.food.id)) {
+    sugerencias.push(
+      `Antes de cambiar cantidades, prueba la <strong>doble cocción</strong>: corta ${escapeHtml(top.food.nombre.toLowerCase())} en trozos, remoja al menos 2 horas y cuece en agua nueva abundante, botando esa agua. Suele bajar más el potasio que reducir la porción.`
+    );
+  }
+
+  const alternativas = alternativasMasBajas(nutriente, top, ctx.idsEnReceta);
+  if (alternativas.length) {
+    const lista = alternativas
+      .map((a) => `<strong>${escapeHtml(a.nombre.toLowerCase())}</strong> (${a[nutriente]} mg/100 g)`)
+      .join(", ");
+    sugerencias.push(
+      `Del mismo grupo de alimentos, con bastante menos ${nombreNutriente} y sin subir los otros: ${lista}. Si alguno te calza en el plato, cambiarlo rinde harto.`
+    );
+  } else if (CATEGORIAS_SIN_REEMPLAZO.has(top.food.categoria)) {
+    sugerencias.push(
+      `No hay un reemplazo razonable para ${escapeHtml(top.food.nombre.toLowerCase())}: acá lo que corresponde es usar menos o directamente no agregarlo.`
+    );
+  }
+
+  if (nutriente === "sodio_mg") {
+    sugerencias.push(
+      "En sodio, lo que más rinde suele ser no agregar sal ni caldo en cubo: pueden aportar más que todos los demás ingredientes juntos."
+    );
+  }
+
+  return sugerencias;
+}
+
+function analizarRecetaExterna() {
+  if (!recetaExterna) return;
+  const porcionesInput = document.getElementById("receta-ext-porciones-input");
+  const porciones = Math.max(1, Number(porcionesInput && porcionesInput.value) || 1);
+
+  const base = totalesRecetaExterna(porciones);
+  const ctx = {
+    ...base,
+    porciones,
+    idsEnReceta: new Set(base.aportes.map((a) => a.food.id)),
+  };
+  if (ctx.aportes.length === 0) {
+    els.recetaExternaAnalisis.hidden = false;
+    els.recetaExternaAnalisis.innerHTML = `
+      <p class="no-match">No se pudo calcular nada: ninguno de los ingredientes quedó
+      reconocido y con cantidad. Corrige los nombres o las cantidades y vuelve a intentar.</p>`;
+    return;
+  }
+
+  const hayFaltantes = ctx.faltantes.length > 0;
+  const densidad = (n) => (ctx.totalGramos > 0 ? (ctx.totales[n] / ctx.totalGramos) * 100 : 0);
+
+  const badges = nutrientesVisibles()
+    .map((n) => badgeRecetaExterna(n, ctx.porPorcion[n], densidad(n), hayFaltantes))
+    .join("");
+
+  // La alarma se dispara con el primero que quede rojo en el orden de
+  // gravedad, no con el que tenga el número más grande: 300 mg de potasio de
+  // más pesan clínicamente mucho más que 300 mg de sodio de más.
+  const enRojo = NUTRIENTES_ALARMA.filter(
+    (n) => clasificar(n, ctx.porPorcion[n], densidad(n)).nivel === "rojo"
+  );
+  const alarma = enRojo.length
+    ? `<div class="receta-ext-alarma">
+         <span class="receta-ext-alarma-icono" aria-hidden="true">⚠️</span>
+         <div>
+           <strong>${NUTRIENTE_LABEL[enRojo[0]]} muy alto para ti.</strong>
+           ${enRojo.length > 1
+             ? `También queda alto en ${enRojo.slice(1).map((n) => NUTRIENTE_LABEL[n].toLowerCase()).join(" y ")}.`
+             : ""}
+           Revisa los cambios de abajo antes de preparar esta receta.
+         </div>
+       </div>`
+    : "";
+
+  const avisoFaltantes = hayFaltantes
+    ? `<p class="receta-ext-faltantes">
+         No se pudo contar ${ctx.faltantes.length === 1 ? "este ingrediente" : `estos ${ctx.faltantes.length} ingredientes`}:
+         ${escapeHtml(ctx.faltantes.join(", "))}. El total real solo puede ser
+         <strong>igual o más alto</strong> que el que ves acá.
+       </p>`
+    : "";
+
+  const bloquesSugerencias = NUTRIENTES_ALARMA
+    .map((n) => {
+      const { nivel, modo } = clasificar(n, ctx.porPorcion[n], densidad(n));
+      if (nivel !== "rojo" && nivel !== "amarillo") return "";
+      const items = sugerenciasPara(n, modo, ctx);
+      if (!items.length) return "";
+      return `
+        <div class="receta-ext-sugerencia nivel-${nivel}">
+          <h4>Para bajar el ${NUTRIENTE_LABEL[n].toLowerCase()}</h4>
+          <ul>${items.map((t) => `<li>${t}</li>`).join("")}</ul>
+        </div>`;
+    })
+    .join("");
+
+  els.recetaExternaAnalisis.hidden = false;
+  els.recetaExternaAnalisis.innerHTML = `
+    ${alarma}
+    <p class="portion-note">
+      Por porción: ${Math.round(ctx.totalGramos / porciones)} g
+      (${porciones} ${porciones === 1 ? "porción" : "porciones"} de ${Math.round(ctx.totalGramos)} g en total).
+    </p>
+    <div class="semaforo-row">${badges}</div>
+    ${notaSinMeta()}
+    ${avisoFaltantes}
+    ${bloquesSugerencias || `<p class="clinical-note">Esta receta te queda bien como está.</p>`}`;
+  els.recetaExternaAnalisis.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 

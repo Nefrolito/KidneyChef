@@ -145,7 +145,7 @@ Son **3 niveles con precio fijo**, cada uno mensual o anual (constante
 |----------|---------|-------|---------|
 | Gold     | $5.990  | $49.990 | Semáforo Na/K/P/carbohidratos, "Tu día de hoy", historial |
 | Platinum | $7.990  | $69.990 | Todo Gold + recetas con IA desde el refrigerador + pestaña Súper |
-| Diamond  | $9.990  | $89.990 | Todo Platinum + Modo robot de cocina |
+| Diamond  | $9.990  | $89.990 | Todo Platinum + Modo robot de cocina + Revisar recetas |
 
 Los product IDs son `com.kidneychef.app.<nivel>` (mensual) y
 `com.kidneychef.app.<nivel>.annual` (anual). En RevenueCat cada producto
@@ -228,6 +228,55 @@ temperatura a las recetas guiadas del propio fabricante.
 
 **Para agregar un robot nuevo:** basta agregar una entrada a
 `public/robots-cocina.json` con su `fuente`. No hay que tocar código.
+
+## Revisar una receta de terceros (nivel Diamond)
+
+El paciente trae una receta que ya tiene —Cookidoo, la app de su robot, un
+libro, la libreta de su mamá— la fotografía o pega su texto, y la app le
+calcula el semáforo renal, le avisa si algo queda peligrosamente alto y le
+dice qué cambiar.
+
+**Qué se toma de la receta ajena y qué no.** Solo la lista de ingredientes con
+sus cantidades. El texto de preparación no se pide, no se guarda y no se
+muestra: republicarlo sería redistribuir contenido con derechos de otro
+(Cookidoo es contenido pagado de Vorwerk) y no aporta nada al cálculo. Por eso
+tampoco existe ni debe existir un "catálogo de recetas de Cookidoo" dentro de
+la app.
+
+**Reparto de responsabilidades:**
+
+- `server.py` — `POST /api/leer-receta` (`call_claude_leer_receta`). La IA
+  **solo transcribe**: extrae ingredientes, convierte medidas caseras a gramos
+  ("2 cebollas" ≈ 300 g) y resuelve cada uno contra `nutrientes.json`. Si un
+  ingrediente no tiene equivalente confiable devuelve `id: null` en vez de
+  forzar una equivalencia mala.
+- `public/app.js` — **todo el análisis es determinista y local**
+  (`totalesRecetaExterna`, `sugerenciasPara`, `analizarRecetaExterna`). Los
+  totales salen de `nutrientes.json` y el semáforo de `clasificar()`, la misma
+  función validada clínicamente que usa el resto de la app. Ninguna cifra
+  proviene de lo que el modelo crea sobre un alimento.
+
+**Tres decisiones de seguridad:**
+
+1. **Nunca verde con datos incompletos.** Si algún ingrediente no se pudo
+   contar, un nutriente que daría verde se muestra como "Sin confirmar"
+   (`badgeRecetaExterna`). El ámbar y el rojo se mantienen, porque lo que falta
+   solo puede subir el total. Un verde calculado sobre datos parciales es una
+   falsa tranquilidad, y en potasio eso se paga caro.
+2. **La alarma sigue el orden de gravedad clínica**, no el número más grande:
+   potasio, después fósforo, después sodio (`NUTRIENTES_ALARMA`).
+3. **Un reemplazo no puede empeorar nada** (`alternativasMasBajas`). Debe ser
+   de la misma categoría, tener bastante menos del nutriente en problema, no
+   superar al original en ninguno de los otros dos, y no pasar de 1,5× sus
+   calorías. Sin esas guardas la primera versión proponía cambiar papa por
+   aceituna (735 mg de sodio) y carne de res por panceta (518 kcal/100 g):
+   bajaba el semáforo vigilado y empeoraba al paciente. En categorías donde un
+   reemplazo no tiene sentido (`CATEGORIAS_SIN_REEMPLAZO`: condimentos,
+   bebidas, postres, platos preparados) el consejo es usar menos o no
+   agregarlo.
+
+La transcripción es **editable a propósito**: la conversión a gramos es
+aproximada y el paciente es quien sabe si sus cebollas eran grandes o chicas.
 
 ## Documentos legales
 
