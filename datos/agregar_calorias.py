@@ -148,6 +148,13 @@ KCAL_POR_FDC_ID = {
     "175139": 208.0,  # Fish, sardine, Atlantic, canned in oil, drained solids with bone
     "175168": 206.0,  # Fish, salmon, Atlantic, farmed, cooked, dry heat
     "175180": 99.0,  # Crustaceans, shrimp, cooked
+    # Agregados el 2026-08-24 junto con los seis alimentos que faltaban.
+    "169997": 23.0,  # Coriander (cilantro) leaves, raw
+    "171241": 356.0,  # Cheese, gouda
+    "168894": 364.0,  # Wheat flour, white, all-purpose, enriched, bleached
+    "171401": 902.0,  # Lard
+    "170287": 83.0,  # Bulgur, cooked
+    "169112": 74.0,  # Peaches, canned, heavy syrup pack, solids and liquids
 }
 
 # Alimentos calculados desde una receta (fuente.receta_g_por_100g), no desde un

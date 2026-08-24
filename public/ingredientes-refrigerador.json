@@ -225,7 +225,7 @@
     "id": "cilantro",
     "nombre": "Cilantro",
     "categoria": "Verduras y legumbres",
-    "nutrientes_id": null
+    "nutrientes_id": "cilantro"
   },
   {
     "id": "col",
@@ -525,7 +525,7 @@
     "id": "queso_gauda",
     "nombre": "Queso gauda o mantecoso",
     "categoria": "Lácteos y huevos",
-    "nutrientes_id": null
+    "nutrientes_id": "queso_gauda"
   },
   {
     "id": "yogur_fruta",
@@ -573,7 +573,7 @@
     "id": "harina",
     "nombre": "Harina",
     "categoria": "Abarrotes",
-    "nutrientes_id": null
+    "nutrientes_id": "harina"
   },
   {
     "id": "jamon",
@@ -585,7 +585,7 @@
     "id": "manteca",
     "nombre": "Manteca",
     "categoria": "Abarrotes",
-    "nutrientes_id": null
+    "nutrientes_id": "manteca"
   },
   {
     "id": "mani",
@@ -603,7 +603,7 @@
     "id": "trigo_mote",
     "nombre": "Mote de trigo",
     "categoria": "Abarrotes",
-    "nutrientes_id": null
+    "nutrientes_id": "trigo_mote"
   },
   {
     "id": "nuez",
@@ -681,6 +681,6 @@
     "id": "durazno_conserva",
     "nombre": "Durazno en conserva",
     "categoria": "Otros",
-    "nutrientes_id": null
+    "nutrientes_id": "durazno_conserva"
   }
 ]

@@ -45,6 +45,32 @@
   específico de la cocina chilena) usa el grano de trigo crudo de USDA porque
   no existe una cifra chilena medida ni un equivalente USDA de "mote" cocido.
 
+## Alimentos agregados después de la carga inicial
+
+Los 166 alimentos originales salieron de una pasada masiva sobre el bulk
+download de USDA. Los agregados después se buscaron uno a uno en la **API de
+FoodData Central** (`POST /fdc/v1/foods/search` con `dataType: ["SR Legacy"]`),
+que devuelve los mismos valores del bulk y sirve para agregar unos pocos sin
+volver a bajar el ZIP. El proyecto no tiene una API key propia de USDA, así que
+se usó `DEMO_KEY`, limitada a 10 solicitudes por hora — alcanza para un puñado
+de alimentos, no para una recarga completa.
+
+**2026-08-24 — seis ingredientes que las recetas chilenas ya usaban pero que no
+estaban en la base**, así que el checklist del refrigerador los mostraba sin dato
+y el generador de recetas no podía proponerlos: cilantro, queso gauda, harina de
+trigo, manteca, mote de trigo y durazno en conserva. Su mapeo quedó en
+`usda_mapeo.py` y sus calorías en `agregar_calorias.py`, igual que el resto.
+
+Dos equivalencias que conviene tener presentes:
+
+- **Mote de trigo → bulgur cocido**, no grano de trigo crudo. El mote se come
+  cocido, y el grano crudo da 431 mg de potasio por 100 g contra 68 del cocido:
+  más de seis veces, porque al cocerse absorbe agua. Usar el crudo haría ver el
+  mote como un alimento peligroso cuando no lo es.
+- **Harina → harina blanca corriente**, no la que trae polvos de hornear
+  (self-rising), que en USDA tiene 1190 mg de sodio y 595 mg de fósforo por
+  100 g. Si una receta usa harina con polvos, este dato no aplica.
+
 ## Robots de cocina
 
 `public/robots-cocina.json` sigue el mismo criterio que este archivo: ninguna

@@ -146,4 +146,15 @@ MAPEO = {
     "vino": "Alcoholic beverage, wine, table, red",
     "leche_almendra": "Beverages, almond milk, unsweetened, shelf stable",
     "jugo_tomate": "Tomato juice, canned, with salt added",
+    # Ingredientes que las recetas chilenas ya usaban pero que no estaban en
+    # nutrientes.json, así que el checklist del refrigerador los mostraba sin
+    # dato y el generador de recetas no podía proponerlos (2026-08-24).
+    "cilantro": "Coriander (cilantro) leaves, raw",
+    "queso_gauda": "Cheese, gouda",
+    "harina": "Wheat flour, white, all-purpose, enriched, bleached",
+    "manteca": "Lard",
+    # Mote = trigo pelado y COCIDO. Bulgur cocido es el equivalente correcto;
+    # el grano crudo daría 431 mg de potasio por 100 g contra 68 del cocido.
+    "trigo_mote": "Bulgur, cooked",
+    "durazno_conserva": "Peaches, canned, heavy syrup pack, solids and liquids",
 }

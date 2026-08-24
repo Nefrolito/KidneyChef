@@ -29,14 +29,14 @@ STAPLES = {"sal", "aceite", "azucar", "polvo_hornear", "aji_color"}
 # nutrientes_id=None sigue sirviendo para matchear contra las 34/35 recetas
 # fijas, pero no se ofrece como candidato para la receta generada por IA.
 INGREDIENTES = {
-    "harina": ("harina", "Harina", "Abarrotes", None),
-    "manteca": ("manteca", "Manteca", "Abarrotes", None),
+    "harina": ("harina", "Harina", "Abarrotes", "harina"),
+    "manteca": ("manteca", "Manteca", "Abarrotes", "manteca"),
     "zapallo": ("zapallo", "Zapallo", "Verduras y legumbres", "calabaza"),
     "zapallo_cocido": ("zapallo", "Zapallo", "Verduras y legumbres", "calabaza"),
     "vacuno": ("vacuno", "Carne de vacuno", "Carnes y pescados", "res"),
     "cebolla": ("cebolla", "Cebolla", "Verduras y legumbres", "cebolla"),
     "huevo": ("huevo", "Huevo", "Lácteos y huevos", "huevo"),
-    "queso_gauda": ("queso_gauda", "Queso gauda o mantecoso", "Lácteos y huevos", None),
+    "queso_gauda": ("queso_gauda", "Queso gauda o mantecoso", "Lácteos y huevos", "queso_gauda"),
     "pan_blanco": ("pan_blanco", "Pan blanco (marraqueta, hallulla)", "Abarrotes", "pan_blanco"),
     "vienesa": ("vienesa", "Vienesa", "Carnes y pescados", "salchicha"),
     "palta": ("palta", "Palta", "Verduras y legumbres", "aguacate"),
@@ -55,9 +55,9 @@ INGREDIENTES = {
     "merluza": ("merluza", "Merluza (o pescado blanco similar)", "Carnes y pescados", "merluza"),
     "leche": ("leche", "Leche", "Lácteos y huevos", "leche_entera"),
     "mantequilla": ("mantequilla", "Mantequilla", "Lácteos y huevos", "mantequilla"),
-    "cilantro": ("cilantro", "Cilantro", "Verduras y legumbres", None),
-    "trigo_mote": ("trigo_mote", "Mote de trigo", "Abarrotes", None),
-    "durazno_conserva": ("durazno_conserva", "Durazno en conserva", "Otros", None),
+    "cilantro": ("cilantro", "Cilantro", "Verduras y legumbres", "cilantro"),
+    "trigo_mote": ("trigo_mote", "Mote de trigo", "Abarrotes", "trigo_mote"),
+    "durazno_conserva": ("durazno_conserva", "Durazno en conserva", "Otros", "durazno_conserva"),
     "acelga_cocida_ing": ("acelga", "Acelga", "Verduras y legumbres", "acelga"),
 }
 

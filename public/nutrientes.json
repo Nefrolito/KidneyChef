@@ -4133,5 +4133,139 @@
     },
     "aditivos_fosfato": null,
     "indice_glucemico": null
+  },
+  {
+    "id": "cilantro",
+    "nombre": "Cilantro",
+    "categoria": "Verdura",
+    "alias": [
+      "culantro",
+      "coriandro"
+    ],
+    "potasio_mg": 521,
+    "fosforo_mg": 48,
+    "sodio_mg": 46,
+    "carbohidratos_g": 3.67,
+    "calorias_kcal": 23.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Coriander (cilantro) leaves, raw",
+      "fdc_id": "169997"
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "queso_gauda",
+    "nombre": "Queso gauda o mantecoso",
+    "categoria": "Lácteo",
+    "alias": [
+      "queso gauda",
+      "queso mantecoso",
+      "gouda"
+    ],
+    "potasio_mg": 121,
+    "fosforo_mg": 546,
+    "sodio_mg": 819,
+    "carbohidratos_g": 2.22,
+    "calorias_kcal": 356.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Cheese, gouda",
+      "fdc_id": "171241",
+      "nota_equivalencia": "El queso gauda/mantecoso chileno no tiene tabla nacional digitalizada; se usa el gouda de USDA, que es el mismo tipo de queso semiduro. Es la misma equivalencia que ya asumía la receta de queso chanco en datos/recetas_chilenas.py."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "harina",
+    "nombre": "Harina de trigo",
+    "categoria": "Cereal",
+    "alias": [
+      "harina",
+      "harina blanca",
+      "harina sin polvos"
+    ],
+    "potasio_mg": 107,
+    "fosforo_mg": 108,
+    "sodio_mg": 2,
+    "carbohidratos_g": 76.3,
+    "calorias_kcal": 364.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Wheat flour, white, all-purpose, enriched, bleached",
+      "fdc_id": "168894",
+      "nota_equivalencia": "Harina blanca corriente. Ojo: NO es la harina con polvos de hornear (self-rising), que en USDA trae 1190 mg de sodio y 595 mg de fósforo por 100 g — si una receta usa harina con polvos, ese dato no aplica."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "manteca",
+    "nombre": "Manteca",
+    "categoria": "Condimento",
+    "alias": [
+      "manteca de cerdo",
+      "grasa"
+    ],
+    "potasio_mg": 0,
+    "fosforo_mg": 0,
+    "sodio_mg": 0,
+    "carbohidratos_g": 0.0,
+    "calorias_kcal": 902.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Lard",
+      "fdc_id": "171401",
+      "nota_equivalencia": "La manteca de repostería chilena puede ser de cerdo o vegetal. Se usa la de cerdo, pero la elección no cambia el semáforo: ambas son grasa casi pura y aportan 0 mg de potasio, fósforo y sodio. Lo que sí aporta son calorías (902 kcal/100 g)."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "trigo_mote",
+    "nombre": "Mote de trigo",
+    "categoria": "Cereal",
+    "alias": [
+      "mote",
+      "mote de trigo cocido"
+    ],
+    "potasio_mg": 68,
+    "fosforo_mg": 40,
+    "sodio_mg": 5,
+    "carbohidratos_g": 18.6,
+    "calorias_kcal": 83.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Bulgur, cooked",
+      "fdc_id": "170287",
+      "nota_equivalencia": "El mote chileno (trigo pelado y cocido) no tiene tabla nacional digitalizada. Se usa bulgur cocido, que es trigo partido precocido, y NO el grano de trigo crudo: el crudo da 431 mg de potasio por 100 g contra 68 del cocido, más de seis veces, porque al cocerse absorbe agua. Usar el crudo haría ver el mote como un alimento peligroso cuando no lo es."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "durazno_conserva",
+    "nombre": "Durazno en conserva",
+    "categoria": "Fruta",
+    "alias": [
+      "durazno en almíbar",
+      "duraznos en conserva",
+      "melocotón en almíbar"
+    ],
+    "potasio_mg": 92,
+    "fosforo_mg": 11,
+    "sodio_mg": 6,
+    "carbohidratos_g": 19.9,
+    "calorias_kcal": 74.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Peaches, canned, heavy syrup pack, solids and liquids",
+      "fdc_id": "169112",
+      "nota_equivalencia": "Conserva en almíbar, contando fruta y líquido juntos, que es como se come. Si el paciente escurre el almíbar bajan los carbohidratos, no el potasio."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
   }
 ]
