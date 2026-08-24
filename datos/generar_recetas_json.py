@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from recetas_chilenas import RECETAS
+from recetas_chilenas import RECETAS, PREPARACIONES
 
 STAPLES = {"sal", "aceite", "azucar", "polvo_hornear", "aji_color"}
 
@@ -142,11 +142,20 @@ def main():
                 claves_canonicas.append(canon_id)
             ingredientes_vistos[canon_id] = (canon_nombre, canon_categoria, canon_nutrientes_id)
 
+        armable = id_ not in NO_ARMABLES
+        pasos = PREPARACIONES.get(id_, [])
+        # Una receta que el paciente puede preparar tiene que traer sus pasos.
+        # Sin esta guarda, agregar una receta nueva y olvidar la preparación
+        # pasaría inadvertido hasta que alguien la abriera en la app.
+        if armable and not pasos:
+            raise ValueError(f"Receta sin preparación en PREPARACIONES: {id_}")
+
         recetas_out.append({
             "id": id_,
             "nombre": nombre,
             "ingredientes": claves_canonicas,
-            "armable": id_ not in NO_ARMABLES,
+            "armable": armable,
+            "pasos": pasos,
         })
 
     foods = json.loads((public_dir / "nutrientes.json").read_text())

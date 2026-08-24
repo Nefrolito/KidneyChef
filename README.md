@@ -229,6 +229,40 @@ temperatura a las recetas guiadas del propio fabricante.
 **Para agregar un robot nuevo:** basta agregar una entrada a
 `public/robots-cocina.json` con su `fuente`. No hay que tocar código.
 
+## Recetario chileno
+
+`datos/recetas_chilenas.py` tiene dos partes: `RECETAS`, con los gramos de cada
+ingrediente por 100 g de plato terminado (proporciones validadas clínicamente
+por Camilo), y `PREPARACIONES`, con los pasos de cada receta. Los pasos son
+contenido culinario, no cambian ninguna cifra: el semáforo se sigue calculando
+desde las proporciones y `nutrientes.json`.
+
+Donde la receta lleva papa, zapallo, zanahoria o legumbres, el paso dice
+explícitamente que se cuezan en agua abundante y se bote esa agua. Es la doble
+cocción que se le enseña al paciente renal, y el paso de la preparación es
+justo donde corresponde decirlo.
+
+`generar_recetas_json.py` exige que toda receta preparable en casa tenga sus
+pasos, así que agregar una receta y olvidar la preparación falla al regenerar
+en vez de pasar inadvertido. Las dos que no llevan pasos a propósito son la
+longaniza y el queso chanco: se compran hechos (`NO_ARMABLES`).
+
+**Los pasos en el robot del paciente** no se escriben a mano: serían 35 recetas
+por 7 máquinas. `POST /api/pasos-robot` (`call_claude_pasos_robot` en
+`server.py`) traduce los pasos de una de nuestras recetas a la máquina cuando
+el paciente lo pide, con los mismos límites de `robots-cocina.json` y el mismo
+saneo que el resto del modo robot. El endpoint recibe el **id** de la receta,
+no su texto, para que no se pueda usar como traductor genérico de recetas
+ajenas. El resultado se guarda en el dispositivo (`kidneyChefPasosRobot`), así
+que la misma receta en la misma máquina no se vuelve a pedir.
+
+Una regla del prompt que vale la pena no perder: cuando un paso pide botar el
+agua de cocción, el alimento tiene que ir **sumergido** en el agua del vaso (o
+en el cestillo dentro del vaso), nunca en el accesorio de vapor. Al vapor el
+alimento va por encima del agua y el potasio no se lixivia: el paso se vería
+correcto y el paciente no recibiría ningún beneficio. La primera versión
+cometía exactamente ese error.
+
 ## Revisar una receta de terceros (nivel Diamond)
 
 El paciente trae una receta que ya tiene —Cookidoo, la app de su robot, un

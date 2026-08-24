@@ -1361,6 +1361,10 @@ async function init() {
   );
   els.recetaExternaLeerBtn.addEventListener("click", leerRecetaExternaTexto);
   els.refrigeradorBuscador.addEventListener("input", filtrarChecklistRefrigerador);
+  els.refrigeradorResultados.addEventListener("click", (e) => {
+    const boton = e.target.closest(".btn-pasos-robot");
+    if (boton) pedirPasosRobot(boton.dataset.receta, boton);
+  });
   renderVinculacion();
   refrescarVinculos();
   refrescarMetasSincronizadas();
@@ -1932,12 +1936,74 @@ function tarjetaReceta(receta, faltantes) {
     ? `<p class="portion-note">Te falta: ${faltantes.map((id) => escapeHtml(nombreIngrediente(id))).join(", ")}</p>`
     : "";
 
+  const pasos = (receta.pasos || []).length
+    ? `<details class="receta-pasos">
+        <summary>Cómo se prepara</summary>
+        <ol class="refrigerador-receta-lista">
+          ${receta.pasos.map((p) => `<li>${escapeHtml(p)}</li>`).join("")}
+        </ol>
+        ${botonPasosRobot(receta)}
+      </details>`
+    : "";
+
   return `
     <div class="food-result">
       <div class="food-result-header"><h3>${escapeHtml(receta.nombre)}</h3></div>
       ${faltantesHtml}
       ${semaforo}
+      ${pasos}
     </div>`;
+}
+
+// --- Las recetas fijas, dichas en el robot del paciente -----------------
+// Los pasos caseros de las 35 recetas viven en el repositorio
+// (datos/recetas_chilenas.py). Traducirlos a cada máquina sería 35 x 7 juegos
+// de pasos escritos a mano, así que la traducción se pide al backend cuando el
+// paciente la necesita y se guarda en el dispositivo: la misma receta en la
+// misma máquina no se vuelve a pedir nunca.
+const PASOS_ROBOT_CACHE_KEY = "kidneyChefPasosRobot";
+
+function cachePasosRobot() {
+  try {
+    return JSON.parse(localStorage.getItem(PASOS_ROBOT_CACHE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function botonPasosRobot(receta) {
+  const robot = robotSeleccionado();
+  if (!robot || !nivelSuficiente("diamond")) return "";
+  const guardados = cachePasosRobot()[`${receta.id}|${robot.id}`];
+  if (guardados) return pasosRobotHtml({ robot, pasos_robot: guardados }, { conCopiar: false });
+  return `<button class="btn btn-secondary btn-pasos-robot" data-receta="${escapeHtml(receta.id)}">
+            Verlo en mi ${escapeHtml(robot.nombre)}
+          </button>`;
+}
+
+async function pedirPasosRobot(recetaId, boton) {
+  const robot = robotSeleccionado();
+  if (!robot) return;
+  boton.disabled = true;
+  boton.textContent = "Adaptando la receta…";
+  try {
+    const res = await fetch(`${API_BASE}/api/pasos-robot`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      body: JSON.stringify({ receta: recetaId, robot: robot.id }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Error desconocido");
+
+    const cache = cachePasosRobot();
+    cache[`${recetaId}|${robot.id}`] = data.pasos_robot;
+    localStorage.setItem(PASOS_ROBOT_CACHE_KEY, JSON.stringify(cache));
+
+    boton.outerHTML = pasosRobotHtml(data, { conCopiar: false });
+  } catch (err) {
+    boton.disabled = false;
+    boton.textContent = err.message;
+  }
 }
 
 // --- Identificar ingredientes por foto y generar una receta a medida con IA ---
@@ -2612,7 +2678,7 @@ function ajustesPasoRobot(paso) {
   return chips;
 }
 
-function pasosRobotHtml(receta) {
+function pasosRobotHtml(receta, { conCopiar = true } = {}) {
   const pasos = receta.pasos_robot || [];
   if (!receta.robot || pasos.length === 0) return "";
 
@@ -2635,7 +2701,7 @@ function pasosRobotHtml(receta) {
         Tiempos y temperaturas de referencia: revisa el punto de cocción antes de servir.
         La carne, el pollo, el cerdo, el pescado y el huevo deben quedar bien cocidos.
       </p>
-      <button id="robot-copiar-btn" class="btn btn-secondary">Copiar receta</button>
+      ${conCopiar ? '<button id="robot-copiar-btn" class="btn btn-secondary">Copiar receta</button>' : ""}
     </div>`;
 }
 
