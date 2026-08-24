@@ -628,6 +628,17 @@ h1, h2, h3 {
 .refrigerador-manual { margin: 0.85rem 0; }
 .refrigerador-manual summary { cursor: pointer; font-weight: 600; font-size: 0.88rem; color: var(--brand); padding: 0.3rem 0; }
 .refrigerador-manual[open] summary { margin-bottom: 0.6rem; }
+#refrigerador-buscador {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+}
 .refrigerador-acciones { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
 .alt-chip-removable { display: inline-flex; align-items: center; gap: 0.4rem; }
 .refrigerador-receta-lista { margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.88rem; }

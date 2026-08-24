@@ -1259,6 +1259,8 @@ const els = {
   metaPotasioValor: document.getElementById("meta-potasio-valor"),
   metaFosforoValor: document.getElementById("meta-fosforo-valor"),
   refrigeradorChecklist: document.getElementById("refrigerador-checklist"),
+  refrigeradorBuscador: document.getElementById("refrigerador-buscador"),
+  refrigeradorSinResultados: document.getElementById("refrigerador-sin-resultados"),
   refrigeradorBuscarBtn: document.getElementById("refrigerador-buscar-btn"),
   refrigeradorResultados: document.getElementById("refrigerador-resultados"),
   refrigeradorPreviewWrap: document.getElementById("refrigerador-preview-wrap"),
@@ -1358,6 +1360,7 @@ async function init() {
     handleRecetaExternaFoto(e.target.files[0])
   );
   els.recetaExternaLeerBtn.addEventListener("click", leerRecetaExternaTexto);
+  els.refrigeradorBuscador.addEventListener("input", filtrarChecklistRefrigerador);
   renderVinculacion();
   refrescarVinculos();
   refrescarMetasSincronizadas();
@@ -1758,6 +1761,33 @@ function idsIngredientesMasComprados() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, MAS_COMPRADOS_MAX)
     .map(([idBase]) => idBase);
+}
+
+// Con 114 ingredientes en la lista, encontrar uno a ojo dejó de ser viable.
+// El filtro esconde las casillas que no coinciden, pero NO desmarca nada: si el
+// paciente ya marcó cebolla y después busca "pollo", la cebolla sigue marcada y
+// vuelve a aparecer al limpiar la búsqueda.
+function filtrarChecklistRefrigerador() {
+  const q = normalize(els.refrigeradorBuscador.value || "");
+  let visibles = 0;
+
+  els.refrigeradorChecklist.querySelectorAll(".refrigerador-categoria").forEach((grupo) => {
+    let enGrupo = 0;
+    grupo.querySelectorAll(".clinical-check").forEach((label) => {
+      const coincide = !q || normalize(label.textContent).includes(q);
+      label.hidden = !coincide;
+      if (coincide) enGrupo += 1;
+    });
+    grupo.hidden = enGrupo === 0;
+    visibles += enGrupo;
+  });
+
+  // Los "más comprados" son un atajo, no parte de la lista: con una búsqueda
+  // activa estorban más de lo que ayudan.
+  const destacados = els.refrigeradorChecklist.querySelector(".mas-comprados");
+  if (destacados) destacados.hidden = Boolean(q);
+
+  els.refrigeradorSinResultados.hidden = visibles > 0;
 }
 
 function renderRefrigeradorChecklist() {

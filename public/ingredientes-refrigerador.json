@@ -1,9 +1,39 @@
 [
   {
+    "id": "alitas_pollo",
+    "nombre": "Alitas",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "alitas_pollo"
+  },
+  {
+    "id": "asado_tira_vacuno",
+    "nombre": "Asado de tira",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "asado_tira_vacuno"
+  },
+  {
+    "id": "atun",
+    "nombre": "Atún en lata",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "atun"
+  },
+  {
+    "id": "camaron",
+    "nombre": "Camarón / Gamba",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "camaron"
+  },
+  {
     "id": "vacuno",
     "nombre": "Carne de vacuno",
     "categoria": "Carnes y pescados",
     "nutrientes_id": "res"
+  },
+  {
+    "id": "carne_molida",
+    "nombre": "Carne molida",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "carne_molida"
   },
   {
     "id": "cerdo",
@@ -12,10 +42,64 @@
     "nutrientes_id": "cerdo"
   },
   {
+    "id": "chuleta_cerdo",
+    "nombre": "Chuleta de cerdo",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "chuleta_cerdo"
+  },
+  {
+    "id": "costillar_cerdo_crudo",
+    "nombre": "Costillar",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "costillar_cerdo_crudo"
+  },
+  {
+    "id": "filete_vacuno",
+    "nombre": "Filete",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "filete_vacuno"
+  },
+  {
+    "id": "jurel_conserva",
+    "nombre": "Jurel en conserva",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "jurel_conserva"
+  },
+  {
+    "id": "lomo_liso_vacuno",
+    "nombre": "Lomo liso",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "lomo_liso_vacuno"
+  },
+  {
     "id": "merluza",
     "nombre": "Merluza (o pescado blanco similar)",
     "categoria": "Carnes y pescados",
-    "nutrientes_id": null
+    "nutrientes_id": "merluza"
+  },
+  {
+    "id": "panceta_cerdo",
+    "nombre": "Panceta",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "panceta_cerdo"
+  },
+  {
+    "id": "pavo",
+    "nombre": "Pavo (pechuga)",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "pavo"
+  },
+  {
+    "id": "pechuga_pollo",
+    "nombre": "Pechuga de pollo",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "pechuga_pollo"
+  },
+  {
+    "id": "plateada_vacuno",
+    "nombre": "Plateada",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "plateada_vacuno"
   },
   {
     "id": "pollo",
@@ -24,10 +108,64 @@
     "nutrientes_id": "pollo"
   },
   {
+    "id": "posta_negra_vacuno",
+    "nombre": "Posta negra",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "posta_negra_vacuno"
+  },
+  {
+    "id": "pulpa_cerdo",
+    "nombre": "Pulpa de cerdo",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "pulpa_cerdo"
+  },
+  {
+    "id": "punta_paleta_vacuno",
+    "nombre": "Punta paleta",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "punta_paleta_vacuno"
+  },
+  {
+    "id": "salmon",
+    "nombre": "Salmón",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "salmon"
+  },
+  {
+    "id": "sardina_conserva",
+    "nombre": "Sardinas en conserva",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "sardina_conserva"
+  },
+  {
+    "id": "tofu",
+    "nombre": "Tofu",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "tofu"
+  },
+  {
+    "id": "trutro_pollo",
+    "nombre": "Trutro entero",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "trutro_pollo"
+  },
+  {
+    "id": "vacio_vacuno",
+    "nombre": "Vacío",
+    "categoria": "Carnes y pescados",
+    "nutrientes_id": "vacio_vacuno"
+  },
+  {
     "id": "vienesa",
     "nombre": "Vienesa",
     "categoria": "Carnes y pescados",
     "nutrientes_id": "salchicha"
+  },
+  {
+    "id": "aceituna",
+    "nombre": "Aceituna",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "aceituna"
   },
   {
     "id": "acelga",
@@ -36,10 +174,46 @@
     "nutrientes_id": "acelga"
   },
   {
+    "id": "ajo",
+    "nombre": "Ajo",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "ajo"
+  },
+  {
+    "id": "apio",
+    "nombre": "Apio",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "apio"
+  },
+  {
+    "id": "berenjena",
+    "nombre": "Berenjena",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "berenjena"
+  },
+  {
+    "id": "brocoli",
+    "nombre": "Brócoli",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "brocoli"
+  },
+  {
+    "id": "calabacin",
+    "nombre": "Calabacín / Zucchini",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "calabacin"
+  },
+  {
     "id": "cebolla",
     "nombre": "Cebolla",
     "categoria": "Verduras y legumbres",
     "nutrientes_id": "cebolla"
+  },
+  {
+    "id": "champinon",
+    "nombre": "Champiñón / Hongo",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "champinon"
   },
   {
     "id": "choclo",
@@ -52,6 +226,54 @@
     "nombre": "Cilantro",
     "categoria": "Verduras y legumbres",
     "nutrientes_id": null
+  },
+  {
+    "id": "col",
+    "nombre": "Col / Repollo",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "col"
+  },
+  {
+    "id": "coliflor",
+    "nombre": "Coliflor",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "coliflor"
+  },
+  {
+    "id": "espinaca",
+    "nombre": "Espinaca",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "espinaca"
+  },
+  {
+    "id": "esparrago",
+    "nombre": "Espárrago",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "esparrago"
+  },
+  {
+    "id": "garbanzo",
+    "nombre": "Garbanzos cocidos",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "garbanzo"
+  },
+  {
+    "id": "guisante",
+    "nombre": "Guisantes / Arvejas cocidos",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "guisante"
+  },
+  {
+    "id": "haba",
+    "nombre": "Habas cocidas",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "haba"
+  },
+  {
+    "id": "lechuga",
+    "nombre": "Lechuga",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "lechuga"
   },
   {
     "id": "lenteja",
@@ -72,10 +294,28 @@
     "nutrientes_id": "papa"
   },
   {
+    "id": "pepino",
+    "nombre": "Pepino",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "pepino"
+  },
+  {
+    "id": "pimiento",
+    "nombre": "Pimiento",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "pimiento"
+  },
+  {
     "id": "porotos_negros",
     "nombre": "Porotos negros",
     "categoria": "Verduras y legumbres",
     "nutrientes_id": "frijol_negro"
+  },
+  {
+    "id": "remolacha",
+    "nombre": "Remolacha / Betabel",
+    "categoria": "Verduras y legumbres",
+    "nutrientes_id": "remolacha"
   },
   {
     "id": "tomate",
@@ -96,6 +336,144 @@
     "nutrientes_id": "calabaza"
   },
   {
+    "id": "arandano",
+    "nombre": "Arándano",
+    "categoria": "Frutas",
+    "nutrientes_id": "arandano"
+  },
+  {
+    "id": "cereza",
+    "nombre": "Cereza",
+    "categoria": "Frutas",
+    "nutrientes_id": "cereza"
+  },
+  {
+    "id": "ciruela",
+    "nombre": "Ciruela",
+    "categoria": "Frutas",
+    "nutrientes_id": "ciruela"
+  },
+  {
+    "id": "durazno",
+    "nombre": "Durazno / Melocotón",
+    "categoria": "Frutas",
+    "nutrientes_id": "durazno"
+  },
+  {
+    "id": "datil",
+    "nombre": "Dátil",
+    "categoria": "Frutas",
+    "nutrientes_id": "datil"
+  },
+  {
+    "id": "frambuesa",
+    "nombre": "Frambuesa",
+    "categoria": "Frutas",
+    "nutrientes_id": "frambuesa"
+  },
+  {
+    "id": "fresa",
+    "nombre": "Fresa",
+    "categoria": "Frutas",
+    "nutrientes_id": "fresa"
+  },
+  {
+    "id": "granada",
+    "nombre": "Granada",
+    "categoria": "Frutas",
+    "nutrientes_id": "granada"
+  },
+  {
+    "id": "guayaba",
+    "nombre": "Guayaba",
+    "categoria": "Frutas",
+    "nutrientes_id": "guayaba"
+  },
+  {
+    "id": "higo",
+    "nombre": "Higo",
+    "categoria": "Frutas",
+    "nutrientes_id": "higo"
+  },
+  {
+    "id": "kiwi",
+    "nombre": "Kiwi",
+    "categoria": "Frutas",
+    "nutrientes_id": "kiwi"
+  },
+  {
+    "id": "limon",
+    "nombre": "Limón",
+    "categoria": "Frutas",
+    "nutrientes_id": "limon"
+  },
+  {
+    "id": "mandarina",
+    "nombre": "Mandarina",
+    "categoria": "Frutas",
+    "nutrientes_id": "mandarina"
+  },
+  {
+    "id": "mango",
+    "nombre": "Mango",
+    "categoria": "Frutas",
+    "nutrientes_id": "mango"
+  },
+  {
+    "id": "manzana",
+    "nombre": "Manzana",
+    "categoria": "Frutas",
+    "nutrientes_id": "manzana"
+  },
+  {
+    "id": "melon",
+    "nombre": "Melón",
+    "categoria": "Frutas",
+    "nutrientes_id": "melon"
+  },
+  {
+    "id": "naranja",
+    "nombre": "Naranja",
+    "categoria": "Frutas",
+    "nutrientes_id": "naranja"
+  },
+  {
+    "id": "papaya",
+    "nombre": "Papaya",
+    "categoria": "Frutas",
+    "nutrientes_id": "papaya"
+  },
+  {
+    "id": "pera",
+    "nombre": "Pera",
+    "categoria": "Frutas",
+    "nutrientes_id": "pera"
+  },
+  {
+    "id": "pina",
+    "nombre": "Piña",
+    "categoria": "Frutas",
+    "nutrientes_id": "pina"
+  },
+  {
+    "id": "platano",
+    "nombre": "Plátano / Banana",
+    "categoria": "Frutas",
+    "nutrientes_id": "platano"
+  },
+  {
+    "id": "sandia",
+    "nombre": "Sandía",
+    "categoria": "Frutas",
+    "nutrientes_id": "sandia"
+  },
+  {
+    "id": "uva",
+    "nombre": "Uva",
+    "categoria": "Frutas",
+    "nutrientes_id": "uva"
+  },
+  {
     "id": "huevo",
     "nombre": "Huevo",
     "categoria": "Lácteos y huevos",
@@ -108,10 +486,40 @@
     "nutrientes_id": "leche_entera"
   },
   {
+    "id": "leche_descremada",
+    "nombre": "Leche descremada",
+    "categoria": "Lácteos y huevos",
+    "nutrientes_id": "leche_descremada"
+  },
+  {
     "id": "mantequilla",
     "nombre": "Mantequilla",
     "categoria": "Lácteos y huevos",
     "nutrientes_id": "mantequilla"
+  },
+  {
+    "id": "margarina",
+    "nombre": "Margarina",
+    "categoria": "Lácteos y huevos",
+    "nutrientes_id": "margarina"
+  },
+  {
+    "id": "queso_cheddar",
+    "nombre": "Queso cheddar",
+    "categoria": "Lácteos y huevos",
+    "nutrientes_id": "queso_cheddar"
+  },
+  {
+    "id": "queso_crema",
+    "nombre": "Queso crema",
+    "categoria": "Lácteos y huevos",
+    "nutrientes_id": "queso_crema"
+  },
+  {
+    "id": "queso_fresco",
+    "nombre": "Queso fresco",
+    "categoria": "Lácteos y huevos",
+    "nutrientes_id": "queso_fresco"
   },
   {
     "id": "queso_gauda",
@@ -120,10 +528,40 @@
     "nutrientes_id": null
   },
   {
+    "id": "yogur_fruta",
+    "nombre": "Yogur con fruta",
+    "categoria": "Lácteos y huevos",
+    "nutrientes_id": "yogur_fruta"
+  },
+  {
+    "id": "yogur",
+    "nombre": "Yogur natural",
+    "categoria": "Lácteos y huevos",
+    "nutrientes_id": "yogur"
+  },
+  {
+    "id": "almendra",
+    "nombre": "Almendras",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "almendra"
+  },
+  {
     "id": "arroz",
     "nombre": "Arroz",
     "categoria": "Abarrotes",
     "nutrientes_id": "arroz_blanco"
+  },
+  {
+    "id": "arroz_integral",
+    "nombre": "Arroz integral cocido",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "arroz_integral"
+  },
+  {
+    "id": "avena",
+    "nombre": "Avena cruda",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "avena"
   },
   {
     "id": "fideo",
@@ -138,10 +576,28 @@
     "nutrientes_id": null
   },
   {
+    "id": "jamon",
+    "nombre": "Jamón",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "jamon"
+  },
+  {
     "id": "manteca",
     "nombre": "Manteca",
     "categoria": "Abarrotes",
     "nutrientes_id": null
+  },
+  {
+    "id": "mani",
+    "nombre": "Maní / Cacahuate",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "mani"
+  },
+  {
+    "id": "mortadela",
+    "nombre": "Mortadela",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "mortadela"
   },
   {
     "id": "trigo_mote",
@@ -150,10 +606,76 @@
     "nutrientes_id": null
   },
   {
+    "id": "nuez",
+    "nombre": "Nueces",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "nuez"
+  },
+  {
     "id": "pan_blanco",
     "nombre": "Pan blanco (marraqueta, hallulla)",
     "categoria": "Abarrotes",
     "nutrientes_id": "pan_blanco"
+  },
+  {
+    "id": "pan_hamburguesa",
+    "nombre": "Pan de hamburguesa",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "pan_hamburguesa"
+  },
+  {
+    "id": "pan_integral",
+    "nombre": "Pan integral",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "pan_integral"
+  },
+  {
+    "id": "pate",
+    "nombre": "Paté",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "pate"
+  },
+  {
+    "id": "queso_procesado",
+    "nombre": "Queso procesado (tipo americano)",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "queso_procesado"
+  },
+  {
+    "id": "quinoa",
+    "nombre": "Quinoa cocida",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "quinoa"
+  },
+  {
+    "id": "chia",
+    "nombre": "Semillas de chía",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "chia"
+  },
+  {
+    "id": "girasol",
+    "nombre": "Semillas de girasol",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "girasol"
+  },
+  {
+    "id": "tocino",
+    "nombre": "Tocino",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "tocino"
+  },
+  {
+    "id": "tortilla_harina",
+    "nombre": "Tortilla de harina",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "tortilla_harina"
+  },
+  {
+    "id": "tortilla_maiz",
+    "nombre": "Tortilla de maíz",
+    "categoria": "Abarrotes",
+    "nutrientes_id": "tortilla_maiz"
   },
   {
     "id": "durazno_conserva",

@@ -52,7 +52,7 @@ INGREDIENTES = {
     "zanahoria_cocida": ("zanahoria", "Zanahoria", "Verduras y legumbres", "zanahoria"),
     "pollo": ("pollo", "Pollo", "Carnes y pescados", "pollo"),
     "cerdo": ("cerdo", "Cerdo", "Carnes y pescados", "cerdo"),
-    "merluza": ("merluza", "Merluza (o pescado blanco similar)", "Carnes y pescados", None),
+    "merluza": ("merluza", "Merluza (o pescado blanco similar)", "Carnes y pescados", "merluza"),
     "leche": ("leche", "Leche", "Lácteos y huevos", "leche_entera"),
     "mantequilla": ("mantequilla", "Mantequilla", "Lácteos y huevos", "mantequilla"),
     "cilantro": ("cilantro", "Cilantro", "Verduras y legumbres", None),
@@ -65,7 +65,59 @@ INGREDIENTES = {
 # son algo que el paciente prepare en casa a partir de ellos.
 NO_ARMABLES = {"longaniza", "queso_chanco"}
 
-CATEGORIA_ORDEN = ["Carnes y pescados", "Verduras y legumbres", "Lácteos y huevos", "Abarrotes", "Otros"]
+# --- Ingredientes disponibles aunque ninguna receta fija los use --------
+#
+# El checklist del refrigerador nació derivado de las 35 recetas chilenas, así
+# que solo ofrecía los ~20 ingredientes que esas recetas ocupan. Pero la receta
+# generada con IA puede combinar cualquier alimento que tenga dato auditado en
+# nutrientes.json, y había más de 90 alimentos ya cargados que nunca se le
+# ofrecían al paciente. Esto los incorpora: no agrega ni un dato nuevo, solo
+# deja de esconder los que ya estaban.
+#
+# La regla es automática y por eso reproducible: se toma todo alimento base de
+# nutrientes.json que no sea un plato ya preparado (los ids de RECETAS) ni de
+# una categoría que no sirve como ingrediente, y se traduce su categoría a las
+# del checklist.
+CATEGORIA_A_CHECKLIST = {
+    "Carne": "Carnes y pescados",
+    "Pescado": "Carnes y pescados",
+    "Proteína": "Carnes y pescados",
+    "Verdura": "Verduras y legumbres",
+    "Legumbre": "Verduras y legumbres",
+    "Fruta": "Frutas",
+    "Lácteo": "Lácteos y huevos",
+    "Cereal": "Abarrotes",
+    "Fruto seco": "Abarrotes",
+    "Procesado": "Abarrotes",
+}
+
+# Se excluyen las categorías que no son ingredientes de una preparación
+# (bebidas, postres, condimentos) y, dentro de "Procesado", lo que se come tal
+# cual: ofrecerle papas fritas o pizza como ingrediente al generador de recetas
+# solo lo empuja a armar platos que no tienen sentido.
+NO_SON_INGREDIENTES = {
+    "papas_fritas", "pizza", "galleta", "chocolate", "mermelada",
+    "empanada_pino", "empanada_queso", "completo", "churrasco",
+    "marraqueta", "hallulla", "sopaipilla",
+}
+
+
+def ingredientes_extra(foods, recetas_ids, ya_mapeados):
+    """Alimentos con dato auditado que el paciente puede marcar aunque ninguna
+    receta fija los use. Existen para la receta generada con IA."""
+    extra = {}
+    for f in foods:
+        if f["id"] in recetas_ids or f["id"] in ya_mapeados:
+            continue
+        if f["id"] in NO_SON_INGREDIENTES:
+            continue
+        categoria = CATEGORIA_A_CHECKLIST.get(f["categoria"])
+        if not categoria:
+            continue
+        extra[f["id"]] = (f["nombre"], categoria, f["id"])
+    return extra
+
+CATEGORIA_ORDEN = ["Carnes y pescados", "Verduras y legumbres", "Frutas", "Lácteos y huevos", "Abarrotes", "Otros"]
 
 
 def main():
@@ -96,6 +148,12 @@ def main():
             "ingredientes": claves_canonicas,
             "armable": id_ not in NO_ARMABLES,
         })
+
+    foods = json.loads((public_dir / "nutrientes.json").read_text())
+    ya_mapeados = {n for (_n, _c, n) in ingredientes_vistos.values() if n}
+    ingredientes_vistos.update(
+        ingredientes_extra(foods, set(RECETAS), ya_mapeados)
+    )
 
     ingredientes_out = [
         {"id": id_, "nombre": nombre, "categoria": categoria, "nutrientes_id": nutrientes_id}
