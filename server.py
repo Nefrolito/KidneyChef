@@ -462,6 +462,13 @@ def call_claude_leer_receta(imagen=None, texto=None):
     }
 
 
+# Tamaño de un plato principal para una persona. Sin decírselo, el modelo
+# armaba platos de 80-100 g que "cumplían" el presupuesto por ser diminutos —
+# y un plato diminuto siempre da semáforo verde, porque el semáforo mide la
+# porción. La app ya usa 300 g como porción de referencia de una receta
+# (PORCION_REFERENCIA_RECETA_G en public/app.js).
+PORCION_OBJETIVO_G = (300, 400)
+
 NUTRIENTE_UNIDAD = {"potasio_mg": "mg", "fosforo_mg": "mg", "sodio_mg": "mg", "carbohidratos_g": "g"}
 NUTRIENTE_NOMBRE = {"potasio_mg": "potasio", "fosforo_mg": "fósforo", "sodio_mg": "sodio", "carbohidratos_g": "carbohidratos"}
 
@@ -621,12 +628,32 @@ ese nutriente por sí solo, y sugiere en el consejo ELIMINARLO por completo de l
 alternativa (no solo reducirlo) — sobre todo si ni bajándolo a la mitad alcanzaría a dejarlo \
 dentro del límite. Sé específico: nombra el ingrediente exacto que conviene sacar y por qué.
 - Si todo queda holgado, deja "consejo" como cadena vacía.
+- En el "consejo" NO escribas cifras ni porcentajes de nutrientes (nada de "usa el 98% de \
+tu potasio" ni "aporta 703 mg"). Los números que ve el paciente los calcula la app sumando \
+los valores auditados de su base de datos, y una cifra tuya que no coincida con el semáforo \
+que tiene al lado lo confunde y le hace desconfiar de los dos. Escribe la ACCIÓN concreta \
+("baja la papa a la mitad", "no le agregues sal", "cuece la papa en agua nueva y bótala"), \
+no la aritmética. Sí puedes nombrar gramos de un ingrediente, porque esos los propones tú.
+- Si aun cambiando la composición algún nutriente queda POR ENCIMA del presupuesto, dilo \
+derecho al principio del consejo ("esta receta se pasa de tu potasio del día") en vez de \
+describirla como si cupiera.
 - Los nombres de la lista son categorías amplias (ej. "Carne de res", "Pechuga de pollo") y \
 no distinguen el corte o la forma exacta del ingrediente (molida, en trozos, entera, etc.). \
 No asumas un corte específico que el nombre no aclara — evita preparaciones que solo \
 funcionan con un corte particular (ej. "bistec" o "filete" para carne de res genérica); \
 preferí preparaciones versátiles que funcionan con cualquier forma del ingrediente (guisos, \
 salteados, cazuelas, revueltos).
+- Tamaño del plato: arma una porción realista de una comida para una persona, del orden \
+de {PORCION_OBJETIVO_G[0]} a {PORCION_OBJETIVO_G[1]} g en total para un plato principal \
+(un guiso o una sopa puede ir algo por encima; un acompañamiento, por debajo).
+- Si con una porción realista te pasas del presupuesto de algún nutriente, NO achiques el \
+plato para que quepa: cambia la COMPOSICIÓN. Baja el ingrediente que más aporta ese \
+nutriente y compensa con los que aportan poco, hasta llegar a un plato de tamaño normal \
+que sí entre en el presupuesto. Un plato de 80 g que "cumple" no le sirve al paciente: se \
+queda con hambre, come otra cosa después, y el semáforo verde que vio no representó su \
+comida real.
+- Solo si de verdad no hay manera de llegar a una porción realista dentro del presupuesto, \
+arma la mayor porción que sí quepa y dilo explícitamente en el "consejo".
 - Pasos de preparación breves (máximo 5), en español, para una preparación casera simple."""
 
 
