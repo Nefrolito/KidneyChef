@@ -147,6 +147,7 @@ async function sincronizarSuscripcionRevenueCat() {
     perfil.suscripcion.nivel = nivel;
     guardarPerfil(perfil);
     renderSuscripcion();
+    renderPlan();
   } catch (e) {
     console.warn("No se pudo sincronizar el estado de suscripción de RevenueCat", e);
   }
@@ -773,10 +774,20 @@ function clasificar(nutriente, valorPorcion, densidad100g) {
   return { nivel, modo: "contenido" };
 }
 
+// El badge y "Acerca de" muestran el nivel de suscripción real (RevenueCat:
+// gold/platinum/diamond), no perfil.planId — ese es un campo aparte para el
+// toggle manual de Plan Clínico (umbrales personalizados, vínculo tratante),
+// sin relación con lo que el usuario efectivamente paga.
 function renderPlan() {
-  const plan = getPlanActual();
-  els.planBadge.textContent = plan.nombre;
-  els.aboutPlan.textContent = `Tu plan actual: ${plan.nombre} (${plan.precio}).`;
+  const { enTrial, bloqueado } = estadoSuscripcion();
+  const nivel = ensurePerfil().suscripcion.nivel;
+  const nombreNivel = nivel
+    ? NIVELES_INFO[nivel].nombre
+    : enTrial && !bloqueado
+      ? "Prueba gratis"
+      : "Sin suscripción";
+  els.planBadge.textContent = nombreNivel;
+  els.aboutPlan.textContent = `Tu plan actual: ${nombreNivel}.`;
 }
 
 function renderDatosClinicos() {
