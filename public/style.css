@@ -48,6 +48,15 @@
 
 * { box-sizing: border-box; }
 
+/* Cualquier regla con `display` le gana al `display: none` que el navegador
+   aplica a [hidden], así que ocultar algo desde JS con `el.hidden = true`
+   fallaba en silencio cada vez que el elemento tenía su propio display
+   (pasó con .plan-upsell-card, con la pestaña Tratante y con los botones).
+   Esta regla lo resuelve de una vez para todo el documento; las reglas
+   `.algo[hidden] { display: none }` que quedan más abajo son redundantes
+   pero inofensivas. */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -623,6 +632,77 @@ h1, h2, h3 {
 .alt-chip-removable { display: inline-flex; align-items: center; gap: 0.4rem; }
 .refrigerador-receta-lista { margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.88rem; }
 .refrigerador-receta-lista li { margin-bottom: 0.25rem; }
+
+/* --- Modo robot de cocina (nivel Diamond) --- */
+.robot-selector-wrap { margin-top: 0.85rem; }
+.robot-selector-wrap[hidden] { display: none; }
+.robot-selector-wrap label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.88rem;
+  margin-bottom: 0.35rem;
+}
+.robot-selector-wrap select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.92rem;
+}
+.robot-selector-wrap .clinical-note { margin-top: 0.4rem; }
+
+.robot-bloque {
+  margin-top: 0.9rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--brand);
+  border-radius: 12px;
+  background: var(--surface-alt);
+}
+.robot-bloque h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--brand-dark);
+}
+.robot-pasos { margin: 0; padding-left: 1.25rem; font-size: 0.88rem; }
+.robot-pasos li { margin-bottom: 0.55rem; }
+.robot-paso-texto { display: block; }
+/* Los ajustes van bajo el texto del paso y no dentro, para que se lean de un
+   vistazo mientras se cocina, sin buscar el número en medio de la frase. */
+.robot-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.3rem; }
+.robot-chip {
+  display: inline-block;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  background: var(--brand-50);
+  color: var(--brand-dark);
+  font-size: 0.76rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.robot-aviso {
+  margin: 0.7rem 0 0.6rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.robot-bloque .btn { width: 100%; }
+.robot-copia-manual p { margin: 0 0 0.4rem; font-size: 0.8rem; color: var(--muted); }
+.robot-copia-manual textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  resize: vertical;
+}
 .clinical-field input[type="number"],
 .clinical-field input[type="text"],
 .clinical-field input[type="date"] {

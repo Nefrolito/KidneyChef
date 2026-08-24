@@ -145,7 +145,7 @@ Son **3 niveles con precio fijo**, cada uno mensual o anual (constante
 |----------|---------|-------|---------|
 | Gold     | $5.990  | $49.990 | Semáforo Na/K/P/carbohidratos, "Tu día de hoy", historial |
 | Platinum | $7.990  | $69.990 | Todo Gold + recetas con IA desde el refrigerador + pestaña Súper |
-| Diamond  | $9.990  | $89.990 | Todo Platinum + Cookidoo (aún no construido) |
+| Diamond  | $9.990  | $89.990 | Todo Platinum + Modo robot de cocina |
 
 Los product IDs son `com.kidneychef.app.<nivel>` (mensual) y
 `com.kidneychef.app.<nivel>.annual` (anual). En RevenueCat cada producto
@@ -180,6 +180,54 @@ Lo que falta:
 Mientras una key esté vacía, `initRevenueCat()` no hace nada en esa
 plataforma y el botón del paywall solo muestra "disponible muy pronto" — la
 app sigue funcionando con el trial local.
+
+## Modo robot de cocina (nivel Diamond)
+
+Cuando el paciente declara qué robot de cocina tiene, la receta generada en la
+pestaña Refrigerador viene además con los pasos traducidos a esa máquina:
+velocidad, temperatura, tiempo, giro inverso y accesorio de vapor. Un botón
+copia la receta como texto para pegarla donde quiera.
+
+**Qué NO es:** no hay integración técnica con Cookidoo ni con la nube de
+ningún fabricante, y no conviene prometerla.
+
+- Cookidoo no publica ninguna API para terceros. Su función "Created Recipes"
+  solo importa *desde dentro* de Cookidoo o desde la Comunidad de Recetas de
+  Vorwerk: no acepta una URL, ni un archivo, ni texto pegado desde fuera.
+- Lo único programático que existe es una librería de ingeniería inversa (la
+  que usa Home Assistant) que **pide el correo y la contraseña de Cookidoo del
+  usuario**. Eso viola los términos de Vorwerk, se rompe cuando ellos cambian
+  un endpoint, y pedirle a un paciente la contraseña de un tercero es motivo
+  de rechazo en la App Store. No se usa.
+
+**Cómo funciona:**
+
+- `public/robots-cocina.json` — catálogo de máquinas con lo que cada una puede
+  hacer (rango de velocidades, rango de temperatura, velocidad máxima cuando
+  hay calor, accesorio de vapor, capacidad, reglas del fabricante). Cada
+  entrada lleva su bloque `fuente` con el documento consultado, y un
+  `_PENDIENTE_VALIDAR` donde la cifra viene de una ficha comercial en vez del
+  manual. Mismo criterio que `datos/README.md` con los datos USDA.
+- `server.py` — `_bloque_robot()` inyecta esos límites y las reglas de
+  seguridad alimentaria en el prompt de la receta, y `_sanear_pasos_robot()`
+  **recorta la respuesta del modelo contra el catálogo** antes de devolverla.
+  Si la IA escribe "180 °C, velocidad 8", el paciente recibe lo que su máquina
+  sí puede hacer. Mismo criterio que con los nutrientes: la IA propone, el
+  dato auditado manda.
+- `public/app.js` — `renderRobotSelector()`, `pasosRobotHtml()`,
+  `recetaRobotComoTexto()`, `copiarRecetaRobot()`. El selector aparece solo
+  con nivel Diamond (o durante el mes de prueba). `perfil.robotCocina` guarda
+  la máquina elegida.
+
+**Criterio de seguridad deliberado:** el catálogo no expone modos sobre 120 °C
+aunque la máquina llegue más arriba (el MyCook llega a 140, el Monsieur
+Cuisine a 130), y el prompt prohíbe cocción a baja temperatura, sous vide y
+carnes jugosas. Un paciente renal con una infección alimentaria la pasa peor
+que la población general, y varias de esas máquinas reservan sus modos de alta
+temperatura a las recetas guiadas del propio fabricante.
+
+**Para agregar un robot nuevo:** basta agregar una entrada a
+`public/robots-cocina.json` con su `fuente`. No hay que tocar código.
 
 ## Documentos legales
 

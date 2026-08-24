@@ -77,9 +77,15 @@ const NIVELES_INFO = {
     nombre: "Diamond",
     precioMensualClp: 9990,
     precioAnualClp: 89990,
+    // Antes decía "Integración con Cookidoo (próximamente)". Se cambió por lo
+    // que la app hace de verdad: Cookidoo no tiene API pública ni permite
+    // importar recetas desde fuera, así que una "integración" era una promesa
+    // que no se podía cumplir — y vender un nivel por una función futura es
+    // motivo de rechazo en la App Store.
     features: [
       "Todo lo de Platinum",
-      "Integración con Cookidoo (próximamente)",
+      "Modo robot de cocina: cada receta con la velocidad, temperatura y tiempo de tu máquina",
+      "Compatible con Thermomix, Cecotec Mambo, MyCook, Monsieur Cuisine y otros",
     ],
   },
 };
@@ -152,6 +158,9 @@ async function sincronizarSuscripcionRevenueCat() {
     guardarPerfil(perfil);
     renderSuscripcion();
     renderPlan();
+    // El modo robot es de Diamond: si el nivel acaba de cambiar, el selector
+    // tiene que aparecer (o desaparecer) sin que el paciente reinicie la app.
+    renderRobotSelector();
   } catch (e) {
     console.warn("No se pudo sincronizar el estado de suscripción de RevenueCat", e);
   }
@@ -289,6 +298,7 @@ function ensurePerfil() {
   if (perfil.confirmacionClinica === undefined) {
     perfil.confirmacionClinica = { confirmado: false, confirmadoEn: null };
   }
+  if (perfil.robotCocina === undefined) perfil.robotCocina = null;
   return perfil;
 }
 
@@ -1257,6 +1267,9 @@ const els = {
   refrigeradorIdentificados: document.getElementById("refrigerador-identificados"),
   refrigeradorGenerarBtn: document.getElementById("refrigerador-generar-btn"),
   refrigeradorRecetaIa: document.getElementById("refrigerador-receta-ia"),
+  robotSelectorWrap: document.getElementById("robot-selector-wrap"),
+  robotSelector: document.getElementById("robot-selector"),
+  robotSelectorNota: document.getElementById("robot-selector-nota"),
   refrigeradorLimpiarBtn: document.getElementById("refrigerador-limpiar-btn"),
   recetasGuardadasWrap: document.getElementById("recetas-guardadas-wrap"),
   recetasGuardadasList: document.getElementById("recetas-guardadas-list"),
@@ -1294,6 +1307,13 @@ async function init() {
   } catch (e) {
     console.warn("No se pudo cargar precios-referencia.json", e);
   }
+  // Si el catálogo de robots no carga, el modo robot simplemente no aparece y
+  // la receta se genera igual con los pasos normales.
+  try {
+    ROBOTS = await fetch("robots-cocina.json").then((r) => r.json()).then((d) => d.robots || []);
+  } catch (e) {
+    console.warn("No se pudo cargar robots-cocina.json, el modo robot queda oculto", e);
+  }
   // Ambos catálogos deben estar cargados antes de renderizar cualquiera de
   // los dos checklists: "Más comprados" del refrigerador agrega frecuencia
   // de cortes de PRECIOS_REFERENCIA a nivel de INGREDIENTES_REFRIGERADOR.
@@ -1320,6 +1340,8 @@ async function init() {
   els.tabTratanteBtn.hidden = !MOSTRAR_TAB_TRATANTE;
   initTabs();
   renderRecetasGuardadas();
+  renderRobotSelector();
+  els.robotSelector.addEventListener("change", guardarRobotCocina);
   renderVinculacion();
   refrescarVinculos();
   refrescarMetasSincronizadas();
@@ -1686,6 +1708,13 @@ function badge(nutriente, valorPorcion, densidad100g) {
 }
 
 // --- Recetas con lo que tienes en el refrigerador ---
+// Catálogo de robots de cocina del "Modo robot" (public/robots-cocina.json).
+// Ojo con la expectativa que genera el nombre: KidneyChef NO se conecta con
+// Cookidoo ni con la nube de ningún fabricante — no existe una API pública
+// para eso, y la única vía no oficial exige la contraseña de Cookidoo del
+// paciente. Lo que sí hace es escribir los pasos en el lenguaje de su máquina.
+let ROBOTS = [];
+
 let RECETAS_DATA = [];
 let INGREDIENTES_REFRIGERADOR = [];
 let PRECIOS_REFERENCIA = [];
@@ -2468,6 +2497,167 @@ function situacionClinicaParaIA() {
   return { declarada: true, etiqueta: cfg.etiqueta, consideracion: cfg.consideracion };
 }
 
+// --- Modo robot de cocina (nivel Diamond) ------------------------------
+// Qué es y qué NO es: no hay integración técnica con Cookidoo ni con la nube
+// de ningún fabricante. Cookidoo no publica API y su única vía de importación
+// es manual, desde dentro de la propia Cookidoo; la única librería que existe
+// es de ingeniería inversa y pide la contraseña del paciente. Lo que hace esta
+// función es lo que sí se puede hacer bien: escribir los pasos de la receta
+// con la velocidad, temperatura, tiempo y accesorios que la máquina declarada
+// puede ejecutar de verdad (límites reales en robots-cocina.json, con la
+// fuente de cada cifra), y dejarlos listos para copiar.
+//
+// Los ajustes los propone la IA pero los recorta el backend contra el
+// catálogo (_sanear_pasos_robot en server.py) — el mismo criterio que con los
+// nutrientes: la IA propone, el dato auditado manda.
+
+function robotSeleccionado() {
+  const perfil = ensurePerfil();
+  if (!perfil.robotCocina) return null;
+  return ROBOTS.find((r) => r.id === perfil.robotCocina) || null;
+}
+
+function renderRobotSelector() {
+  if (!els.robotSelectorWrap) return;
+  // Durante el mes de prueba nivelSuficiente() ya devuelve true, así que el
+  // paciente puede probar el modo robot antes de decidir si paga Diamond.
+  const disponible = ROBOTS.length > 0 && nivelSuficiente("diamond");
+  els.robotSelectorWrap.hidden = !disponible;
+  if (!disponible) return;
+
+  const perfil = ensurePerfil();
+  els.robotSelector.innerHTML = ['<option value="">Sin robot — pasos normales</option>']
+    .concat(
+      ROBOTS.map(
+        (r) => `<option value="${escapeHtml(r.id)}">${escapeHtml(r.nombre)}</option>`
+      )
+    )
+    .join("");
+  els.robotSelector.value = perfil.robotCocina || "";
+  renderRobotNota();
+}
+
+function renderRobotNota() {
+  if (!els.robotSelectorNota) return;
+  const robot = robotSeleccionado();
+  els.robotSelectorNota.textContent = robot
+    ? `Tu receta va a traer además los pasos con velocidad, temperatura y tiempo para tu ${robot.nombre}, listos para copiar. KidneyChef no se conecta con tu máquina ni con Cookidoo.`
+    : "Elige tu máquina y la receta generada va a traer además los pasos con velocidad, temperatura y tiempo para ella.";
+}
+
+function guardarRobotCocina() {
+  const perfil = ensurePerfil();
+  perfil.robotCocina = els.robotSelector.value || null;
+  guardarPerfil(perfil);
+  renderRobotNota();
+}
+
+// Los ajustes de un paso como etiquetas cortas ("8 min", "100 °C", "vel. 2").
+// Una velocidad puede ser un número o un modo con nombre propio de la marca
+// ("Varoma", "turbo"), así que solo se le antepone "vel." a los numéricos.
+function ajustesPasoRobot(paso) {
+  const chips = [];
+  if (paso.minutos != null) chips.push(`${paso.minutos} min`);
+  if (paso.temperatura_c != null) chips.push(`${paso.temperatura_c} °C`);
+  if (paso.velocidad) {
+    chips.push(/^[\d,]+$/.test(paso.velocidad) ? `vel. ${paso.velocidad}` : paso.velocidad);
+  }
+  if (paso.inverso) chips.push("giro inverso");
+  return chips;
+}
+
+function pasosRobotHtml(receta) {
+  const pasos = receta.pasos_robot || [];
+  if (!receta.robot || pasos.length === 0) return "";
+
+  const items = pasos
+    .map((paso) => {
+      const chips = ajustesPasoRobot(paso)
+        .map((c) => `<span class="robot-chip">${escapeHtml(c)}</span>`)
+        .join("");
+      return `<li><span class="robot-paso-texto">${escapeHtml(paso.texto)}</span>${
+        chips ? `<span class="robot-chips">${chips}</span>` : ""
+      }</li>`;
+    })
+    .join("");
+
+  return `
+    <div class="robot-bloque">
+      <h4>En tu ${escapeHtml(receta.robot.nombre)}</h4>
+      <ol class="robot-pasos">${items}</ol>
+      <p class="robot-aviso">
+        Tiempos y temperaturas de referencia: revisa el punto de cocción antes de servir.
+        La carne, el pollo, el cerdo, el pescado y el huevo deben quedar bien cocidos.
+      </p>
+      <button id="robot-copiar-btn" class="btn btn-secondary">Copiar receta</button>
+    </div>`;
+}
+
+// Texto plano para pegar donde el paciente quiera: "Created Recipes" de
+// Cookidoo, la app de su robot, o un mensaje a alguien. Es la única forma de
+// llevar la receta a Cookidoo, porque no acepta importar desde fuera.
+function recetaRobotComoTexto(receta) {
+  const lineas = [receta.nombre, ""];
+  lineas.push("Ingredientes:");
+  (receta.ingredientes || []).forEach((i) => lineas.push(`- ${i.nombre}: ${i.gramos} g`));
+  lineas.push("");
+  if (receta.robot && (receta.pasos_robot || []).length) {
+    lineas.push(`Preparación en ${receta.robot.nombre}:`);
+    receta.pasos_robot.forEach((paso, i) => {
+      const ajustes = ajustesPasoRobot(paso);
+      lineas.push(`${i + 1}. ${paso.texto}${ajustes.length ? ` — ${ajustes.join(" / ")}` : ""}`);
+    });
+  } else {
+    lineas.push("Preparación:");
+    (receta.pasos || []).forEach((paso, i) => lineas.push(`${i + 1}. ${paso}`));
+  }
+  lineas.push("");
+  lineas.push(`Porción total: ${receta.total_gramos} g`);
+  lineas.push(
+    "Receta generada por KidneyChef para una dieta renal. Los tiempos y temperaturas son de referencia: verifica el punto de cocción."
+  );
+  return lineas.join("\n");
+}
+
+async function copiarRecetaRobot() {
+  if (!recetaActualIA) return;
+  const texto = recetaRobotComoTexto(recetaActualIA);
+  const btn = document.getElementById("robot-copiar-btn");
+  try {
+    await navigator.clipboard.writeText(texto);
+    if (btn) {
+      btn.textContent = "¡Copiada!";
+      setTimeout(() => (btn.textContent = "Copiar receta"), 2000);
+    }
+  } catch {
+    // El portapapeles puede estar bloqueado (permisos del sistema, WebView sin
+    // gesto reconocido). Copiar es la ÚNICA forma de llevar la receta a
+    // Cookidoo —no acepta importar desde fuera—, así que no basta con avisar
+    // que falló: se muestra el texto listo para seleccionar y copiar a mano.
+    mostrarRecetaParaCopiarAMano(texto, btn);
+  }
+}
+
+function mostrarRecetaParaCopiarAMano(texto, btn) {
+  const bloque = document.querySelector(".robot-bloque");
+  if (!bloque || bloque.querySelector(".robot-copia-manual")) return;
+  if (btn) btn.hidden = true;
+
+  const wrap = document.createElement("div");
+  wrap.className = "robot-copia-manual";
+  wrap.innerHTML =
+    '<p>No se pudo usar el portapapeles. Mantén presionado el texto para copiarlo:</p>';
+  const area = document.createElement("textarea");
+  area.readOnly = true;
+  area.rows = 10;
+  area.value = texto;
+  wrap.appendChild(area);
+  bloque.appendChild(wrap);
+  area.focus();
+  area.select();
+}
+
+
 async function generarRecetaIA() {
   const ingredientes = candidatosParaIA();
   if (ingredientes.length === 0) {
@@ -2496,6 +2686,7 @@ async function generarRecetaIA() {
         densidad_maxima: densidadMaximaSinMeta(),
         situacion_clinica: situacionClinicaParaIA(),
         riesgo_hiperkalemia: riesgoHiperkalemia(),
+        robot: robotSeleccionado() ? robotSeleccionado().id : null,
       }),
     });
     const data = await res.json();
@@ -2546,9 +2737,12 @@ function renderRecetaIA(receta) {
       ${notaSinMeta()}
       ${consejoHtml}
       <ol class="refrigerador-receta-lista">${pasos}</ol>
+      ${pasosRobotHtml(receta)}
       <button id="receta-ia-guardar-btn" class="btn btn-secondary btn-guardar-receta">Guardar receta</button>
     </div>`;
   document.getElementById("receta-ia-guardar-btn").addEventListener("click", guardarRecetaIA);
+  const copiarBtn = document.getElementById("robot-copiar-btn");
+  if (copiarBtn) copiarBtn.addEventListener("click", copiarRecetaRobot);
 }
 
 // --- Recetas guardadas por el paciente (localStorage, solo en este dispositivo) ---

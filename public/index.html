@@ -124,6 +124,16 @@
         <div id="refrigerador-checklist"></div>
       </details>
 
+      <!-- Modo robot de cocina (nivel Diamond): la app no se conecta a Cookidoo
+           ni a ninguna nube del fabricante — no existe una API pública para
+           eso—, sino que escribe los pasos con la velocidad, temperatura y
+           accesorios que la máquina declarada sí puede ejecutar. -->
+      <div id="robot-selector-wrap" class="robot-selector-wrap" hidden>
+        <label for="robot-selector">Tu robot de cocina</label>
+        <select id="robot-selector"></select>
+        <p class="clinical-note" id="robot-selector-nota"></p>
+      </div>
+
       <div class="refrigerador-acciones">
         <button id="refrigerador-buscar-btn" class="btn btn-secondary">Buscar entre recetas conocidas</button>
         <button id="refrigerador-generar-btn" class="btn btn-primary">Generar receta a mi medida</button>

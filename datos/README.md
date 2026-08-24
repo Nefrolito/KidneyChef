@@ -45,6 +45,16 @@
   específico de la cocina chilena) usa el grano de trigo crudo de USDA porque
   no existe una cifra chilena medida ni un equivalente USDA de "mote" cocido.
 
+## Robots de cocina
+
+`public/robots-cocina.json` sigue el mismo criterio que este archivo: ninguna
+cifra se escribe de memoria. Los rangos del Thermomix TM5 y TM6 salen de los
+manuales de instrucciones oficiales de Vorwerk (PDF en vorwerk.com); los del
+Cecotec Mambo, Taurus MyCook y Monsieur Cuisine, de la ficha o el manual del
+fabricante. Donde solo hubo ficha comercial y no manual, la entrada queda
+marcada con `_PENDIENTE_VALIDAR`, igual que el contenido clínico sin validar.
+Ver la sección "Modo robot de cocina" del README principal.
+
 ## Criterios aplicados
 
 - Las preparaciones hervidas usan el valor USDA del alimento **ya cocido**, no del

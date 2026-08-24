@@ -1,0 +1,209 @@
+{
+  "_descripcion": "Catálogo de robots de cocina soportados por el \"Modo robot\" de KidneyChef. Cada entrada describe SOLO lo que hace falta para escribir pasos que la máquina pueda ejecutar de verdad: qué velocidades tiene, hasta qué temperatura llega en cocina manual, qué pasa al combinar calor con velocidad alta, y cómo se llama el accesorio de vapor en esa marca.",
+  "_procedencia": "Igual que nutrientes.json, este archivo no se escribe de memoria. Cada robot lleva su bloque \"fuente\" con el documento consultado. Donde la cifra viene del manual oficial del fabricante está marcada como tal; donde solo hay ficha comercial o prensa especializada queda un \"_PENDIENTE_VALIDAR\" hasta poder leer el manual. Ver datos/README.md.",
+  "_consultado": "2026-08-24",
+  "_campos": "temperatura.max_c es el techo que puede usar un paso generado; temperatura.max_c_maquina, cuando existe, es lo que la máquina alcanza de verdad según su fabricante y siempre es mayor. velocidad.max_con_calor es la velocidad más alta permitida en un paso que lleva temperatura.",
+  "_criterio_seguridad": "El catálogo es deliberadamente conservador: no expone modos de alta temperatura (>120 °C) aunque la máquina los tenga, porque en varias de ellas esos modos están reservados a recetas de cocina guiada del fabricante y no a la cocina manual, que es lo que esta app genera. Un paso que la máquina no puede ejecutar es peor que un paso simple.",
+
+  "robots": [
+    {
+      "id": "thermomix_tm6",
+      "nombre": "Thermomix TM6",
+      "fabricante": "Vorwerk",
+      "velocidad": {
+        "min": 1,
+        "max": 10,
+        "max_con_calor": 6,
+        "suave": "velocidad cuchara (0,5)",
+        "turbo": true,
+        "inverso": true,
+        "nombre_inverso": "giro inverso"
+      },
+      "temperatura": { "min_c": 37, "max_c": 120 },
+      "vapor": { "accesorio": "Varoma", "max_c": 120, "agua_minima_l": 0.5 },
+      "capacidad_vaso_l": 2.2,
+      "accesorios": ["cubilete", "cestillo", "mariposa", "Varoma", "espátula"],
+      "reglas": [
+        "El calentamiento se desconecta a velocidades superiores a la 6: si el paso lleva temperatura, la velocidad no puede pasar de 6.",
+        "No usar el modo Turbo con alimentos o líquidos a más de 60 °C.",
+        "Con temperatura Varoma, usar solo velocidades bajas (hasta 6).",
+        "Para cocinar al vapor en el Varoma, poner al menos 0,5 L de agua en el vaso para 30 minutos de cocción."
+      ],
+      "fuente": {
+        "documento": "Thermomix® TM6 — Manual de instrucciones (Vorwerk, es-ES)",
+        "url": "https://www.vorwerk.com/language-master/es/download/service/manual/thermomix/TM6_digital_manual_MES-es-ES_prefill_20190121.pdf",
+        "notas": "Escala de velocidades y advertencias de Turbo/Varoma tomadas del capítulo de manejo; capacidad máxima del vaso (2,2 L) de \"Características técnicas\"."
+      },
+      "_PENDIENTE_VALIDAR": "El manual digital del TM6 no imprime la escala de temperaturas seleccionables; se usa el rango 37–120 °C que sí publica el manual del TM5, que comparte vaso y sistema de calentamiento. El modo Alta Temperatura (por encima de 120 °C) se deja fuera a propósito: Vorwerk lo restringe a recetas de cocina guiada y esta app genera cocina manual."
+    },
+    {
+      "id": "thermomix_tm7",
+      "nombre": "Thermomix TM7",
+      "fabricante": "Vorwerk",
+      "velocidad": {
+        "min": 1,
+        "max": 10,
+        "max_con_calor": 6,
+        "suave": "velocidad cuchara (0,5)",
+        "turbo": true,
+        "inverso": true,
+        "nombre_inverso": "giro inverso"
+      },
+      "temperatura": { "min_c": 37, "max_c": 120 },
+      "vapor": { "accesorio": "Varoma", "max_c": 120, "agua_minima_l": 0.5 },
+      "capacidad_vaso_l": 2.2,
+      "accesorios": ["cubilete", "cestillo", "mariposa", "Varoma", "espátula"],
+      "reglas": [
+        "El calentamiento se desconecta a velocidades superiores a la 6: si el paso lleva temperatura, la velocidad no puede pasar de 6.",
+        "No usar el modo Turbo con alimentos o líquidos a más de 60 °C.",
+        "Con temperatura Varoma, usar solo velocidades bajas (hasta 6)."
+      ],
+      "fuente": {
+        "documento": "Ficha de producto Thermomix® TM7 (Vorwerk) y distribuidor oficial en Chile",
+        "url": "https://www.thermomix.cl/producto/thermomix-tm7/",
+        "notas": "Modelo lanzado en 2025. Se asumen los mismos límites de manejo que el TM6 (misma familia, mismo vaso de 2,2 L y misma escala 1–10 + Turbo)."
+      },
+      "_PENDIENTE_VALIDAR": "No se pudo leer el manual de instrucciones oficial del TM7 (no está publicado en el mismo repositorio de manuales que TM5/TM6). Los rangos se heredaron del TM6. Revisar contra el manual del TM7 cuando esté disponible, sobre todo el corte de calentamiento por velocidad."
+    },
+    {
+      "id": "thermomix_tm5",
+      "nombre": "Thermomix TM5",
+      "fabricante": "Vorwerk",
+      "velocidad": {
+        "min": 1,
+        "max": 10,
+        "max_con_calor": 6,
+        "suave": "velocidades 1–3 (remover); las velocidades 2 y 3 calientan de forma más gradual",
+        "turbo": true,
+        "inverso": true,
+        "nombre_inverso": "giro inverso"
+      },
+      "temperatura": { "min_c": 37, "max_c": 120 },
+      "vapor": { "accesorio": "Varoma", "max_c": 120, "agua_minima_l": 0.5 },
+      "capacidad_vaso_l": 2.2,
+      "accesorios": ["cubilete", "cestillo", "mariposa", "Varoma", "espátula"],
+      "reglas": [
+        "Con temperatura Varoma, usar únicamente velocidades bajas (hasta 6).",
+        "No usar la función Turbo ni subir de golpe la velocidad con alimentos a más de 60 °C.",
+        "Con la mariposa puesta, no pasar de velocidad 4.",
+        "La función de calentar solo funciona si se programa un tiempo."
+      ],
+      "fuente": {
+        "documento": "Thermomix® TM5 — Manual de instrucciones ID: 20700-4914 ES V2 (Vorwerk)",
+        "url": "https://www.vorwerk.com/language-master/es/download/service/manual/thermomix/20700_SN_GA_TM5_ES_V2.pdf",
+        "notas": "Cifras textuales del manual: \"Puede ajustarse una temperatura de entre 37 °C y 120 °C\"; con temperatura Varoma \"se pueden alcanzar temperaturas de hasta 120 °C\"; velocidades Remover 1–3 y Mezclar/trocear/triturar 4–10; \"Capacidad máxima: 2,2 litros\"; \"No seleccione una velocidad superior a 4 cuando tenga colocada la mariposa\"."
+      }
+    },
+    {
+      "id": "cecotec_mambo",
+      "nombre": "Cecotec Mambo",
+      "fabricante": "Cecotec",
+      "velocidad": {
+        "min": 1,
+        "max": 10,
+        "max_con_calor": 6,
+        "suave": "velocidades 1–5 (bajas)",
+        "turbo": true,
+        "inverso": null,
+        "nombre_inverso": null
+      },
+      "temperatura": { "min_c": 37, "max_c": 120 },
+      "vapor": { "accesorio": "vaporera", "max_c": 120, "agua_minima_l": 0.5 },
+      "capacidad_vaso_l": 3.3,
+      "accesorios": ["vaso dosificador", "cestillo", "vaporera", "espátula"],
+      "reglas": [
+        "Colocar bien el vaso dosificador al usar velocidades sobre 6 o temperaturas sobre 60 °C, para evitar salpicaduras.",
+        "Si el paso lleva temperatura, mantener la velocidad baja."
+      ],
+      "fuente": {
+        "documento": "Manual de usuario Cecotec Mambo (serie 9590)",
+        "url": "https://www.manualpdf.es/cecotec/mambo-9590/manual",
+        "notas": "Rango de temperatura 37–120 °C, temporizador hasta 720 min y jarra de 3,3 L de la ficha técnica del manual; escala de velocidades 1–10 (bajas 1–5, altas 6–10) del cuerpo del manual."
+      },
+      "_PENDIENTE_VALIDAR": "La familia Mambo tiene muchos modelos (7090, 9590, 10070, 11090, 12090…) con potencias y accesorios distintos; acá se usan los valores del 9590 como representativos. Falta confirmar si todos los modelos vigentes comparten el rango 37–120 °C, si tienen giro inverso (queda en null, la app no lo va a usar), y a qué velocidad se corta el calentamiento — mientras tanto se aplica el límite conservador de 6."
+    },
+    {
+      "id": "mycook_touch",
+      "nombre": "Taurus MyCook Touch",
+      "fabricante": "Taurus",
+      "velocidad": {
+        "min": 1,
+        "max": 10,
+        "max_con_calor": 6,
+        "suave": "velocidades 1–3",
+        "turbo": true,
+        "inverso": null,
+        "nombre_inverso": null
+      },
+      "temperatura": { "min_c": 40, "max_c": 120, "max_c_maquina": 140 },
+      "vapor": { "accesorio": "vaporera", "max_c": 120, "agua_minima_l": 0.5 },
+      "capacidad_vaso_l": 2.0,
+      "accesorios": ["vaso dosificador", "cestillo colador", "vaporera", "paleta removedora", "espátula"],
+      "reglas": [
+        "Calienta por inducción: sube de temperatura más rápido que un robot de resistencia, así que conviene revisar antes el punto de cocción.",
+        "Si el paso lleva temperatura, mantener la velocidad baja."
+      ],
+      "fuente": {
+        "documento": "Ficha oficial Mycook Touch (Taurus) y manual de usuario Mycook Touch",
+        "url": "https://mycook.es/downloads/help/manual-mycook-touch.pdf",
+        "notas": "Temperatura regulable de 40 a 140 °C, 10 velocidades más las funciones Sofrito, Amasar y Turbo, jarra de 2 litros y accesorios (vaporera, cestillo colador, paleta removedora, espátula) de la ficha oficial del fabricante."
+      },
+      "_PENDIENTE_VALIDAR": "Las cifras vienen de la ficha comercial del fabricante, no de una lectura directa del manual. Aunque la máquina llega a 140 °C, el catálogo la limita a 120 °C para los pasos generados, por el criterio de seguridad de arriba."
+    },
+    {
+      "id": "monsieur_cuisine",
+      "nombre": "Monsieur Cuisine Smart",
+      "fabricante": "Lidl / Monsieur Cuisine",
+      "velocidad": {
+        "min": 1,
+        "max": 10,
+        "max_con_calor": 6,
+        "suave": "velocidades 1–3",
+        "turbo": true,
+        "inverso": true,
+        "nombre_inverso": "marcha atrás"
+      },
+      "temperatura": { "min_c": 37, "max_c": 120, "max_c_maquina": 130 },
+      "vapor": { "accesorio": "recipiente de vapor", "max_c": 120, "agua_minima_l": 0.5 },
+      "capacidad_vaso_l": 3.0,
+      "accesorios": ["vaso dosificador", "cestillo", "recipiente de vapor", "mariposa", "espátula"],
+      "reglas": [
+        "El temporizador llega hasta 99 minutos por paso.",
+        "Si el paso lleva temperatura, mantener la velocidad baja."
+      ],
+      "fuente": {
+        "documento": "Ficha oficial Monsieur Cuisine Smart (monsieur-cuisine.com / Lidl)",
+        "url": "https://www.monsieur-cuisine.com/en/monsieur-cuisine-smart",
+        "notas": "Jarra de 3 L, ajuste de temperatura 37–130 °C, temporizador de 99 minutos, función turbo y marcha adelante/atrás, según la ficha del fabricante y la comparativa oficial de Lidl."
+      },
+      "_PENDIENTE_VALIDAR": "La máquina admite hasta 130 °C, pero el catálogo la limita a 120 °C para los pasos generados (criterio de seguridad). Falta leer el manual oficial para confirmar a qué velocidad se corta el calentamiento; mientras tanto se aplica el límite conservador de 6. Nota de mercado: Lidl no opera en Chile, así que este robot llega solo por importación."
+    },
+    {
+      "id": "generico",
+      "nombre": "Otro robot de cocina",
+      "fabricante": null,
+      "velocidad": {
+        "min": 1,
+        "max": 10,
+        "max_con_calor": 4,
+        "suave": "velocidades bajas",
+        "turbo": false,
+        "inverso": null,
+        "nombre_inverso": null
+      },
+      "temperatura": { "min_c": 40, "max_c": 100 },
+      "vapor": { "accesorio": "accesorio de vapor", "max_c": 100, "agua_minima_l": 0.5 },
+      "capacidad_vaso_l": 2.0,
+      "accesorios": ["cestillo", "accesorio de vapor", "espátula"],
+      "reglas": [
+        "Como no se conoce el modelo, los pasos se escriben con el mínimo común: velocidades bajas cuando hay calor, y nada por encima de 100 °C.",
+        "Si tu robot no llega a alguna temperatura o velocidad indicada, usa la más cercana que sí tenga y alarga un poco el tiempo."
+      ],
+      "fuente": {
+        "documento": "Perfil conservador definido por KidneyChef, no corresponde a una máquina específica",
+        "url": null,
+        "notas": "Existe para que un paciente con una máquina fuera del catálogo igual pueda usar la función, con instrucciones que casi cualquier robot con calor puede ejecutar."
+      }
+    }
+  ]
+}

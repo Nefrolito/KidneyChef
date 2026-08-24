@@ -85,6 +85,14 @@ NUTRIENTES_RECETA = ["potasio_mg", "fosforo_mg", "sodio_mg", "carbohidratos_g"]
 # ingredientes sueltos la empujaba a adivinar un plato preparado en vez de
 # listar cada ingrediente individual.
 _RECETAS_IDS = {r["id"] for r in json.loads((PUBLIC_DIR / "recetas.json").read_text())}
+
+# Catálogo de robots de cocina para el "Modo robot" (ver public/robots-cocina.json,
+# con la procedencia de cada cifra). El backend lo usa para acotar los pasos que
+# escribe la IA a lo que la máquina del paciente puede ejecutar de verdad.
+ROBOTS_COCINA = {
+    r["id"]: r
+    for r in json.loads((PUBLIC_DIR / "robots-cocina.json").read_text())["robots"]
+}
 INGREDIENTES_CRUDOS_LIST = ", ".join(f["nombre"] for f in KNOWN_FOODS if f["id"] not in _RECETAS_IDS)
 
 PROMPT = f"""Eres un asistente que identifica alimentos en fotografías para una app de \
@@ -300,7 +308,57 @@ NUTRIENTE_UNIDAD = {"potasio_mg": "mg", "fosforo_mg": "mg", "sodio_mg": "mg", "c
 NUTRIENTE_NOMBRE = {"potasio_mg": "potasio", "fosforo_mg": "fósforo", "sodio_mg": "sodio", "carbohidratos_g": "carbohidratos"}
 
 
-def _build_prompt_receta(foods, presupuesto, densidad_maxima=None, situacion_clinica=None, riesgo_hiperkalemia=False):
+def _bloque_robot(robot):
+    """Instrucciones para que la IA escriba los pasos en el lenguaje de la
+    máquina del paciente. Lo que puede o no puede hacer cada robot sale de
+    public/robots-cocina.json, no de lo que el modelo recuerde de la marca."""
+    if not robot:
+        return "", ""
+
+    vel = robot["velocidad"]
+    temp = robot["temperatura"]
+    vapor = robot.get("vapor") or {}
+    reglas = "\n".join(f"- {r}" for r in robot.get("reglas", []))
+    inverso = (
+        f'- Tiene {vel["nombre_inverso"]}: úsalo cuando haya que remover sin triturar '
+        "(guisos, carnes en trozos, verduras cocidas).\n"
+        if vel.get("inverso") else
+        "- No des por hecho que tiene giro inverso: si un paso necesita remover sin triturar, "
+        "indica velocidad muy baja y tiempo corto.\n"
+    )
+
+    bloque = f"""
+
+El paciente cocina en un {robot["nombre"]}. Además de los pasos normales, escribe los mismos \
+pasos traducidos a esa máquina, respetando EXACTAMENTE estos límites:
+- Velocidades: de {vel["min"]} a {vel["max"]}. Para remover suave, {vel["suave"]}.
+- Temperatura: de {temp["min_c"]} °C a {temp["max_c"]} °C. Nunca indiques una temperatura \
+mayor a {temp["max_c"]} °C, aunque la máquina llegue más arriba.
+- En cualquier paso que lleve temperatura, la velocidad NO puede pasar de \
+{vel["max_con_calor"]}.
+- Para cocinar al vapor, el accesorio se llama "{vapor.get("accesorio", "accesorio de vapor")}".
+{inverso}{reglas}
+
+Seguridad alimentaria (esto es obligatorio, el paciente es renal y una infección \
+alimentaria le pega más fuerte):
+- El pollo, el cerdo, la carne molida, el pescado y el huevo tienen que quedar bien \
+cocidos por dentro. Nunca escribas un paso que los deje crudos, jugosos o "a punto".
+- No uses cocción a baja temperatura, sous vide ni fermentación para carnes o pescado.
+- Para cocinar carnes y pescado usa 100 °C o la temperatura de vapor, con tiempo \
+suficiente; si dudas entre dos tiempos, elige el más largo.
+- Si la receta lleva papa, zanahoria, zapallo o legumbres, y el consejo menciona la \
+doble cocción, refléjalo en los pasos del robot: cocer en agua abundante y botar esa \
+agua antes de seguir."""
+
+    forma = (
+        ', "pasos_robot": [{"texto": "qué hacer", "minutos": numero, '
+        '"temperatura_c": numero o null, "velocidad": "1" (o \"vapor\"/\"turbo\" si aplica), '
+        '"inverso": true o false}]'
+    )
+    return bloque, forma
+
+
+def _build_prompt_receta(foods, presupuesto, densidad_maxima=None, situacion_clinica=None, riesgo_hiperkalemia=False, robot=None):
     lineas_ingredientes = []
     for f in foods:
         aportes = ", ".join(
@@ -360,6 +418,8 @@ tratante recomienda en general no superar esta densidad en el plato final:
             "medicamentos que retienen potasio) — prioriza especialmente mantener el potasio bajo."
         )
 
+    bloque_robot, forma_robot = _bloque_robot(robot)
+
     return f"""Eres un asistente que arma una receta casera chilena para un paciente con \
 enfermedad renal crónica, usando SOLO los ingredientes que tiene disponibles. La precisión \
 de las cantidades importa para su salud: si te pasas del presupuesto de un nutriente, el \
@@ -370,14 +430,14 @@ Ingredientes disponibles, con su aporte por 100 g:
 
 Presupuesto que le queda disponible al paciente hoy (no lo superes):
 {chr(10).join(lineas_presupuesto)}{bloque_densidad}
-{bloque_situacion}
+{bloque_situacion}{bloque_robot}
 
 Responde EXCLUSIVAMENTE con un JSON válido (sin texto adicional, sin bloques de código \
 markdown), con esta forma:
 
 {{"nombre": "nombre del plato", "pasos": ["paso 1", "paso 2"], \
 "ingredientes": [{{"id": "id_exacto_de_la_lista", "gramos": numero}}], \
-"consejo": "sugerencia opcional, o cadena vacía"}}
+"consejo": "sugerencia opcional, o cadena vacía"{forma_robot}}}
 
 Reglas:
 - Usa solo ids exactos de la lista de ingredientes disponibles — no inventes otros ni \
@@ -452,7 +512,79 @@ def _intentar_llamada_receta(prompt, api_key):
     return receta
 
 
-def call_claude_receta(ingrediente_ids, presupuesto, densidad_maxima=None, situacion_clinica=None, riesgo_hiperkalemia=False):
+def _sanear_pasos_robot(pasos, robot):
+    """Los ajustes que devuelve la IA no se muestran tal cual: se recortan a lo
+    que la máquina declara en robots-cocina.json. Un modelo puede escribir
+    "180 °C velocidad 8" sin que la máquina pueda hacerlo, y ese paso en manos
+    del paciente es, en el mejor caso, una receta arruinada.
+
+    Lo importante acá es la combinación calor + velocidad: casi todos estos
+    robots desconectan el calentamiento sobre cierta velocidad, así que un paso
+    con temperatura y velocidad alta simplemente no calienta."""
+    if not robot or not isinstance(pasos, list):
+        return []
+
+    vel = robot["velocidad"]
+    temp = robot["temperatura"]
+    vapor = robot.get("vapor") or {}
+    nombre_vapor = (vapor.get("accesorio") or "vapor").lower()
+
+    salida = []
+    for paso in pasos[:8]:
+        if not isinstance(paso, dict):
+            continue
+        texto = str(paso.get("texto") or "").strip()
+        if not texto:
+            continue
+
+        temperatura = paso.get("temperatura_c")
+        try:
+            temperatura = int(round(float(temperatura)))
+        except (TypeError, ValueError):
+            temperatura = None
+        if temperatura is not None:
+            temperatura = max(temp["min_c"], min(temperatura, temp["max_c"]))
+
+        velocidad = str(paso.get("velocidad") or "").strip().lower()
+        if velocidad in ("vapor", "varoma", nombre_vapor):
+            velocidad = vapor.get("accesorio") or "vapor"
+        elif velocidad == "turbo":
+            # Turbo con comida caliente es justo lo que los manuales prohíben,
+            # y en un robot que no declara turbo tampoco corresponde ofrecerlo:
+            # en ambos casos cae al tope de velocidad que sí aplica.
+            tope = vel["max_con_calor"] if temperatura is not None else vel["max"]
+            velocidad = "turbo" if (vel.get("turbo") and temperatura is None) else str(tope)
+        else:
+            try:
+                n = float(velocidad.replace(",", "."))
+            except ValueError:
+                n = None
+            if n is None:
+                velocidad = ""
+            else:
+                tope = vel["max_con_calor"] if temperatura is not None else vel["max"]
+                n = max(vel["min"], min(n, tope))
+                velocidad = str(int(n)) if n == int(n) else str(n).replace(".", ",")
+
+        try:
+            minutos = int(round(float(paso.get("minutos"))))
+        except (TypeError, ValueError):
+            minutos = None
+        if minutos is not None:
+            minutos = max(1, min(minutos, 240))
+
+        salida.append({
+            "texto": texto,
+            "minutos": minutos,
+            "temperatura_c": temperatura,
+            "velocidad": velocidad,
+            "inverso": bool(paso.get("inverso")) and bool(vel.get("inverso")),
+        })
+
+    return salida
+
+
+def call_claude_receta(ingrediente_ids, presupuesto, densidad_maxima=None, situacion_clinica=None, riesgo_hiperkalemia=False, robot_id=None):
     foods = []
     for fid in ingrediente_ids:
         food = KNOWN_FOODS_BY_ID.get(fid)
@@ -469,7 +601,11 @@ def call_claude_receta(ingrediente_ids, presupuesto, densidad_maxima=None, situa
             "con la línea: ANTHROPIC_API_KEY=tu_api_key"
         )
 
-    prompt = _build_prompt_receta(foods, presupuesto, densidad_maxima, situacion_clinica, riesgo_hiperkalemia)
+    # Un robot desconocido (o ninguno) simplemente no agrega el bloque: la
+    # receta sale igual, solo sin los pasos para máquina.
+    robot = ROBOTS_COCINA.get(robot_id) if robot_id else None
+
+    prompt = _build_prompt_receta(foods, presupuesto, densidad_maxima, situacion_clinica, riesgo_hiperkalemia, robot)
 
     # Sonnet 5 piensa por defecto (adaptive thinking) y con varias
     # restricciones a la vez (presupuesto + densidad + situación + consejo)
@@ -524,6 +660,8 @@ def call_claude_receta(ingrediente_ids, presupuesto, densidad_maxima=None, situa
         "totales": {n: round(v, 1) for n, v in totales.items()},
         "total_gramos": round(total_gramos),
         "consejo": str(consejo).strip() if isinstance(consejo, str) and consejo.strip() else None,
+        "robot": {"id": robot["id"], "nombre": robot["nombre"]} if robot else None,
+        "pasos_robot": _sanear_pasos_robot(receta.get("pasos_robot"), robot),
     }
 
 
@@ -755,6 +893,7 @@ def handle_generar_receta(handler):
     densidad_maxima = body.get("densidad_maxima") if isinstance(body.get("densidad_maxima"), dict) else {}
     situacion_clinica = body.get("situacion_clinica") if isinstance(body.get("situacion_clinica"), dict) else None
     riesgo_hiperkalemia = bool(body.get("riesgo_hiperkalemia"))
+    robot_id = body.get("robot") if isinstance(body.get("robot"), str) else None
 
     ip = handler._client_ip()
     permitido, retry_after, motivo = RATE_LIMITER.check(ip)
@@ -771,7 +910,7 @@ def handle_generar_receta(handler):
         return
 
     try:
-        receta = call_claude_receta(ingredientes, presupuesto, densidad_maxima, situacion_clinica, riesgo_hiperkalemia)
+        receta = call_claude_receta(ingredientes, presupuesto, densidad_maxima, situacion_clinica, riesgo_hiperkalemia, robot_id)
         handler._send_json(200, receta)
     except ValueError as e:
         handler._send_json(400, {"error": str(e)})
