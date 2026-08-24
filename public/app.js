@@ -33,7 +33,7 @@ const API_BASE = esAppNativa() ? "https://kidneychef-api.onrender.com" : "";
 // plataforma — son públicas, igual que APP_KEY o las keys de Supabase en
 // tratante/config.js). Mientras estén vacías, initRevenueCat() no hace nada
 // y la app sigue funcionando solo con el trial local ya implementado.
-const REVENUECAT_API_KEY_IOS = "";
+const REVENUECAT_API_KEY_IOS = "appl_CqmSDZNWUZxeKLOQgWQGsaITuRr";
 const REVENUECAT_API_KEY_ANDROID = "";
 
 // De mayor a menor nivel — deben coincidir con los entitlements creados en
