@@ -101,7 +101,9 @@ MAPEO = {
     # Cortes de cerdo para la lista de supermercado, mismo criterio (crudos,
     # equivalencia USDA por corte/grupo muscular, no dato chileno medido).
     "chuleta_cerdo": "Pork, fresh, loin, center loin (chops), bone-in, separable lean and fat, raw",
-    "costillar_cerdo": "Pork, fresh, spareribs, separable lean and fat, raw",
+    # Va con sufijo "_crudo" para no chocar con el id del plato preparado
+    # "costillar_cerdo" de recetas_chilenas.py (mismo corte, pero cocido y con sal).
+    "costillar_cerdo_crudo": "Pork, fresh, spareribs, separable lean and fat, raw",
     "pulpa_cerdo": "Pork, fresh, leg (ham), whole, separable lean only, raw",
     "panceta_cerdo": "Pork, fresh, belly, raw",
     "cerdo": "Pork, fresh, loin, center loin (chops), bone-in, separable lean only, cooked, broiled",

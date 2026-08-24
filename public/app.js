@@ -54,9 +54,13 @@ const NIVELES_INFO = {
     nombre: "Gold",
     precioMensualClp: 5990,
     precioAnualClp: 49990,
+    // El Plan Clínico (vínculo con el tratante) NO se ofrece acá mientras
+    // MOSTRAR_TAB_TRATANTE sea false: vive entero en esa pestaña, y vender una
+    // función que el usuario no puede abrir es motivo de rechazo en la App
+    // Store. Cuando la pestaña vuelva, vuelve también este bullet.
     features: [
       "Semáforo de sodio, potasio, fósforo y carbohidratos",
-      "Plan Clínico: vínculo con tu nefrólogo(a) o nutricionista",
+      "Tu día de hoy: metas diarias, registro por foto e historial",
     ],
   },
   platinum: {
@@ -954,10 +958,11 @@ function renderPlanUpsell() {
 // confirmación legal (Ley 20.584): sin esto, el tratante nunca ve datos
 // clínicos de este paciente.
 //
-// Solo visible en la pestaña "Tratante" (interruptor manual abajo) mientras
-// se sigue probando — Camilo la quita (MOSTRAR_TAB_TRATANTE = false) antes de
-// subir la versión que va a producción/App Store.
-const MOSTRAR_TAB_TRATANTE = true;
+// Solo visible en la pestaña "Tratante" (interruptor manual abajo). Queda en
+// false para el envío a App Store: el portal del tratante existe y funciona,
+// pero su backend (Supabase) está pausado y no hay tratantes reales todavía.
+// Ponerlo en true es todo lo que hace falta para volver a probar la pestaña.
+const MOSTRAR_TAB_TRATANTE = false;
 
 // Sin infraestructura de push, se refresca por polling mientras la app está
 // abierta — así una solicitud de vínculo nueva aparece sin que el paciente

@@ -132,7 +132,7 @@
         "id": "costillar_cerdo",
         "nombre": "Costillar",
         "presentacion": "1 kg",
-        "nutrientes_id": "costillar_cerdo",
+        "nutrientes_id": "costillar_cerdo_crudo",
         "precios": {
           "jumbo": 6990,
           "lider": 5930,

@@ -1223,6 +1223,9 @@ h1, h2, h3 {
   cursor: pointer;
 }
 .tab-btn svg { flex-shrink: 0; }
+/* El display:flex de arriba le gana a [hidden], así que ocultar la pestaña
+   desde JS (MOSTRAR_TAB_TRATANTE) no bastaba sin esta regla. */
+.tab-btn[hidden] { display: none; }
 .tab-btn[aria-selected="true"] {
   color: var(--brand-dark);
   background: var(--brand-50);

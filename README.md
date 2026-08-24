@@ -134,31 +134,72 @@ públicos por diseño — no la `service_role` key, esa es solo del servidor).
 ## Suscripción
 
 La app es gratis un mes desde la primera vez que se abre (`perfil.creadoEn`
-en `localStorage`, ver `estadoSuscripcion()`/`renderSuscripcion()` en
-`public/app.js`). Pasado ese mes, toda la app queda bloqueada por una
-pantalla de pago hasta que exista una suscripción activa. El precio de esa
-suscripción sube con el tiempo a medida que se agregan features grandes
-(hoy $9.990 CLP/mes; sin precio legado — cuando sube, sube para todos los
-suscriptores).
+en `localStorage`, ver `TRIAL_DIAS`/`estadoSuscripcion()`/`renderSuscripcion()`
+en `public/app.js`). Pasado ese mes, toda la app queda bloqueada por el
+paywall hasta que exista una suscripción activa.
 
-La compra real se integra con **RevenueCat** (`@revenuecat/purchases-capacitor`,
-ya instalado y sincronizado en `ios/`/`android/` vía `npx cap sync`), llamado
-directo por `window.Capacitor.Plugins.Purchases` sin bundler. Falta, y es
-trabajo que solo puede hacer Camilo (no se pueden crear cuentas de
-terceros):
+Son **3 niveles con precio fijo**, cada uno mensual o anual (constante
+`NIVELES_INFO` en `public/app.js`):
 
-1. Crear las cuentas de Apple Developer y Google Play Developer.
-2. Crear el proyecto en RevenueCat y vincularlo a ambas tiendas.
-3. Crear el producto de suscripción única en cada tienda y su entitlement en
-   RevenueCat (el código espera el identificador `"premium"`, constante
-   `REVENUECAT_ENTITLEMENT_ID` en `public/app.js`).
-4. Completar `REVENUECAT_API_KEY_IOS`/`REVENUECAT_API_KEY_ANDROID` en
-   `public/app.js` (son públicas, igual que `APP_KEY` o las keys de Supabase
-   en `tratante/config.js`).
+| Nivel    | Mensual | Anual | Incluye |
+|----------|---------|-------|---------|
+| Gold     | $5.990  | $49.990 | Semáforo Na/K/P/carbohidratos, "Tu día de hoy", historial |
+| Platinum | $7.990  | $69.990 | Todo Gold + recetas con IA desde el refrigerador + pestaña Súper |
+| Diamond  | $9.990  | $89.990 | Todo Platinum + Cookidoo (aún no construido) |
 
-Mientras esas keys estén vacías, `initRevenueCat()` no hace nada y el botón
-"Suscribirme" del paywall solo muestra un mensaje de "disponible muy
-pronto" — la app sigue funcionando normalmente con el trial local.
+Los product IDs son `com.kidneychef.app.<nivel>` (mensual) y
+`com.kidneychef.app.<nivel>.annual` (anual). En RevenueCat cada producto
+otorga su propio entitlement (`gold`/`platinum`/`diamond`); el código guarda
+el más alto activo en `perfil.suscripcion.nivel` y compara rangos con
+`nivelSuficiente(minimo)` (`NIVELES_SUSCRIPCION` en `public/app.js`).
+En App Store Connect los 6 productos viven en un solo grupo ("KidneyChef")
+con 3 niveles de rank, para que Apple maneje el upgrade/downgrade.
+
+La compra real se integra con **RevenueCat**
+(`@revenuecat/purchases-capacitor`, ya instalado y sincronizado en
+`ios/`/`android/` vía `npx cap sync`), llamado directo por
+`window.Capacitor.Plugins.Purchases` sin bundler. La API key pública de iOS
+ya está puesta en `REVENUECAT_API_KEY_IOS`; la compra sandbox se probó de
+punta a punta en un iPhone real.
+
+El Plan Clínico (vínculo con el tratante) **no** se ofrece en ningún nivel
+mientras `MOSTRAR_TAB_TRATANTE` sea `false` en `public/app.js`: esa función
+vive entera en la pestaña Tratante, y vender algo que el usuario no puede
+abrir es motivo de rechazo en la App Store. Al volver a prender la pestaña
+—después de reactivar el proyecto de Supabase, que está pausado— hay que
+reponer ese bullet en `NIVELES_INFO.gold.features`.
+
+Lo que falta:
+
+1. Enviar los 6 productos a revisión **junto con el primer build** de la app
+   (Apple exige que las suscripciones de una app nueva se envíen con el
+   binario, no antes ni por separado).
+2. La cuenta de Google Play Developer y el equivalente Android: completar
+   `REVENUECAT_API_KEY_ANDROID` en `public/app.js`.
+
+Mientras una key esté vacía, `initRevenueCat()` no hace nada en esa
+plataforma y el botón del paywall solo muestra "disponible muy pronto" — la
+app sigue funcionando con el trial local.
+
+## Documentos legales
+
+`public/terminos.html` y `public/privacidad.html` son los Términos y
+Condiciones y la Política de Privacidad que la app muestra antes de dejar
+entrar (overlay bloqueante `#terminos-overlay`, ver `TERMINOS_VERSION` /
+`terminosAceptados()` en `public/app.js`). La aceptación se guarda en
+`perfil.terminos`; subir `TERMINOS_VERSION` vuelve a pedirla a todos.
+
+Ambos documentos están completos y con el correo de contacto real
+(contacto@kidneychef.com), pero **los escribió Claude, no un abogado**.
+Antes de publicar conviene que los revise uno, sobre todo por tratarse de
+una app relacionada con salud y por la Ley 21.719 de protección de datos
+personales en Chile (vigente desde diciembre de 2026). La advertencia que
+decía esto vivía dentro de los propios documentos y se sacó de ahí: el
+usuario final —y el revisor de Apple— no tienen por qué leer una nota
+interna en un documento legal.
+
+Al editar cualquiera de los dos hay que actualizar a mano la fecha de
+"Última actualización" del encabezado.
 
 ## Limitaciones importantes
 
