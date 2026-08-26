@@ -739,7 +739,10 @@ y no alteres las técnicas: si un paso dice cocer algo en agua y botar esa agua,
 robot tiene que hacer lo mismo — es una técnica que le baja el potasio al paciente, no un \
 detalle de estilo. Los pasos que no se hacen en la máquina (amasar a mano, hornear, dejar \
 leudar, freír en sartén, servir) déjalos como paso normal, sin ajustes de velocidad ni \
-temperatura.{bloque}
+temperatura, PERO en el lugar que les corresponde: mantén exactamente el mismo orden de \
+la receta original. Un paso manual que va al principio —dejar reposar la berenjena con \
+sal, remojar una legumbre, marinar— no puede terminar al final de la lista: seguido en ese \
+orden, el plato sale mal.{bloque}
 
 Responde EXCLUSIVAMENTE con un JSON válido (sin texto adicional, sin bloques de código \
 markdown), con esta forma:

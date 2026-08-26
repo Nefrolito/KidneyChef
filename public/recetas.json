@@ -554,5 +554,109 @@
       "Agrega la leche caliente.",
       "Endulza al gusto."
     ]
+  },
+  {
+    "id": "pasta_berenjena",
+    "nombre": "Pasta con berenjena y tomate",
+    "ingredientes": [
+      "fideo",
+      "berenjena",
+      "tomate",
+      "cebolla",
+      "ajo"
+    ],
+    "armable": true,
+    "pasos": [
+      "Corta la berenjena en cubos y déjala 20 minutos con un poco de sal para que largue agua; después enjuágala y sécala.",
+      "Sofríe la cebolla y el ajo picados finos en el aceite.",
+      "Agrega la berenjena y cocínala hasta que esté blanda y dorada.",
+      "Suma el tomate picado y deja reducir a fuego suave hasta que se deshaga.",
+      "Cuece la pasta en agua hirviendo hasta que esté al dente, escúrrela y mézclala con la salsa.",
+      "Ajusta la sal al final: el tomate y la berenjena ya traen bastante sabor."
+    ]
+  },
+  {
+    "id": "tortilla_espanola",
+    "nombre": "Tortilla española",
+    "ingredientes": [
+      "papa",
+      "huevo",
+      "cebolla"
+    ],
+    "armable": true,
+    "pasos": [
+      "Pela las papas y córtalas en láminas delgadas.",
+      "Si necesitas bajarle el potasio, cuece las papas en agua abundante y bota esa agua antes de seguir. La papa es lo que más potasio aporta a esta tortilla.",
+      "Fríe las papas y la cebolla en el aceite a fuego suave, sin dorarlas, hasta que estén blandas. Escúrrelas.",
+      "Bate los huevos, mézclalos con las papas y deja reposar 10 minutos.",
+      "Cuaja la tortilla en la sartén a fuego medio, dándola vuelta con un plato, hasta que esté firme por dentro."
+    ]
+  },
+  {
+    "id": "salmon_horno",
+    "nombre": "Salmón al horno con limón",
+    "ingredientes": [
+      "salmon",
+      "esparrago",
+      "limon"
+    ],
+    "armable": true,
+    "pasos": [
+      "Seca el salmón y ponlo en una fuente con el aceite y unas rodajas de limón.",
+      "Acomoda los espárragos alrededor.",
+      "Hornea a 200 °C entre 12 y 15 minutos, hasta que el salmón se separe en láminas.",
+      "Exprime el resto del limón al servir: el ácido reemplaza bien a la sal."
+    ]
+  },
+  {
+    "id": "ensalada_garbanzos",
+    "nombre": "Ensalada de garbanzos",
+    "ingredientes": [
+      "garbanzo",
+      "tomate",
+      "pepino",
+      "cebolla"
+    ],
+    "armable": true,
+    "pasos": [
+      "Si usas garbanzos secos, remójalos toda la noche, bota esa agua, cuécelos en agua nueva abundante y bota también esa agua.",
+      "Corta el tomate y el pepino en cubos, y la cebolla en pluma fina.",
+      "Deja la cebolla unos minutos en agua fría para quitarle el picor y escúrrela.",
+      "Mezcla todo con el aceite y ajusta la sal al final."
+    ]
+  },
+  {
+    "id": "verduras_asadas",
+    "nombre": "Verduras asadas al horno",
+    "ingredientes": [
+      "calabacin",
+      "pimiento",
+      "berenjena",
+      "cebolla"
+    ],
+    "armable": true,
+    "pasos": [
+      "Corta el calabacín, el pimiento, la berenjena y la cebolla en trozos parejos.",
+      "Revuélvelos con el aceite en una fuente para horno, en una sola capa.",
+      "Hornea a 200 °C entre 30 y 40 minutos, revolviendo a la mitad, hasta que estén doradas.",
+      "Ajusta la sal recién al sacarlas: asadas concentran su sabor y necesitan menos."
+    ]
+  },
+  {
+    "id": "ensalada_atun",
+    "nombre": "Ensalada de atún con verduras",
+    "ingredientes": [
+      "atun",
+      "lechuga",
+      "tomate",
+      "pepino"
+    ],
+    "armable": true,
+    "pasos": [
+      "Escurre bien el atún: el líquido de la lata es donde se concentra el sodio.",
+      "Corta el tomate y el pepino en cubos, y trocea la lechuga.",
+      "Mezcla todo con el aceite.",
+      "Ajusta la sal al final, teniendo en cuenta que el atún de lata ya aporta bastante."
+    ]
   }
 ]

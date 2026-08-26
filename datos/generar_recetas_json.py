@@ -16,7 +16,14 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from recetas_chilenas import RECETAS, PREPARACIONES
+from recetas_chilenas import RECETAS as RECETAS_CL, PREPARACIONES as PREPARACIONES_CL
+from recetas_internacionales import RECETAS as RECETAS_INT, PREPARACIONES as PREPARACIONES_INT
+
+# El recetario chileno y el internacional viven en archivos distintos porque
+# tienen distinto estado de validación clínica (ver la cabecera de
+# recetas_internacionales.py), pero la app los consume como uno solo.
+RECETAS = {**RECETAS_CL, **RECETAS_INT}
+PREPARACIONES = {**PREPARACIONES_CL, **PREPARACIONES_INT}
 
 STAPLES = {"sal", "aceite", "azucar", "polvo_hornear", "aji_color"}
 
@@ -59,6 +66,25 @@ INGREDIENTES = {
     "trigo_mote": ("trigo_mote", "Mote de trigo", "Abarrotes", "trigo_mote"),
     "durazno_conserva": ("durazno_conserva", "Durazno en conserva", "Otros", "durazno_conserva"),
     "acelga_cocida_ing": ("acelga", "Acelga", "Verduras y legumbres", "acelga"),
+    # Ingredientes del recetario internacional (mediterráneo). A diferencia de
+    # las claves chilenas, acá la clave usa la MISMA forma que guarda
+    # nutrientes.json — "pasta_cocida" y "garbanzo_cocido" son gramos de
+    # producto ya cocido, no crudo.
+    # Comparte el id canónico con "fideo_crudo": son el mismo ingrediente para
+    # el paciente, y dos casillas ("Fideos" y "Pasta") para lo mismo solo
+    # confunden. Lo que cambia es la forma en que cada receta cuenta los gramos.
+    "pasta_cocida": ("fideo", "Fideos", "Abarrotes", "pasta"),
+    "garbanzo_cocido": ("garbanzo", "Garbanzos cocidos", "Verduras y legumbres", "garbanzo"),
+    "berenjena": ("berenjena", "Berenjena", "Verduras y legumbres", "berenjena"),
+    "calabacin": ("calabacin", "Calabacín / Zucchini", "Verduras y legumbres", "calabacin"),
+    "pimiento": ("pimiento", "Pimiento", "Verduras y legumbres", "pimiento"),
+    "pepino": ("pepino", "Pepino", "Verduras y legumbres", "pepino"),
+    "lechuga": ("lechuga", "Lechuga", "Verduras y legumbres", "lechuga"),
+    "esparrago": ("esparrago", "Espárrago", "Verduras y legumbres", "esparrago"),
+    "ajo": ("ajo", "Ajo", "Verduras y legumbres", "ajo"),
+    "salmon": ("salmon", "Salmón", "Carnes y pescados", "salmon"),
+    "atun": ("atun", "Atún en lata", "Carnes y pescados", "atun"),
+    "limon": ("limon", "Limón", "Frutas", "limon"),
 }
 
 # Productos industriales que técnicamente "usan" pocos ingredientes pero no

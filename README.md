@@ -231,9 +231,20 @@ temperatura a las recetas guiadas del propio fabricante.
 
 ## Recetario chileno
 
-`datos/recetas_chilenas.py` tiene dos partes: `RECETAS`, con los gramos de cada
-ingrediente por 100 g de plato terminado (proporciones validadas clínicamente
-por Camilo), y `PREPARACIONES`, con los pasos de cada receta. Los pasos son
+El recetario son **41 recetas** repartidas en dos archivos, separados a
+propósito porque tienen distinto estado de validación clínica:
+
+- `datos/recetas_chilenas.py` — las 35 originales, con proporciones **validadas
+  por Camilo** en julio de 2026.
+- `datos/recetas_internacionales.py` — 6 recetas mediterráneas agregadas en
+  agosto de 2026, **pendientes de esa validación** (marcadas
+  `_PENDIENTE_VALIDAR` en `nutrientes.json`). La cocina mediterránea es de las
+  más recomendadas en nefrología, así que amplía la variedad sin pelear con la
+  dieta renal.
+
+Cada archivo tiene dos partes: `RECETAS`, con los gramos de cada ingrediente
+por 100 g de plato terminado, y `PREPARACIONES`, con los pasos. El generador
+los une; la app los consume como un solo recetario. Los pasos son
 contenido culinario, no cambian ninguna cifra: el semáforo se sigue calculando
 desde las proporciones y `nutrientes.json`.
 
@@ -246,6 +257,19 @@ justo donde corresponde decirlo.
 pasos, así que agregar una receta y olvidar la preparación falla al regenerar
 en vez de pasar inadvertido. Las dos que no llevan pasos a propósito son la
 longaniza y el queso chanco: se compran hechos (`NO_ARMABLES`).
+
+**Calcular el aporte nutricional de una receta nueva:**
+`python3 datos/calcular_platos.py` suma los alimentos de `nutrientes.json` por
+los gramos de cada proporción y escribe la entrada del plato. Ese script no
+existía: los 35 platos chilenos se calcularon una vez y quedaron guardados sin
+la herramienta para rehacerlo, y al intentar reproducirlos **3 de los 8 que se
+pueden recalcular no calzan** — el más claro es "Merluza al vapor", con 401 mg
+de potasio guardados contra 242 recalculados, porque el valor original salió de
+pescado cocido y el alimento `merluza` de la base es crudo. Por eso el script
+**no toca los platos que ya están**: solo agrega los que se le piden. Ocho
+claves de ingrediente de las recetas chilenas (`papa_cocida`, `zapallo_cocido`,
+`aceite`, `azucar`…) tampoco tienen alimento equivalente en `nutrientes.json`,
+así que esos platos hoy no se pueden recalcular.
 
 **Los pasos en el robot del paciente** no se escriben a mano: serían 35 recetas
 por 7 máquinas. `POST /api/pasos-robot` (`call_claude_pasos_robot` en
