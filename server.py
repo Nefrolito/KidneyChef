@@ -84,8 +84,14 @@ NUTRIENTES_RECETA = ["potasio_mg", "fosforo_mg", "sodio_mg", "carbohidratos_g"]
 # "empanada de pino"), y sugerírselos a la IA como candidato para una foto de
 # ingredientes sueltos la empujaba a adivinar un plato preparado en vez de
 # listar cada ingrediente individual.
-RECETAS_FIJAS = {r["id"]: r for r in json.loads((PUBLIC_DIR / "recetas.json").read_text())}
-_RECETAS_IDS = set(RECETAS_FIJAS)
+_RECETAS = json.loads((PUBLIC_DIR / "recetas.json").read_text())
+_RECETAS_IDS = {r["id"] for r in _RECETAS}
+
+# Los nombres de los platos que el paciente reconoce. No se le ofrecen como
+# receta —muchos son inviables en dieta renal: un completo gasta el 92% del
+# sodio del día— pero sirven para que la receta generada le suene familiar en
+# vez de sonar a comida de dieta.
+PLATOS_CONOCIDOS = ", ".join(r["nombre"] for r in _RECETAS)
 
 # Catálogo de robots de cocina para el "Modo robot" (ver public/robots-cocina.json,
 # con la procedencia de cada cifra). El backend lo usa para acotar los pasos que
@@ -649,6 +655,11 @@ No asumas un corte específico que el nombre no aclara — evita preparaciones q
 funcionan con un corte particular (ej. "bistec" o "filete" para carne de res genérica); \
 preferí preparaciones versátiles que funcionan con cualquier forma del ingrediente (guisos, \
 salteados, cazuelas, revueltos).
+- Platos que el paciente conoce, como referencia de qué le resulta familiar: \
+{PLATOS_CONOCIDOS}. Puedes inspirarte en ellos para que la receta le suene a comida de \
+casa y no a comida de dieta, pero NO los copies tal cual: casi todos, como están, se pasan \
+del sodio o del fósforo que este paciente puede permitirse. Toma la idea y ajusta las \
+cantidades al presupuesto de arriba.
 - La cocina NO tiene que ser chilena. Elige la preparación que mejor aproveche los \
 ingredientes disponibles, venga de donde venga: un salteado con salsa de soya, una pasta, \
 un curry de lentejas, tacos, un cuscús, una tortilla española, un salmón al horno. La dieta \
@@ -714,69 +725,6 @@ def _intentar_llamada_receta(prompt, api_key):
         raise RuntimeError("La IA no devolvió una receta con el formato esperado")
 
     return receta
-
-
-def call_claude_pasos_robot(receta, robot):
-    """Los mismos pasos de la receta, dichos en el lenguaje de la máquina. Los
-    ajustes vuelven a pasar por _sanear_pasos_robot: la IA propone, el
-    catálogo manda."""
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        raise RuntimeError("Falta ANTHROPIC_API_KEY.")
-
-    bloque, forma = _bloque_robot(robot)
-    pasos = "\n".join(f"{i}. {p}" for i, p in enumerate(receta["pasos"], 1))
-    prompt = f"""Eres un asistente que adapta una receta casera chilena a un robot de cocina, \
-para una app usada por pacientes con enfermedad renal crónica.
-
-Receta: {receta["nombre"]}
-
-Pasos de la preparación casera:
-{pasos}
-
-Traduce ESTOS pasos a la máquina. No cambies la receta, no agregues ni quites ingredientes \
-y no alteres las técnicas: si un paso dice cocer algo en agua y botar esa agua, el paso del \
-robot tiene que hacer lo mismo — es una técnica que le baja el potasio al paciente, no un \
-detalle de estilo. Los pasos que no se hacen en la máquina (amasar a mano, hornear, dejar \
-leudar, freír en sartén, servir) déjalos como paso normal, sin ajustes de velocidad ni \
-temperatura, PERO en el lugar que les corresponde: mantén exactamente el mismo orden de \
-la receta original. Un paso manual que va al principio —dejar reposar la berenjena con \
-sal, remojar una legumbre, marinar— no puede terminar al final de la lista: seguido en ese \
-orden, el plato sale mal.{bloque}
-
-Responde EXCLUSIVAMENTE con un JSON válido (sin texto adicional, sin bloques de código \
-markdown), con esta forma:
-
-{{"pasos_robot": [{{"texto": "qué hacer", "minutos": numero o null, \
-"temperatura_c": numero o null, "velocidad": "1" o cadena vacía, "inverso": true o false}}]}}"""
-
-    body = json.dumps({
-        "model": ANTHROPIC_MODEL,
-        "max_tokens": 2048,
-        "output_config": {"effort": "low"},
-        "messages": [{"role": "user", "content": prompt}],
-    }).encode("utf-8")
-    req = urllib.request.Request(ANTHROPIC_URL, data=body, method="POST", headers={
-        "x-api-key": api_key, "anthropic-version": "2023-06-01", "content-type": "application/json",
-    })
-    try:
-        with urllib.request.urlopen(req, timeout=90) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        raise RuntimeError(f"Error de la API de Claude ({e.code}): {e.read().decode('utf-8', 'replace')}") from e
-
-    text = "".join(b.get("text", "") for b in payload.get("content", []) if b.get("type") == "text").strip()
-    text = re.sub(r"^```(?:json)?|```$", "", text, flags=re.MULTILINE).strip()
-    try:
-        datos = json.loads(text)
-    except json.JSONDecodeError as e:
-        raise RuntimeError(f"No se pudo interpretar la respuesta de la IA: {text[:300]}") from e
-
-    return {
-        "receta": receta["id"],
-        "robot": {"id": robot["id"], "nombre": robot["nombre"]},
-        "pasos_robot": _sanear_pasos_robot(datos.get("pasos_robot"), robot),
-    }
 
 
 def _sanear_pasos_robot(pasos, robot):
@@ -1181,49 +1129,6 @@ def handle_generar_receta(handler):
         handler._send_json(200, receta)
     except ValueError as e:
         handler._send_json(400, {"error": str(e)})
-    except RuntimeError as e:
-        handler._send_json(500, {"error": str(e)})
-    except Exception as e:
-        handler._send_json(500, {"error": f"Error inesperado: {e}"})
-
-
-def handle_pasos_robot(handler):
-    """POST /api/pasos-robot — traduce los pasos de una de NUESTRAS recetas
-    chilenas a los ajustes del robot del paciente.
-
-    Recibe el id de la receta, no su texto: así el endpoint no se puede usar
-    como traductor genérico de recetas ajenas, y los pasos de origen son
-    siempre los que escribimos y quedaron en el repositorio."""
-    if APP_KEY:
-        provided = handler.headers.get("X-App-Key", "")
-        if not hmac.compare_digest(provided, APP_KEY):
-            print(f"[auth] rechazado ip={handler._client_ip()}", flush=True)
-            handler._send_json(401, {"error": "Acceso no autorizado a la API."})
-            return
-
-    body = _leer_body_json(handler)
-    if body is None:
-        return
-
-    receta = RECETAS_FIJAS.get(body.get("receta"))
-    robot = ROBOTS_COCINA.get(body.get("robot"))
-    if not receta or not receta.get("pasos"):
-        handler._send_json(400, {"error": "Receta desconocida o sin preparación"})
-        return
-    if not robot:
-        handler._send_json(400, {"error": "Robot de cocina desconocido"})
-        return
-
-    ip = handler._client_ip()
-    permitido, retry_after, motivo = RATE_LIMITER.check(ip)
-    if not permitido:
-        espera = format_espera(retry_after)
-        handler._send_json(429, {"error": f"Hiciste muchas solicitudes en poco tiempo. Vuelve a intentarlo en {espera}."},
-                           {"Retry-After": str(retry_after)})
-        return
-
-    try:
-        handler._send_json(200, call_claude_pasos_robot(receta, robot))
     except RuntimeError as e:
         handler._send_json(500, {"error": str(e)})
     except Exception as e:
@@ -1651,7 +1556,6 @@ ROUTES = [
     ("POST", re.compile(r"^/api/identificar-ingredientes$"), handle_identificar_ingredientes),
     ("POST", re.compile(r"^/api/generar-receta$"), handle_generar_receta),
     ("POST", re.compile(r"^/api/leer-receta$"), handle_leer_receta),
-    ("POST", re.compile(r"^/api/pasos-robot$"), handle_pasos_robot),
     ("POST", re.compile(r"^/api/pacientes$"), handle_crear_paciente),
     ("GET", re.compile(r"^/api/pacientes/me$"), handle_get_paciente_me),
     ("GET", re.compile(r"^/api/pacientes/me/vinculos$"), handle_get_vinculos_paciente),

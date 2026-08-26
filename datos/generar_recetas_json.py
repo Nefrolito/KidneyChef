@@ -16,14 +16,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from recetas_chilenas import RECETAS as RECETAS_CL, PREPARACIONES as PREPARACIONES_CL
-from recetas_internacionales import RECETAS as RECETAS_INT, PREPARACIONES as PREPARACIONES_INT
-
-# El recetario chileno y el internacional viven en archivos distintos porque
-# tienen distinto estado de validación clínica (ver la cabecera de
-# recetas_internacionales.py), pero la app los consume como uno solo.
-RECETAS = {**RECETAS_CL, **RECETAS_INT}
-PREPARACIONES = {**PREPARACIONES_CL, **PREPARACIONES_INT}
+from recetas_chilenas import RECETAS
 
 STAPLES = {"sal", "aceite", "azucar", "polvo_hornear", "aji_color"}
 
@@ -168,20 +161,16 @@ def main():
                 claves_canonicas.append(canon_id)
             ingredientes_vistos[canon_id] = (canon_nombre, canon_categoria, canon_nutrientes_id)
 
-        armable = id_ not in NO_ARMABLES
-        pasos = PREPARACIONES.get(id_, [])
-        # Una receta que el paciente puede preparar tiene que traer sus pasos.
-        # Sin esta guarda, agregar una receta nueva y olvidar la preparación
-        # pasaría inadvertido hasta que alguien la abriera en la app.
-        if armable and not pasos:
-            raise ValueError(f"Receta sin preparación en PREPARACIONES: {id_}")
-
+        # La app ya no le ofrece estas recetas al paciente: casi todas se pasan
+        # del sodio o del fósforo que puede permitirse (un completo gasta el 92%
+        # de su meta diaria de sodio). Lo que queda de recetas.json es su lista
+        # de ingredientes, que arma el checklist del refrigerador, y sus nombres,
+        # que el generador usa como referencia de qué le resulta familiar.
         recetas_out.append({
             "id": id_,
             "nombre": nombre,
             "ingredientes": claves_canonicas,
-            "armable": armable,
-            "pasos": pasos,
+            "armable": id_ not in NO_ARMABLES,
         })
 
     foods = json.loads((public_dir / "nutrientes.json").read_text())

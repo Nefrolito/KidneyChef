@@ -79,6 +79,14 @@ RECETAS = {
 
 # Pasos de preparación de cada receta, en orden.
 #
+# ACTUALMENTE SIN USO. La app dejó de ofrecerle estas recetas al paciente
+# (2026-08-24): casi todas se pasan del sodio o del fósforo que puede
+# permitirse — un completo gasta el 92% de su meta diaria de sodio— así que
+# proponerlas como "recetas que puedes preparar" no correspondía. Ahora las
+# recetas se generan con IA ajustadas a su presupuesto, usando estos nombres
+# solo como referencia de qué le resulta familiar. Los pasos se conservan por
+# si el recetario vuelve en otra forma; generar_recetas_json.py ya no los lee.
+#
 # Las proporciones de arriba las validó Camilo clínicamente; estos pasos son
 # contenido culinario escrito después (2026-08-24) y no cambian ninguna cifra:
 # el semáforo se sigue calculando desde las proporciones y nutrientes.json.

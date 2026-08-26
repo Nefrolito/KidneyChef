@@ -1261,8 +1261,6 @@ const els = {
   refrigeradorChecklist: document.getElementById("refrigerador-checklist"),
   refrigeradorBuscador: document.getElementById("refrigerador-buscador"),
   refrigeradorSinResultados: document.getElementById("refrigerador-sin-resultados"),
-  refrigeradorBuscarBtn: document.getElementById("refrigerador-buscar-btn"),
-  refrigeradorResultados: document.getElementById("refrigerador-resultados"),
   refrigeradorPreviewWrap: document.getElementById("refrigerador-preview-wrap"),
   refrigeradorPreview: document.getElementById("refrigerador-preview"),
   refrigeradorCameraInput: document.getElementById("refrigerador-camera-input"),
@@ -1310,10 +1308,9 @@ init();
 async function init() {
   FOODS = await fetch("nutrientes.json").then((r) => r.json());
   try {
-    RECETAS_DATA = await fetch("recetas.json").then((r) => r.json());
     INGREDIENTES_REFRIGERADOR = await fetch("ingredientes-refrigerador.json").then((r) => r.json());
   } catch (e) {
-    console.warn("No se pudo cargar recetas.json / ingredientes-refrigerador.json", e);
+    console.warn("No se pudo cargar ingredientes-refrigerador.json", e);
   }
   try {
     PRECIOS_REFERENCIA = await fetch("precios-referencia.json").then((r) => r.json());
@@ -1361,10 +1358,6 @@ async function init() {
   );
   els.recetaExternaLeerBtn.addEventListener("click", leerRecetaExternaTexto);
   els.refrigeradorBuscador.addEventListener("input", filtrarChecklistRefrigerador);
-  els.refrigeradorResultados.addEventListener("click", (e) => {
-    const boton = e.target.closest(".btn-pasos-robot");
-    if (boton) pedirPasosRobot(boton.dataset.receta, boton);
-  });
   renderVinculacion();
   refrescarVinculos();
   refrescarMetasSincronizadas();
@@ -1423,7 +1416,6 @@ async function init() {
   });
   els.activarPlanClinico.addEventListener("change", activarPlanClinico);
   els.copiarCodigoBtn.addEventListener("click", copiarCodigoCliente);
-  els.refrigeradorBuscarBtn.addEventListener("click", buscarRecetasRefrigerador);
   els.refrigeradorCameraInput.addEventListener("change", (e) => handleRefrigeradorFileSelected(e.target.files[0]));
   els.refrigeradorIdentificarBtn.addEventListener("click", identificarIngredientesRefrigerador);
   els.refrigeradorGenerarBtn.addEventListener("click", generarRecetaIA);
@@ -1738,11 +1730,9 @@ function badge(nutriente, valorPorcion, densidad100g) {
 // paciente. Lo que sí hace es escribir los pasos en el lenguaje de su máquina.
 let ROBOTS = [];
 
-let RECETAS_DATA = [];
 let INGREDIENTES_REFRIGERADOR = [];
 let PRECIOS_REFERENCIA = [];
 let recetaActualIA = null; // última receta generada por IA, pendiente o ya guardada
-const MAX_INGREDIENTES_FALTANTES = 2; // "casi listas": les falta esto o menos
 // Sin foto no hay gramos reales de porción: se asume un plato individual
 // estándar para poder mostrar el mismo semáforo verde/ámbar/rojo que el resto
 // de la app, y se avisa en la UI que hay que ajustar según cuánto se sirva.
@@ -1869,143 +1859,6 @@ function ingredientesSeleccionados() {
   return ids;
 }
 
-function buscarRecetasRefrigerador() {
-  const tiene = ingredientesSeleccionados();
-  const completas = [];
-  const casiListas = [];
-
-  for (const receta of RECETAS_DATA) {
-    if (!receta.armable) continue;
-    const faltantes = receta.ingredientes.filter((id) => !tiene.has(id));
-    const tieneAlgunoEnComun = faltantes.length < receta.ingredientes.length;
-    if (faltantes.length === 0) completas.push(receta);
-    // "Casi lista" exige además tener al menos un ingrediente en común: sin
-    // esto, una receta de 1-2 ingredientes en total calificaba igual aunque
-    // no tuvieras NINGUNO de ellos, mostrando resultados sin relación real
-    // con lo que el paciente marcó.
-    else if (faltantes.length <= MAX_INGREDIENTES_FALTANTES && tieneAlgunoEnComun) {
-      casiListas.push({ receta, faltantes });
-    }
-  }
-
-  renderRefrigeradorResultados(completas, casiListas);
-}
-
-function nombreIngrediente(id) {
-  const ing = INGREDIENTES_REFRIGERADOR.find((i) => i.id === id);
-  return ing ? ing.nombre : id;
-}
-
-function renderRefrigeradorResultados(completas, casiListas) {
-  els.refrigeradorResultados.hidden = false;
-
-  if (completas.length === 0 && casiListas.length === 0) {
-    els.refrigeradorResultados.innerHTML = `
-      <p class="no-match">No encontramos recetas con esos ingredientes. Marca más ingredientes e intenta de nuevo.</p>`;
-    return;
-  }
-
-  const nota = `
-    <p class="summary-caption">
-      Semáforo calculado para una porción de referencia de ${PORCION_REFERENCIA_RECETA_G} g.
-      Ajusta según cuánto te sirvas.
-    </p>`;
-  const seccionCompletas = completas.length
-    ? `<h3>Puedes prepararlas ahora</h3>${completas.map((r) => tarjetaReceta(r)).join("")}`
-    : "";
-  const seccionCasi = casiListas.length
-    ? `<h3>Te falta poco</h3>${casiListas.map(({ receta, faltantes }) => tarjetaReceta(receta, faltantes)).join("")}`
-    : "";
-
-  els.refrigeradorResultados.innerHTML = nota + seccionCompletas + seccionCasi;
-}
-
-function tarjetaReceta(receta, faltantes) {
-  const match = FOODS.find((f) => f.id === receta.id);
-  const factor = PORCION_REFERENCIA_RECETA_G / 100;
-  const semaforo = match
-    ? `<div class="semaforo-row">
-        ${nutrientesVisibles()
-          .filter((k) => match[k] != null)
-          .map((k) => badge(k, Math.round(match[k] * factor), match[k]))
-          .join("")}
-      </div>${notaSinMeta()}`
-    : `<p class="no-match">Sin datos nutricionales cargados para esta receta.</p>`;
-
-  const faltantesHtml = faltantes && faltantes.length
-    ? `<p class="portion-note">Te falta: ${faltantes.map((id) => escapeHtml(nombreIngrediente(id))).join(", ")}</p>`
-    : "";
-
-  const pasos = (receta.pasos || []).length
-    ? `<details class="receta-pasos">
-        <summary>Cómo se prepara</summary>
-        <ol class="refrigerador-receta-lista">
-          ${receta.pasos.map((p) => `<li>${escapeHtml(p)}</li>`).join("")}
-        </ol>
-        ${botonPasosRobot(receta)}
-      </details>`
-    : "";
-
-  return `
-    <div class="food-result">
-      <div class="food-result-header"><h3>${escapeHtml(receta.nombre)}</h3></div>
-      ${faltantesHtml}
-      ${semaforo}
-      ${pasos}
-    </div>`;
-}
-
-// --- Las recetas fijas, dichas en el robot del paciente -----------------
-// Los pasos caseros de las 35 recetas viven en el repositorio
-// (datos/recetas_chilenas.py). Traducirlos a cada máquina sería 35 x 7 juegos
-// de pasos escritos a mano, así que la traducción se pide al backend cuando el
-// paciente la necesita y se guarda en el dispositivo: la misma receta en la
-// misma máquina no se vuelve a pedir nunca.
-const PASOS_ROBOT_CACHE_KEY = "kidneyChefPasosRobot";
-
-function cachePasosRobot() {
-  try {
-    return JSON.parse(localStorage.getItem(PASOS_ROBOT_CACHE_KEY) || "{}");
-  } catch {
-    return {};
-  }
-}
-
-function botonPasosRobot(receta) {
-  const robot = robotSeleccionado();
-  if (!robot || !nivelSuficiente("diamond")) return "";
-  const guardados = cachePasosRobot()[`${receta.id}|${robot.id}`];
-  if (guardados) return pasosRobotHtml({ robot, pasos_robot: guardados }, { conCopiar: false });
-  return `<button class="btn btn-secondary btn-pasos-robot" data-receta="${escapeHtml(receta.id)}">
-            Verlo en mi ${escapeHtml(robot.nombre)}
-          </button>`;
-}
-
-async function pedirPasosRobot(recetaId, boton) {
-  const robot = robotSeleccionado();
-  if (!robot) return;
-  boton.disabled = true;
-  boton.textContent = "Adaptando la receta…";
-  try {
-    const res = await fetch(`${API_BASE}/api/pasos-robot`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
-      body: JSON.stringify({ receta: recetaId, robot: robot.id }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Error desconocido");
-
-    const cache = cachePasosRobot();
-    cache[`${recetaId}|${robot.id}`] = data.pasos_robot;
-    localStorage.setItem(PASOS_ROBOT_CACHE_KEY, JSON.stringify(cache));
-
-    boton.outerHTML = pasosRobotHtml(data, { conCopiar: false });
-  } catch (err) {
-    boton.disabled = false;
-    boton.textContent = err.message;
-  }
-}
-
 // --- Identificar ingredientes por foto y generar una receta a medida con IA ---
 let refrigeradorImagenDataUrl = null;
 let ingredientesIdentificados = []; // [{ alimentoIA, match }], match siempre resuelto en FOODS
@@ -2087,7 +1940,6 @@ function limpiarSeleccionRefrigerador() {
   refrigeradorImagenDataUrl = null;
   els.refrigeradorPreviewWrap.hidden = true;
   els.refrigeradorIdentificarBtn.disabled = true;
-  els.refrigeradorResultados.hidden = true;
   els.refrigeradorRecetaIa.hidden = true;
   setRefrigeradorStatus("");
 }
