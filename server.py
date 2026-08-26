@@ -591,7 +591,7 @@ tratante recomienda en general no superar esta densidad en el plato final:
 
     bloque_robot, forma_robot = _bloque_robot(robot)
 
-    return f"""Eres un asistente que arma una receta casera chilena para un paciente con \
+    return f"""Eres un asistente que arma una receta casera para un paciente chileno con \
 enfermedad renal crónica, usando SOLO los ingredientes que tiene disponibles. La precisión \
 de las cantidades importa para su salud: si te pasas del presupuesto de un nutriente, el \
 paciente puede terminar con niveles peligrosos de potasio o fósforo en la sangre.
@@ -649,6 +649,19 @@ No asumas un corte específico que el nombre no aclara — evita preparaciones q
 funcionan con un corte particular (ej. "bistec" o "filete" para carne de res genérica); \
 preferí preparaciones versátiles que funcionan con cualquier forma del ingrediente (guisos, \
 salteados, cazuelas, revueltos).
+- La cocina NO tiene que ser chilena. Elige la preparación que mejor aproveche los \
+ingredientes disponibles, venga de donde venga: un salteado con salsa de soya, una pasta, \
+un curry de lentejas, tacos, un cuscús, una tortilla española, un salmón al horno. La dieta \
+renal ya le quita opciones al paciente; encerrarlo además en un solo recetario le quita \
+más. Si los ingredientes calzan naturalmente con un plato chileno, propónlo sin problema, \
+pero no fuerces uno.
+- Nombra el plato como se llama de verdad y, si no es chileno, deja claro de dónde viene \
+(por ejemplo "Curry de lentejas al estilo indio" o "Salteado de pollo con verduras al wok"). \
+El paciente tiene que saber qué está cocinando.
+- Usa solo condimentos que estén en la lista de ingredientes disponibles o que sean de \
+despensa básica (sal, aceite, azúcar, pimienta, orégano, ají de color). No inventes \
+ingredientes que el paciente no tiene: si un plato necesita algo que no está, adáptalo o \
+elige otro.
 - Tamaño del plato: arma una porción realista de una comida para una persona, del orden \
 de {PORCION_OBJETIVO_G[0]} a {PORCION_OBJETIVO_G[1]} g en total para un plato principal \
 (un guiso o una sopa puede ir algo por encima; un acompañamiento, por debajo).
