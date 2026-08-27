@@ -60,7 +60,7 @@ const NIVELES_INFO = {
     // Store. Cuando la pestaña vuelva, vuelve también este bullet.
     features: [
       "Semáforo de sodio, potasio, fósforo y carbohidratos",
-      "Tu día de hoy: metas diarias, registro por foto e historial",
+      "Así va tu día: metas diarias, registro por foto e historial",
     ],
   },
   platinum: {
@@ -470,18 +470,13 @@ function estadoSuscripcion() {
 }
 
 function renderSuscripcion() {
-  const { diasRestantes, enTrial, bloqueado } = estadoSuscripcion();
+  const { bloqueado } = estadoSuscripcion();
 
   els.paywallOverlay.hidden = !bloqueado;
   if (bloqueado) renderPaywallNiveles();
 
-  els.trialBanner.hidden = !enTrial || bloqueado;
-  if (enTrial) {
-    els.trialBannerText.textContent =
-      diasRestantes === 1
-        ? "Te queda 1 día de prueba gratis"
-        : `Te quedan ${diasRestantes} días de prueba gratis`;
-  }
+  // Los días de prueba los arma renderBanner(), que además rota el consejo.
+  renderBanner();
 }
 
 // Dibuja el toggle mensual/anual y las 3 tarjetas de nivel del paywall según
@@ -1199,7 +1194,6 @@ const els = {
   aboutBtn: document.getElementById("about-btn"),
   aboutModal: document.getElementById("about-modal"),
   aboutClose: document.getElementById("about-close"),
-  tipText: document.getElementById("tip-text"),
   planBadge: document.getElementById("plan-badge"),
   aboutPlan: document.getElementById("about-plan"),
   etapaSello: document.getElementById("etapa-sello"),
@@ -1338,7 +1332,7 @@ async function init() {
   }
   populateDatalist();
   renderHistory();
-  renderTipOfDay();
+  renderBanner();
   renderPlan();
   renderDatosPersonales();
   renderDatosClinicos();
@@ -1466,10 +1460,59 @@ function irATab(tab) {
   localStorage.setItem(TAB_STORAGE_KEY, tab);
 }
 
-function renderTipOfDay() {
+function consejoDelDia() {
   const start = new Date(new Date().getFullYear(), 0, 0);
   const dayOfYear = Math.floor((new Date() - start) / 86400000);
-  els.tipText.textContent = TIPS_DEL_DIA[dayOfYear % TIPS_DEL_DIA.length];
+  return TIPS_DEL_DIA[dayOfYear % TIPS_DEL_DIA.length];
+}
+
+// --- Franja de anuncios de arriba --------------------------------------
+// Antes el consejo del día ocupaba una tarjeta de 145 px en la pestaña Hoy,
+// compitiendo por espacio con lo clínico. Ahora rota en la misma franja que
+// avisa los días de prueba: mismo mensaje, cero altura extra.
+let bannerMensajes = [];
+let bannerIndice = 0;
+let bannerTimer = null;
+
+function renderBanner() {
+  const { diasRestantes, enTrial, bloqueado } = estadoSuscripcion();
+  bannerMensajes = [];
+  if (enTrial && !bloqueado) {
+    bannerMensajes.push(
+      diasRestantes === 1
+        ? "Te queda 1 día de prueba gratis"
+        : `Te quedan ${diasRestantes} días de prueba gratis`
+    );
+  }
+  const consejo = consejoDelDia();
+  if (consejo) bannerMensajes.push(consejo);
+
+  els.trialBanner.hidden = bloqueado || bannerMensajes.length === 0;
+  if (els.trialBanner.hidden) {
+    clearInterval(bannerTimer);
+    bannerTimer = null;
+    return;
+  }
+
+  bannerIndice = 0;
+  mostrarMensajeBanner();
+  clearInterval(bannerTimer);
+  // Con un solo mensaje no hay nada que rotar.
+  if (bannerMensajes.length > 1) {
+    bannerTimer = setInterval(() => {
+      bannerIndice = (bannerIndice + 1) % bannerMensajes.length;
+      mostrarMensajeBanner();
+    }, 7000);
+  }
+}
+
+function mostrarMensajeBanner() {
+  const el = els.trialBannerText;
+  el.classList.add("banner-saliendo");
+  setTimeout(() => {
+    el.textContent = bannerMensajes[bannerIndice];
+    el.classList.remove("banner-saliendo");
+  }, 260);
 }
 
 function populateDatalist() {
@@ -3498,8 +3541,14 @@ function renderHistory() {
   const history = loadHistory();
   renderCalculadora();
 
+  // Vacío, el historial ocupaba una tarjeta de 168 px para decir que no hay
+  // nada. Se colapsa a una línea y se esconde el botón de borrar, que sin
+  // contenido tampoco tiene sentido.
+  const card = els.historyList.closest(".history-card");
+  if (card) card.classList.toggle("history-card-vacio", history.length === 0);
+
   if (history.length === 0) {
-    els.historyList.innerHTML = `<p class="history-empty">Aún no has guardado ningún alimento.</p>`;
+    els.historyList.innerHTML = `<p class="history-empty">Todavía no registras alimentos hoy.</p>`;
     return;
   }
 
@@ -3518,10 +3567,8 @@ function renderHistory() {
         .join("");
       return `
         <div class="history-item">
-          <div>
-            <div class="hi-name">${escapeHtml(h.nombre)}</div>
-            <div class="hi-meta">${h.porcionG} g · ${time}</div>
-          </div>
+          <div class="hi-name">${escapeHtml(h.nombre)}</div>
+          <div class="hi-meta">${h.porcionG} g · ${time}</div>
           <div class="history-dots">${dots}</div>
         </div>`;
     })

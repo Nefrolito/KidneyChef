@@ -538,15 +538,34 @@ h1, h2, h3 {
   color: var(--muted);
   font-size: 0.78rem;
   font-weight: 500;
-  margin: -0.4rem 0 0.9rem;
+  /* Iba con margen superior NEGATIVO para pegarse a las filas de arriba, pero
+     la última fila no lleva margen inferior (.calc-fila:last-child), así que
+     ese negativo metía el aviso encima del texto de la última fila. Se notaba
+     sobre todo sin metas de potasio/fósforo, donde esas filas son bajitas. */
+  margin: 0.75rem 0 0.9rem;
 }
 .summary-caption svg { flex-shrink: 0; }
 
-.history-list { display: flex; flex-direction: column; gap: 0.5rem; }
-.history-item {
+/* En horizontal: con 20 alimentos guardados la tarjeta crecía sin techo y
+   empujaba todo lo de abajo. Así el alto no depende de cuántos haya, y se
+   recorren deslizando. */
+.history-list {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.3rem;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.history-list::-webkit-scrollbar { height: 4px; }
+.history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+.history-item {
+  flex: 0 0 auto;
+  width: 10.5rem;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   padding: 0.7rem 0.85rem;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -560,7 +579,13 @@ h1, h2, h3 {
 .dot-verde { background: var(--verde); }
 .dot-amarillo { background: var(--amarillo); }
 .dot-rojo { background: var(--rojo); }
-.history-empty { color: var(--muted); font-size: 0.9rem; text-align: center; padding: 1.2rem 0; font-weight: 500; }
+.history-empty { color: var(--muted); font-size: 0.88rem; font-weight: 500; margin: 0; }
+/* Sin alimentos, la tarjeta se colapsa a una línea: sin el relleno grande y
+   sin el botón de borrar, que no tendría nada que borrar. */
+.history-card-vacio { padding-top: 0.9rem; padding-bottom: 0.9rem; }
+.history-card-vacio .history-header { margin-bottom: 0.35rem; }
+.history-card-vacio #clear-history { display: none; }
+.history-card-vacio .history-list { overflow: visible; padding-bottom: 0; }
 
 .clinical-card h2, .tratante-card h2 { margin: 0 0 0.3rem; font-size: 1.1rem; font-weight: 700; }
 #metas-tratante { margin-top: 1rem; }
@@ -1192,6 +1217,12 @@ h1, h2, h3 {
   font-weight: 600;
   text-align: center;
 }
+#trial-banner-text {
+  display: inline-block;
+  transition: opacity 0.26s ease, transform 0.26s ease;
+}
+#trial-banner-text.banner-saliendo { opacity: 0; transform: translateY(-4px); }
+
 .trial-banner[hidden] { display: none; }
 
 .terminos-overlay {
