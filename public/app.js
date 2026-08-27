@@ -1225,7 +1225,7 @@ const els = {
   planUpsell: document.getElementById("plan-upsell"),
   planUpsellText: document.getElementById("plan-upsell-text"),
   trialBanner: document.getElementById("trial-banner"),
-  trialBannerText: document.getElementById("trial-banner-text"),
+  bannerPista: document.getElementById("banner-pista"),
   paywallOverlay: document.getElementById("paywall-overlay"),
   paywallPeriodoToggle: document.getElementById("paywall-periodo-toggle"),
   paywallNiveles: document.getElementById("paywall-niveles"),
@@ -1466,54 +1466,49 @@ function consejoDelDia() {
   return TIPS_DEL_DIA[dayOfYear % TIPS_DEL_DIA.length];
 }
 
-// --- Franja de anuncios de arriba --------------------------------------
-// Antes el consejo del día ocupaba una tarjeta de 145 px en la pestaña Hoy,
-// compitiendo por espacio con lo clínico. Ahora rota en la misma franja que
-// avisa los días de prueba: mismo mensaje, cero altura extra.
-let bannerMensajes = [];
-let bannerIndice = 0;
-let bannerTimer = null;
+// --- Banda de anuncios de arriba --------------------------------------
+// El consejo del día ocupaba una tarjeta de 145 px en la pestaña Hoy,
+// compitiendo por espacio con lo clínico. Ahora se desplaza en continuo por la
+// misma franja que avisa los días de prueba: mismo mensaje, cero altura extra.
+//
+// La pista lleva el contenido DOS veces y la animación recorre exactamente la
+// mitad, así el final empalma con el principio y no se ve el salto.
+const BANNER_PX_POR_SEGUNDO = 55;
 
-function renderBanner() {
+function mensajesBanner() {
   const { diasRestantes, enTrial, bloqueado } = estadoSuscripcion();
-  bannerMensajes = [];
+  const mensajes = [];
   if (enTrial && !bloqueado) {
-    bannerMensajes.push(
+    mensajes.push(
       diasRestantes === 1
         ? "Te queda 1 día de prueba gratis"
         : `Te quedan ${diasRestantes} días de prueba gratis`
     );
   }
   const consejo = consejoDelDia();
-  if (consejo) bannerMensajes.push(consejo);
-
-  els.trialBanner.hidden = bloqueado || bannerMensajes.length === 0;
-  if (els.trialBanner.hidden) {
-    clearInterval(bannerTimer);
-    bannerTimer = null;
-    return;
-  }
-
-  bannerIndice = 0;
-  mostrarMensajeBanner();
-  clearInterval(bannerTimer);
-  // Con un solo mensaje no hay nada que rotar.
-  if (bannerMensajes.length > 1) {
-    bannerTimer = setInterval(() => {
-      bannerIndice = (bannerIndice + 1) % bannerMensajes.length;
-      mostrarMensajeBanner();
-    }, 7000);
-  }
+  if (consejo) mensajes.push(`💡 ${consejo}`);
+  return mensajes;
 }
 
-function mostrarMensajeBanner() {
-  const el = els.trialBannerText;
-  el.classList.add("banner-saliendo");
-  setTimeout(() => {
-    el.textContent = bannerMensajes[bannerIndice];
-    el.classList.remove("banner-saliendo");
-  }, 260);
+function renderBanner() {
+  const { bloqueado } = estadoSuscripcion();
+  const mensajes = mensajesBanner();
+
+  els.trialBanner.hidden = bloqueado || mensajes.length === 0;
+  if (els.trialBanner.hidden) return;
+
+  const grupo = mensajes.map((m) => `<span class="banner-item">${escapeHtml(m)}</span>`).join("");
+  els.bannerPista.innerHTML = grupo + grupo;
+
+  // La duración se calcula desde el ancho real para que la banda avance
+  // siempre a la misma velocidad, sea el consejo corto o largo.
+  requestAnimationFrame(() => {
+    const recorrido = els.bannerPista.scrollWidth / 2;
+    if (!recorrido) return;
+    els.bannerPista.style.animationDuration = `${recorrido / BANNER_PX_POR_SEGUNDO}s`;
+  });
 }
+
 
 function populateDatalist() {
   els.foodDatalist.innerHTML = FOODS.map((f) => `<option value="${escapeHtml(f.nombre)}">`).join("");

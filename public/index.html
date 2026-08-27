@@ -41,8 +41,11 @@
     </div>
   </header>
 
+  <!-- Banda de anuncios: el consejo del día y los días de prueba se desplazan
+       en continuo de derecha a izquierda. La pista lleva el contenido DOS
+       veces para que el bucle no tenga salto visible. -->
   <div id="trial-banner" class="trial-banner" hidden>
-    <span id="trial-banner-text"></span>
+    <div id="banner-pista" class="banner-pista" aria-live="polite"></div>
   </div>
 
   <main class="container">
