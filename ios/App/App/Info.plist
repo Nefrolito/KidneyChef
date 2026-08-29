@@ -22,6 +22,11 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<!-- La app solo usa HTTPS estándar hacia su propio backend: no lleva
+	     criptografía propia ni no exenta. Declararlo acá evita que App Store
+	     Connect pregunte por exportación en cada subida. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
