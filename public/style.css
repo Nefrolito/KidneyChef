@@ -1337,6 +1337,20 @@ h1, h2, h3 {
   overscroll-behavior: contain;
 }
 .paywall-overlay > .paywall-card { margin: auto; }
+.paywall-card-niveles { position: relative; }
+.paywall-cerrar { position: absolute; top: 0.75rem; right: 0.75rem; }
+.paywall-cerrar[hidden] { display: none; }
+
+.suscripcion-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.suscripcion-texto { min-width: 0; }
+.suscripcion-texto h2 { margin: 0 0 0.15rem; }
+.suscripcion-texto .clinical-note { margin: 0; }
+.suscripcion-btn { flex: none; }
 .paywall-overlay[hidden] { display: none; }
 .paywall-card {
   max-width: 360px;

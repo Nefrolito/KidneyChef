@@ -132,6 +132,8 @@ async function comprarSuscripcion() {
       const paquete = current?.availablePackages?.find((pkg) => pkg.product?.identifier === idProducto);
       if (paquete) {
         await Purchases.purchasePackage({ aPackage: paquete });
+        // Si se compró desde "Ver planes", el paywall ya cumplió su función.
+        paywallModoConsulta = false;
         await sincronizarSuscripcionRevenueCat();
         return;
       }
@@ -496,11 +498,52 @@ function estadoSuscripcion() {
   return { diasRestantes, enTrial, bloqueado };
 }
 
+// El paywall se abre por dos motivos distintos: porque se acabó el mes de
+// prueba (bloqueante, sin salida hasta suscribirse) o porque el paciente tocó
+// "Ver planes" (consulta, se cierra con la X). Antes solo existía el primero, y
+// eso dejaba los 6 productos inalcanzables durante los primeros 30 días.
+let paywallModoConsulta = false;
+
+function abrirPaywallConsulta() {
+  paywallModoConsulta = true;
+  renderSuscripcion();
+}
+
+function cerrarPaywallConsulta() {
+  paywallModoConsulta = false;
+  renderSuscripcion();
+}
+
+// Estado en palabras para la tarjeta "Tu suscripción" de la pestaña Hoy.
+function textoEstadoSuscripcion() {
+  const { diasRestantes, enTrial } = estadoSuscripcion();
+  const nivel = ensurePerfil().suscripcion.nivel;
+  if (nivel) return `Tienes el nivel ${NIVELES_INFO[nivel].nombre} activo.`;
+  if (enTrial) {
+    return diasRestantes === 1
+      ? "Te queda 1 día de prueba gratis."
+      : `Te quedan ${diasRestantes} días de prueba gratis.`;
+  }
+  return "Tu mes de prueba terminó.";
+}
+
 function renderSuscripcion() {
   const { bloqueado } = estadoSuscripcion();
+  const mostrar = bloqueado || paywallModoConsulta;
 
-  els.paywallOverlay.hidden = !bloqueado;
-  if (bloqueado) renderPaywallNiveles();
+  els.paywallOverlay.hidden = !mostrar;
+  // Con el trial vencido no hay X: la app queda bloqueada hasta que haya
+  // suscripción. En modo consulta sí se puede salir.
+  els.paywallCerrarBtn.hidden = bloqueado;
+  els.paywallTitulo.textContent = bloqueado
+    ? "Tu mes de prueba terminó"
+    : "Los planes de KidneyChef";
+  els.paywallBajada.textContent = bloqueado
+    ? "Elige el nivel de KidneyChef que se ajuste a lo que necesitas."
+    : "Puedes suscribirte cuando quieras: tu mes de prueba sigue corriendo igual.";
+  if (mostrar) renderPaywallNiveles();
+
+  els.suscripcionEstado.textContent = textoEstadoSuscripcion();
 
   // Los días de prueba los arma renderBanner(), que además rota el consejo.
   renderBanner();
@@ -1258,6 +1301,11 @@ const els = {
   paywallNiveles: document.getElementById("paywall-niveles"),
   paywallSuscribirBtn: document.getElementById("paywall-suscribir-btn"),
   paywallRestaurarBtn: document.getElementById("paywall-restaurar-btn"),
+  paywallCerrarBtn: document.getElementById("paywall-cerrar-btn"),
+  paywallTitulo: document.getElementById("paywall-titulo"),
+  paywallBajada: document.getElementById("paywall-bajada"),
+  suscripcionEstado: document.getElementById("suscripcion-estado"),
+  verPlanesBtn: document.getElementById("ver-planes-btn"),
   paywallMsg: document.getElementById("paywall-msg"),
   terminosOverlay: document.getElementById("terminos-overlay"),
   terminosCheckbox: document.getElementById("terminos-checkbox"),
@@ -1412,6 +1460,8 @@ async function init() {
   els.egfrCistatina.addEventListener("input", guardarDatosClinicos);
   els.paywallSuscribirBtn.addEventListener("click", comprarSuscripcion);
   els.paywallRestaurarBtn.addEventListener("click", restaurarCompras);
+  els.verPlanesBtn.addEventListener("click", abrirPaywallConsulta);
+  els.paywallCerrarBtn.addEventListener("click", cerrarPaywallConsulta);
   els.paywallPeriodoToggle.addEventListener("click", (e) => {
     const btn = e.target.closest(".paywall-periodo-btn");
     if (!btn) return;
