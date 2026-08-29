@@ -143,6 +143,33 @@ async function comprarSuscripcion() {
   els.paywallMsg.textContent = "La suscripción estará disponible muy pronto en esta app.";
 }
 
+// Restaurar compras. Apple lo exige (guía 3.1.1) para que alguien que cambia
+// de teléfono, reinstala, o ya pagó en otro dispositivo con el mismo Apple ID
+// recupere su suscripción sin volver a pagar. Sin este botón el binario se
+// rechaza, aunque la compra funcione perfecto.
+async function restaurarCompras() {
+  const platform = esAppNativa() && window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : null;
+  const apiKey = platform === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
+  els.paywallMsg.hidden = false;
+  if (!apiKey) {
+    els.paywallMsg.textContent = "La suscripción estará disponible muy pronto en esta app.";
+    return;
+  }
+  els.paywallMsg.textContent = "Buscando tus compras anteriores…";
+  try {
+    const Purchases = window.Capacitor.Plugins.Purchases;
+    await Purchases.restorePurchases();
+    await sincronizarSuscripcionRevenueCat();
+    const nivel = ensurePerfil().suscripcion.nivel;
+    els.paywallMsg.textContent = nivel
+      ? `Listo: restauramos tu suscripción ${NIVELES_INFO[nivel].nombre}.`
+      : "No encontramos ninguna suscripción activa en esta cuenta.";
+  } catch (e) {
+    console.warn("No se pudo restaurar la compra", e);
+    els.paywallMsg.textContent = "No pudimos restaurar tus compras. Inténtalo de nuevo en un momento.";
+  }
+}
+
 // Refleja en perfil.suscripcion.nivel el entitlement real de RevenueCat (el
 // más alto entre los activos, o null si no hay ninguno). Se guarda en
 // localStorage (no solo en memoria) para que el paywall pueda evaluarse en
@@ -1230,6 +1257,7 @@ const els = {
   paywallPeriodoToggle: document.getElementById("paywall-periodo-toggle"),
   paywallNiveles: document.getElementById("paywall-niveles"),
   paywallSuscribirBtn: document.getElementById("paywall-suscribir-btn"),
+  paywallRestaurarBtn: document.getElementById("paywall-restaurar-btn"),
   paywallMsg: document.getElementById("paywall-msg"),
   terminosOverlay: document.getElementById("terminos-overlay"),
   terminosCheckbox: document.getElementById("terminos-checkbox"),
@@ -1383,6 +1411,7 @@ async function init() {
   els.egfrCreatinina.addEventListener("input", guardarDatosClinicos);
   els.egfrCistatina.addEventListener("input", guardarDatosClinicos);
   els.paywallSuscribirBtn.addEventListener("click", comprarSuscripcion);
+  els.paywallRestaurarBtn.addEventListener("click", restaurarCompras);
   els.paywallPeriodoToggle.addEventListener("click", (e) => {
     const btn = e.target.closest(".paywall-periodo-btn");
     if (!btn) return;

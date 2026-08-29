@@ -1325,12 +1325,18 @@ h1, h2, h3 {
   inset: 0;
   z-index: 500;
   display: flex;
-  align-items: center;
+  /* flex-start + margin:auto en la tarjeta, no align-items:center: con el
+     centrado, una tarjeta más alta que la pantalla se recorta por arriba y por
+     abajo y esos pedazos no se pueden scrollear. Acá abajo hay contenido que
+     Apple exige poder ver (renovación automática, términos, privacidad). */
+  align-items: flex-start;
   justify-content: center;
   padding: 1.25rem;
   background: var(--bg);
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
+.paywall-overlay > .paywall-card { margin: auto; }
 .paywall-overlay[hidden] { display: none; }
 .paywall-card {
   max-width: 360px;
@@ -1356,6 +1362,20 @@ h1, h2, h3 {
 .paywall-card h2 { margin: 0 0 0.6rem; font-size: 1.15rem; color: var(--brand-dark); }
 .paywall-card p { margin: 0 0 0.75rem; font-size: 0.9rem; color: var(--text); line-height: 1.5; }
 .paywall-btn { width: 100%; margin-top: 0.9rem; }
+.paywall-restaurar {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.6rem;
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--brand-dark);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.paywall-legal { margin: 0.7rem 0 0; font-size: 0.72rem; color: var(--muted); line-height: 1.45; }
+.paywall-legal a { color: var(--muted); }
 .paywall-msg { margin-top: 0.85rem; font-size: 0.82rem; color: var(--muted); }
 .paywall-msg[hidden] { display: none; }
 

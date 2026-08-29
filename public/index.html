@@ -450,7 +450,23 @@
       <div class="paywall-niveles" id="paywall-niveles"></div>
 
       <button id="paywall-suscribir-btn" class="btn btn-primary paywall-btn">Suscribirme</button>
+      <button type="button" id="paywall-restaurar-btn" class="paywall-restaurar">Restaurar compras</button>
       <p class="paywall-msg" id="paywall-msg" hidden></p>
+
+      <!-- Apple exige las tres cosas de acá abajo en la propia pantalla de
+           suscripción: que se diga que se renueva sola y cómo se cancela
+           (guía 3.1.2), el botón de restaurar compras (guía 3.1.1) y los
+           enlaces a términos y privacidad. Sin esto el binario se rechaza. -->
+      <p class="paywall-legal">
+        La suscripción se renueva automáticamente. Se cobra a tu cuenta de Apple ID
+        al confirmar la compra y se vuelve a cobrar cada período, salvo que la
+        canceles al menos 24 horas antes de que termine. Puedes gestionarla o
+        cancelarla cuando quieras desde los ajustes de tu cuenta.
+      </p>
+      <p class="paywall-legal">
+        <a href="terminos.html" target="_blank" rel="noopener">Términos y condiciones</a>
+        · <a href="privacidad.html" target="_blank" rel="noopener">Política de privacidad</a>
+      </p>
     </div>
   </div>
 
