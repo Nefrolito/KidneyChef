@@ -53,6 +53,12 @@ INGREDIENTES = {
     "pollo": ("pollo", "Pollo", "Carnes y pescados", "pollo"),
     "cerdo": ("cerdo", "Cerdo", "Carnes y pescados", "cerdo"),
     "merluza": ("merluza", "Merluza (o pescado blanco similar)", "Carnes y pescados", "merluza"),
+    # Misma casilla y mismo nutrientes_id que la merluza cruda, a propósito:
+    # ambos campos describen lo que el paciente tiene en el refrigerador (el
+    # nombre que marca en el checklist, y con qué dato lo cuenta el generador
+    # con IA). Sobre qué entrada se pesan los gramos de la receta es otra cosa,
+    # y la resuelven usda_mapeo.py / agregar_calorias.py con "merluza_cocida".
+    "merluza_cocida": ("merluza", "Merluza (o pescado blanco similar)", "Carnes y pescados", "merluza"),
     "leche": ("leche", "Leche", "Lácteos y huevos", "leche_entera"),
     "mantequilla": ("mantequilla", "Mantequilla", "Lácteos y huevos", "mantequilla"),
     "cilantro": ("cilantro", "Cilantro", "Verduras y legumbres", "cilantro"),
@@ -118,6 +124,10 @@ NO_SON_INGREDIENTES = {
     "papas_fritas", "pizza", "galleta", "chocolate", "mermelada",
     "empanada_pino", "empanada_queso", "completo", "churrasco",
     "marraqueta", "hallulla", "sopaipilla",
+    # Existe en nutrientes.json solo como base de cálculo de los platos de
+    # pescado cocido. En el checklist sería una segunda casilla para lo mismo
+    # que ya ofrece "Merluza".
+    "merluza_cocida",
 }
 
 

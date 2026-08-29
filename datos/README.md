@@ -71,6 +71,26 @@ Dos equivalencias que conviene tener presentes:
   (self-rising), que en USDA tiene 1190 mg de sodio y 595 mg de fósforo por
   100 g. Si una receta usa harina con polvos, este dato no aplica.
 
+**2026-08-28 — merluza cocida (`merluza_cocida`, FDC 175161, "Fish, whiting,
+mixed species, cooked, dry heat").** "Merluza al vapor" guardaba 401 mg de potasio
+por 100 g, una cifra heredada del prototipo anterior a la carga USDA: no se derivaba
+de su propia receta (`{merluza: 97, sal: 0.5}`) ni de ninguna entrada de USDA.
+Recalcularla sobre la merluza **cruda** daba 242 mg, y eso habría sido peor: cocer
+pescado no lixivia potasio como hervir una verdura, sino que lo concentra (el pescado
+pierde agua, 80,3 g → 74,7 g por 100 g), así que el crudo **subestima** el potasio de
+un plato cocido — el error peligroso para un paciente renal. Se agregó la entrada
+cocida y la receta ahora pesa sobre ella: K 421, P 276, Na 322, 112,5 kcal, todo
+derivable de la receta y de USDA. Es la misma lógica del criterio de abajo, con el
+signo invertido: la papa hervida baja de 417 a 321 porque el potasio se va al agua;
+la merluza al vapor sube de 249 a 434 porque el agua se va y el potasio se queda.
+
+**Queda pendiente el mismo problema en dos platos más:** `completo` (K 203 guardado
+contra 255 recalculado) y `merluza_frita` (usa la merluza cruda, y además ni su
+fósforo ni su sodio se derivan de su receta). `merluza_frita` no se puede recalcular
+entero hasta que `aceite` y `harina` tengan potasio/fósforo/sodio en la base, no solo
+calorías — ver los ocho ingredientes de `INGREDIENTE_KCAL_DIRECTO` en
+`agregar_calorias.py`.
+
 ## Robots de cocina
 
 `public/robots-cocina.json` sigue el mismo criterio que este archivo: ninguna

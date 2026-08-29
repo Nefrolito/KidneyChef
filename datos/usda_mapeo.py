@@ -98,6 +98,13 @@ MAPEO = {
     # USDA SR Legacy no tiene "hake" (merluza) como especie propia; se usa
     # whiting, especie muy cercana. Mismo valor para filete y merluza entera.
     "merluza": "Fish, whiting, mixed species, raw",
+    # Version cocida, para los platos de pescado ya preparado. Cocer no lixivia
+    # potasio como el hervido de una verdura: el pescado pierde agua, asi que
+    # los minerales quedan MAS concentrados por 100 g (K 249 -> 434). Usar el
+    # crudo en un plato cocido subestima el potasio, que es el error peligroso.
+    # USDA no tiene "al vapor" para whiting; "cooked, dry heat" es la mas
+    # cercana (tampoco lixivia al agua, a diferencia de "boiled").
+    "merluza_cocida": "Fish, whiting, mixed species, cooked, dry heat",
     # Cortes de cerdo para la lista de supermercado, mismo criterio (crudos,
     # equivalencia USDA por corte/grupo muscular, no dato chileno medido).
     "chuleta_cerdo": "Pork, fresh, loin, center loin (chops), bone-in, separable lean and fat, raw",

@@ -55,7 +55,7 @@ RECETAS = {
  "merluza_frita": ("Merluza frita", "Pescado", ["pescado frito","merluza"],
     {"merluza": 74, "harina": 8, "aceite": 12, "sal": 0.9}),
  "merluza_vapor": ("Merluza al vapor", "Pescado", ["pescado al vapor"],
-    {"merluza": 97, "sal": 0.5}),
+    {"merluza_cocida": 97, "sal": 0.5}),
  "chorrillana": ("Chorrillana", "Plato preparado", ["chorrillana"],
     {"papa": 42, "vacuno": 22, "cebolla": 14, "huevo": 10, "aceite": 9, "sal": 1.0}),
  "arroz_leche": ("Arroz con leche", "Postre", ["arroz con leche"],

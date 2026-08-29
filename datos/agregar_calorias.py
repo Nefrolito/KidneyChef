@@ -125,6 +125,7 @@ KCAL_POR_FDC_ID = {
     "173468": 0.0,  # Salt, table
     "173709": 86.0,  # Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)
     "173713": 90.0,  # Fish, whiting, mixed species, raw
+    "175161": 116.0,  # Fish, whiting, mixed species, cooked, dry heat
     "173735": 132.0,  # Beans, black, mature seeds, cooked, boiled, without salt
     "173753": 110.0,  # Broadbeans (fava beans), mature seeds, cooked, boiled, without salt
     "173757": 164.0,  # Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt
@@ -170,7 +171,8 @@ INGREDIENTE_A_CANONICO = {
     "zanahoria": "zanahoria", "cerdo": "cerdo", "choclo_cocido": "maiz",
     "lenteja_cocida": "lenteja", "porotos_negros": "frijol_negro",
     "arroz_crudo": "arroz_blanco", "fideo_crudo": "pasta", "vienesa": "salchicha",
-    "merluza": "merluza", "sal": "sal", "zapallo": "calabaza",
+    "merluza": "merluza", "merluza_cocida": "merluza_cocida",
+    "sal": "sal", "zapallo": "calabaza",
 }
 
 # Ingredientes SIN equivalente canonico en nutrientes.json (condimentos de

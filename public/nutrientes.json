@@ -3332,19 +3332,19 @@
     "alias": [
       "pescado al vapor"
     ],
-    "potasio_mg": 401,
-    "fosforo_mg": 197,
-    "sodio_mg": 246,
+    "potasio_mg": 421,
+    "fosforo_mg": 276,
+    "sodio_mg": 322,
     "carbohidratos_g": 0.0,
-    "calorias_kcal": 87.3,
+    "calorias_kcal": 112.5,
     "aditivos_fosfato": null,
     "fuente": {
       "base": "Calculado desde receta con ingredientes USDA SR Legacy 2018-04",
       "receta_g_por_100g": {
-        "merluza": 97,
+        "merluza_cocida": 97,
         "sal": 0.5
       },
-      "_nota": "Proporciones estimadas de preparación casera estándar. Pendiente de validación."
+      "_nota": "Proporciones estimadas de preparación casera estándar. Los gramos de pescado son de merluza YA COCIDA (ver 'merluza_cocida'), siguiendo el criterio de datos/README.md de pesar las preparaciones sobre el alimento cocido. Corregido el 2026-08-28: los valores anteriores (K 401, P 197, Na 246) venían del prototipo previo a la carga USDA y no se derivaban de esta receta ni de ninguna entrada de USDA."
     },
     "indice_glucemico": null
   },
@@ -4042,6 +4042,28 @@
       "descripcion": "Fish, whiting, mixed species, raw",
       "fdc_id": "173713",
       "nota_equivalencia": "USDA SR Legacy no tiene 'hake' (merluza) como especie propia; se usa whiting (especie muy cercana, misma familia Merlucciidae/Gadiformes), no un dato chileno medido. Mismo valor para filete y merluza entera — la composición de la carne comestible no cambia por el corte, solo el precio por kg (sin desperdicio de espina/cabeza en el filete)."
+    },
+    "aditivos_fosfato": null,
+    "indice_glucemico": null
+  },
+  {
+    "id": "merluza_cocida",
+    "nombre": "Merluza cocida",
+    "categoria": "Pescado",
+    "alias": [
+      "merluza cocida",
+      "pescado blanco cocido"
+    ],
+    "potasio_mg": 434,
+    "fosforo_mg": 285,
+    "sodio_mg": 132,
+    "carbohidratos_g": 0.0,
+    "calorias_kcal": 116.0,
+    "fuente": {
+      "base": "USDA SR Legacy 2018-04",
+      "descripcion": "Fish, whiting, mixed species, cooked, dry heat",
+      "fdc_id": "175161",
+      "nota_equivalencia": "Misma equivalencia hake→whiting que la entrada cruda 'merluza'. USDA no tiene 'al vapor' para whiting; 'cooked, dry heat' es la más cercana y, como el vapor, no lixivia minerales al agua de cocción (a diferencia de 'boiled'). Cocer concentra: por 100 g el potasio sube de 249 a 434 respecto del crudo, porque el pescado pierde agua (80,3 g → 74,7 g)."
     },
     "aditivos_fosfato": null,
     "indice_glucemico": null
