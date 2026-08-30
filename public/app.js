@@ -732,17 +732,23 @@ function metaDiaria(nutriente) {
 }
 
 // Meta automática de K/P desde ciertas etapas de ERC
-// (config.etapas_aplicables en limites-clinicos.json), salvo que el paciente
-// tenga riesgo de hiperkalemia (diabetes o fármacos retenedores de potasio):
-// ahí Camilo prefirió individualización real por el tratante en vez de un
-// número fijo, dado que el riesgo es más impredecible. No se activa en
-// diálisis peritoneal ni en 3a/3b porque no están en etapas_aplicables.
-// Pedido explícito de Camilo, 2026-08-02 — ver _nota_objetivo_por_defecto.
+// (config.etapas_aplicables en limites-clinicos.json). No se activa en diálisis
+// peritoneal ni en 3a/3b porque no están en esa lista. Pedido de Camilo el
+// 2026-08-02; corregido el 2026-08-30 — ver _nota_meta_estricta.
+//
+// El riesgo de hiperkalemia (diabetes o fármacos retenedores de K) ANTES
+// anulaba la meta, y eso dejaba sin ninguna referencia justo al paciente de
+// mayor riesgo. Ahora aprieta en vez de callar: si el nutriente declara un
+// objetivo estricto, ese paciente recibe el extremo bajo del mismo rango
+// KDOQI/NKF. Solo el potasio lo declara, así que el fósforo queda desacoplado
+// de un factor que no altera la fosfatemia.
 function metaPorDefectoDesdeEtapa(config) {
   if (!config || config.objetivo_mg_dia_por_defecto == null) return null;
-  if (riesgoHiperkalemia()) return null;
   const etapa = situacionActual();
   if (!etapa || !config.etapas_aplicables.includes(etapa)) return null;
+  if (config.objetivo_mg_dia_por_defecto_estricto != null && riesgoHiperkalemia()) {
+    return config.objetivo_mg_dia_por_defecto_estricto;
+  }
   return config.objetivo_mg_dia_por_defecto;
 }
 
