@@ -1341,6 +1341,7 @@ const els = {
   refrigeradorPreview: document.getElementById("refrigerador-preview"),
   refrigeradorCameraInput: document.getElementById("refrigerador-camera-input"),
   refrigeradorIdentificarBtn: document.getElementById("refrigerador-identificar-btn"),
+  refrigeradorManual: document.getElementById("refrigerador-manual"),
   refrigeradorIaStatus: document.getElementById("refrigerador-ia-status"),
   refrigeradorIdentificados: document.getElementById("refrigerador-identificados"),
   refrigeradorGenerarBtn: document.getElementById("refrigerador-generar-btn"),
@@ -1999,6 +2000,16 @@ function handleRefrigeradorFileSelected(file) {
   reader.readAsDataURL(file);
 }
 
+// El checklist manual vive en un <details> colapsado para no ocupar la pantalla
+// con 114 casillas. Pero cuando es la única vía que le queda al paciente —sin
+// cámara, con mala luz, o cuando la IA no reconoce nada— hay que abrirlo y
+// llevarlo hasta ahí, no solo nombrarlo en un mensaje.
+function abrirChecklistManual() {
+  if (!els.refrigeradorManual) return;
+  els.refrigeradorManual.open = true;
+  els.refrigeradorManual.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
 function setRefrigeradorStatus(msg, isError = false, isLoading = false) {
   els.refrigeradorIaStatus.innerHTML = isLoading
     ? `<span class="status-spinner" aria-hidden="true"></span>${escapeHtml(msg)}`
@@ -2025,7 +2036,11 @@ async function identificarIngredientesRefrigerador() {
       .filter((item) => item.match);
 
     if (nuevos.length === 0) {
-      setRefrigeradorStatus("No identificamos ningún ingrediente conocido en la foto. Intenta con otra imagen o márcalos a mano.", true);
+      // Abrir el checklist, no solo nombrarlo: es la única salida que le queda
+      // al paciente y vive dentro de un <details> colapsado, así que
+      // mencionarlo sin abrirlo dejaba la sección en un callejón sin salida.
+      abrirChecklistManual();
+      setRefrigeradorStatus("No identificamos ningún ingrediente conocido en la foto. Márcalos a mano en la lista de abajo.", true);
       return;
     }
     // Cada foto reemplaza a la anterior, no se acumulan: una foto nueva
@@ -3159,7 +3174,8 @@ function analizarRecetaExterna() {
 async function generarRecetaIA() {
   const ingredientes = candidatosParaIA();
   if (ingredientes.length === 0) {
-    setRefrigeradorStatus("Identifica o marca al menos un ingrediente antes de generar una receta.", true);
+    abrirChecklistManual();
+    setRefrigeradorStatus("Marca al menos un ingrediente en la lista de abajo, o fotografía tu refrigerador.", true);
     return;
   }
   // Esta feature vive de la situación clínica del paciente — sin etapa ERC ni
