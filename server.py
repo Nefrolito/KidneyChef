@@ -243,6 +243,21 @@ def format_espera(segundos):
     return f"{horas} hora{'s' if horas != 1 else ''}"
 
 
+def _verificar_no_truncado(payload, que):
+    """Corta con un error claro si el modelo se quedó sin max_tokens.
+
+    Sin esto, una respuesta truncada llega como JSON inválido y se reporta
+    como "no se pudo interpretar la respuesta de la IA", que manda a buscar
+    el problema al lugar equivocado: el JSON está mal porque quedó cortado a
+    media palabra, no porque el modelo se haya equivocado de formato."""
+    if payload.get("stop_reason") == "max_tokens":
+        raise RuntimeError(
+            f"La respuesta de la IA se cortó por falta de espacio ({que}). "
+            "Es un problema de max_tokens en el servidor, no de tu foto ni de "
+            "tus ingredientes."
+        )
+
+
 def _call_claude_vision_con_prompt(data_url, prompt):
     match = re.match(r"^data:(image/\w+);base64,(.+)$", data_url, re.DOTALL)
     if not match:
@@ -258,7 +273,11 @@ def _call_claude_vision_con_prompt(data_url, prompt):
 
     body = json.dumps({
         "model": ANTHROPIC_MODEL,
-        "max_tokens": 1024,
+        # El pensamiento adaptativo se descuenta de este mismo presupuesto, así
+        # que el techo tiene que dejar espacio para pensar Y para el JSON. Un
+        # max_tokens ajustado no ahorra: se paga por lo generado, no por el
+        # techo, y quedarse corto trunca la respuesta a media palabra.
+        "max_tokens": 4096,
         # Sonnet 5 piensa por defecto (adaptive thinking). Desactivarlo del
         # todo ("disabled") hace que a veces escriba su razonamiento como
         # texto plano antes del JSON en vez de pensar internamente — efort
@@ -286,6 +305,8 @@ def _call_claude_vision_con_prompt(data_url, prompt):
     except urllib.error.HTTPError as e:
         detail = e.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"Error de la API de Claude ({e.code}): {detail}") from e
+
+    _verificar_no_truncado(payload, "identificación de alimentos")
 
     text = "".join(
         block.get("text", "") for block in payload.get("content", []) if block.get("type") == "text"
@@ -368,6 +389,7 @@ y corregirla en la app.
 
 
 def _parsear_respuesta_receta(payload):
+    _verificar_no_truncado(payload, "lectura de la receta")
     text = "".join(
         block.get("text", "") for block in payload.get("content", []) if block.get("type") == "text"
     ).strip()
@@ -414,7 +436,7 @@ def call_claude_leer_receta(imagen=None, texto=None):
 
     body = json.dumps({
         "model": ANTHROPIC_MODEL,
-        "max_tokens": 3072,
+        "max_tokens": 8192,
         "output_config": {"effort": "low"},
         "messages": [{"role": "user", "content": contenido}],
     }).encode("utf-8")
@@ -693,7 +715,10 @@ def _intentar_llamada_receta(prompt, api_key):
     llamador pueda reintentar."""
     body = json.dumps({
         "model": ANTHROPIC_MODEL,
-        "max_tokens": 3072,
+        # Era 3072 y no alcanzaba: una receta de cinco pasos con consejo, más
+        # lo que el modelo gasta pensando, se pasaba del techo y el JSON
+        # llegaba cortado a media palabra.
+        "max_tokens": 16000,
         "output_config": {"effort": "low"},
         "messages": [{"role": "user", "content": prompt}],
     }).encode("utf-8")
@@ -710,6 +735,8 @@ def _intentar_llamada_receta(prompt, api_key):
     except urllib.error.HTTPError as e:
         detail = e.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"Error de la API de Claude ({e.code}): {detail}") from e
+
+    _verificar_no_truncado(payload, "generación de la receta")
 
     text = "".join(
         block.get("text", "") for block in payload.get("content", []) if block.get("type") == "text"
