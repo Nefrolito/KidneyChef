@@ -1869,7 +1869,10 @@ function renderResults() {
   els.results.hidden = false;
   els.resultsList.innerHTML = lastAnalysis
     .map((item, idx) => renderFoodResult(item, idx))
-    .join("");
+    .join("") + puenteALaReceta();
+
+  const puente = document.getElementById("ir-a-receta-btn");
+  if (puente) puente.addEventListener("click", llevarAnalisisALaReceta);
 
   lastAnalysis.forEach((item, idx) => {
     const btn = document.getElementById(`correct-${idx}`);
@@ -1883,6 +1886,44 @@ function renderResults() {
       if (altBtn) altBtn.addEventListener("click", () => useAlternative(idx, alt));
     });
   });
+}
+
+// Antes del rediseño por pestañas todo vivía en un solo scroll: bajo el
+// resultado de la foto quedaba, en la misma página, "Generar receta a mi
+// medida". Al separar las pestañas la receta se fue a otra y esta pantalla
+// terminó en un callejón: le decimos al paciente que su plato tiene 765 mg de
+// potasio y ahí lo dejamos. Este puente le devuelve la salida, y se lleva lo
+// que ya reconocimos para que no tenga que fotografiar todo de nuevo.
+function puenteALaReceta() {
+  if (!lastAnalysis.some((i) => i.match)) return "";
+  return `
+    <div class="puente-receta">
+      <p>¿Quieres cocinar algo que te acomode mejor con lo que te queda del día?</p>
+      <button id="ir-a-receta-btn" class="btn btn-primary" style="width:100%;">Generar receta a mi medida</button>
+    </div>`;
+}
+
+// Un plato ya servido no es un ingrediente: "cazuela" no tiene casilla en el
+// refrigerador y no debe entrar al generador como si lo fuera. Se traspasa
+// solo lo que sí es ingrediente, y se dice en voz alta qué quedó fuera para
+// que el paciente no crea que la receta lo tomó en cuenta.
+function llevarAnalisisALaReceta() {
+  const identificados = lastAnalysis.filter((i) => i.match);
+  irATab("refrigerador");
+  const { marcados, fueraDeLista } = marcarIdentificadosEnChecklist(identificados);
+
+  if (marcados.length) {
+    abrirChecklistManual();
+    setRefrigeradorStatus(
+      `Marcamos ${marcados.length === 1 ? "1 ingrediente" : `${marcados.length} ingredientes`} de tu foto` +
+      (fueraDeLista.length ? `. ${fueraDeLista.join(" y ")} no ${fueraDeLista.length === 1 ? "es un ingrediente suelto" : "son ingredientes sueltos"}, así que ${fueraDeLista.length === 1 ? "queda" : "quedan"} fuera.` : ". Agrega lo que falte y genera la receta.")
+    );
+  } else {
+    abrirChecklistManual();
+    setRefrigeradorStatus("Tu foto era un plato ya preparado. Marca abajo los ingredientes que tienes y te armamos la receta.");
+  }
+
+  els.refrigeradorGenerarBtn.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 function confidenceNote(confianza) {
