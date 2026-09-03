@@ -438,6 +438,11 @@ function continuarPerfilOverlay() {
   renderResultadoEgfr();
   renderEtapaSello();
   renderPerfilOverlay();
+
+  // Encadenar los datos clínicos al alta, saltables. Solo la primera vez: si
+  // ya tiene una etapa declarada es que volvió a editar el nombre, y no hay
+  // que devolverlo al formulario clínico.
+  if (!situacionActual()) abrirEdicionClinica(true);
 }
 
 // Tu perfil y Tus antecedentes clínicos viven en una hoja modal aparte (no en
@@ -463,12 +468,21 @@ function renderEtapaBadge() {
   els.etapaBadgeBtn.textContent = datos ? datos.valor : "✓";
 }
 
-function abrirEdicionClinica() {
+// La hoja clínica se abre de dos maneras: desde el botón del encabezado (uso
+// normal) o encadenada al alta, justo después del nombre. En el segundo caso
+// muestra una explicación y un "Ahora no": pedir etapa renal, diálisis y
+// antecedentes como muro obligatorio antes de dejar ver la app espantaría a
+// quien viene a probarla — y el revisor de Apple es exactamente ese caso.
+// Quien los completa entra con sus anillos funcionando desde el primer minuto.
+function abrirEdicionClinica(modoAlta = false) {
   els.editarClinicoOverlay.hidden = false;
+  if (els.onboardingClinico) els.onboardingClinico.hidden = !modoAlta;
+  els.editarClinicoOverlay.scrollTop = 0;
 }
 
 function cerrarEdicionClinica() {
   els.editarClinicoOverlay.hidden = true;
+  if (els.onboardingClinico) els.onboardingClinico.hidden = true;
 }
 
 function confirmarDatosClinicos() {
@@ -1417,6 +1431,8 @@ const els = {
   etapaBadgeBtn: document.getElementById("etapa-badge-btn"),
   editarClinicoOverlay: document.getElementById("editar-clinico-overlay"),
   cerrarClinicoBtn: document.getElementById("cerrar-clinico-btn"),
+  onboardingClinico: document.getElementById("onboarding-clinico"),
+  onboardingOmitirBtn: document.getElementById("onboarding-omitir-btn"),
   tabTratanteBtn: document.getElementById("tab-tratante-btn"),
   activarPlanClinico: document.getElementById("activar-plan-clinico"),
   codigoClienteBloque: document.getElementById("codigo-cliente-bloque"),
@@ -1604,6 +1620,7 @@ async function init() {
   els.confirmarClinicoBtn.addEventListener("click", confirmarDatosClinicos);
   els.etapaBadgeBtn.addEventListener("click", abrirEdicionClinica);
   els.cerrarClinicoBtn.addEventListener("click", cerrarEdicionClinica);
+  els.onboardingOmitirBtn.addEventListener("click", cerrarEdicionClinica);
   els.editarClinicoOverlay.addEventListener("click", (e) => {
     if (e.target === els.editarClinicoOverlay) cerrarEdicionClinica();
   });

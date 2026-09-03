@@ -1848,3 +1848,14 @@ h1, h2, h3 {
   margin-bottom: 0.15rem;
 }
 .consejo-texto p { margin: 0; font-size: 0.92rem; line-height: 1.5; }
+
+/* --- Paso clínico encadenado al alta ---------------------------------- */
+.onboarding-clinico {
+  background: var(--brand-100);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+}
+.onboarding-clinico p { margin: 0 0 0.7rem; font-size: 0.9rem; line-height: 1.5; }
+.onboarding-clinico .btn { width: 100%; }
+.onboarding-clinico[hidden] { display: none; }
