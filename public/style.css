@@ -1833,3 +1833,16 @@ h1, h2, h3 {
   font-size: 0.78rem;
   color: var(--muted);
 }
+
+/* --- Cuánto ocupa la receta del límite diario ------------------------- */
+.receta-dia {
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+}
+.receta-dia h4 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+.receta-dia .clinical-note { margin: 0 0 0.7rem; }
+.receta-dia-filas { display: flex; flex-direction: column; gap: 0.5rem; }
+.receta-dia-fila { display: flex; align-items: center; gap: 0.75rem; }
+.receta-dia-texto { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.liquidos-nota { margin: 0.2rem 0 0.7rem; }

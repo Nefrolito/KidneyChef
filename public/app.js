@@ -3537,6 +3537,43 @@ async function generarRecetaIA() {
 
 // El semáforo de la receta generada usa SIEMPRE los totales que devolvió el
 // backend (sumados desde nutrientes.json), nunca un número que la IA haya
+// Los sellos de arriba dicen qué tan CONCENTRADA es la receta; esto dice cuánto
+// te gasta del límite del día, que es lo que de verdad decide si puedes comerla.
+//
+// Camilo notó el problema: un paciente ve "Potasio Alto" en una receta que la
+// app acaba de proponerle y concluye que no puede comerla — o peor, que la app
+// le está sugiriendo algo que le hace daño. Una receta puede ser densa en
+// potasio y aun así ocupar un cuarto de su día.
+function porcentajeDelDiaHtml(receta) {
+  const filas = nutrientesVisibles()
+    .map((n) => {
+      const meta = metaDiaria(n);
+      if (meta == null) return "";
+      const valor = Math.round(receta.totales[n] || 0);
+      const unidad = n === "carbohidratos_g" ? "g" : "mg";
+      const pct = Math.min(100, Math.round((valor / meta) * 100));
+      return `
+        <div class="receta-dia-fila">
+          ${anilloSVG(pct, nivelPorMeta(valor, meta))}
+          <div class="receta-dia-texto">
+            <span class="calc-label">${NUTRIENTE_LABEL[n]}</span>
+            <span class="calc-total">${valor} de ${Math.round(meta)} ${unidad} del día</span>
+          </div>
+        </div>`;
+    })
+    .filter(Boolean)
+    .join("");
+
+  if (!filas) return "";
+  return `
+    <div class="receta-dia">
+      <h4>Cuánto ocupa de tu día</h4>
+      <p class="clinical-note">Los sellos de arriba dicen qué tan concentrada es la receta.
+        Esto dice cuánto te gasta del límite diario, que es lo que decide si puedes comerla.</p>
+      <div class="receta-dia-filas">${filas}</div>
+    </div>`;
+}
+
 // calculado por su cuenta — mismo criterio que el resto de la app.
 function renderRecetaIA(receta) {
   els.refrigeradorRecetaIa.hidden = false;
@@ -3569,6 +3606,7 @@ function renderRecetaIA(receta) {
       <p class="portion-note">Porción total: ${receta.total_gramos} g</p>
       <ul class="refrigerador-receta-lista">${ingredientesHtml}</ul>
       <div class="semaforo-row">${semaforo}</div>
+      ${porcentajeDelDiaHtml(receta)}
       ${notaSinMeta()}
       ${consejoHtml}
       <ol class="refrigerador-receta-lista">${pasos}</ol>
