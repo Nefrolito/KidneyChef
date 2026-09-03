@@ -255,6 +255,15 @@
          vencer el mes de prueba, así que durante los primeros 30 días no había
          ninguna forma de ver ni comprar la suscripción — y un revisor de la App
          Store, que instala limpio, nunca llegaba a la pantalla de compra. -->
+    <section class="card analisis-dia-card" data-tab="hoy">
+      <h2>¿Cómo te fue hoy?</h2>
+      <p class="clinical-note">Revisamos lo que registraste y te lo resumimos contra tus
+        metas. Puedes enviárselo a tu equipo tratante o llevarlo impreso al control.</p>
+      <button id="analisis-dia-btn" class="btn btn-secondary" style="width:100%;">Analizar mi día</button>
+      <p class="status" id="analisis-dia-status" role="status" aria-live="polite"></p>
+      <div id="analisis-dia-resultado" hidden></div>
+    </section>
+
     <section class="card suscripcion-card" data-tab="hoy">
       <div class="suscripcion-row">
         <div class="suscripcion-texto">
@@ -513,7 +522,7 @@
   <!-- Solo existe para imprimir: se llena al pulsar Imprimir y la hoja de
        estilos de impresión oculta todo lo demás. Así la lista sale limpia,
        sin barra de pestañas ni banderolas. -->
-  <pre id="super-impresion" aria-hidden="true"></pre>
+  <pre id="impresion" aria-hidden="true"></pre>
 
   <div id="editar-clinico-overlay" class="sheet-overlay" hidden>
     <div class="sheet">

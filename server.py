@@ -1111,6 +1111,137 @@ def handle_identificar_ingredientes(handler):
         handler._send_json(500, {"error": f"Error inesperado: {e}"})
 
 
+def _build_prompt_analisis_dia(datos):
+    """El prompt recibe cifras YA CALCULADAS por el cliente contra la base
+    auditada. La IA solo redacta: no suma, no estima y no corrige números.
+    Mismo criterio que el resto de la app — ninguna cifra que vea el paciente
+    sale de lo que diga un modelo."""
+    def linea_nutriente(clave, etiqueta, unidad):
+        total = datos["totales"].get(clave)
+        if total is None:
+            return None
+        meta = (datos.get("metas") or {}).get(clave)
+        if meta:
+            pct = round(total / meta * 100)
+            return f"- {etiqueta}: {total} de {meta} {unidad} ({pct}% de su meta)"
+        return f"- {etiqueta}: {total} {unidad} (sin meta diaria fijada)"
+
+    filas = [
+        linea_nutriente("potasio_mg", "Potasio", "mg"),
+        linea_nutriente("fosforo_mg", "Fósforo", "mg"),
+        linea_nutriente("sodio_mg", "Sodio", "mg"),
+        linea_nutriente("carbohidratos_g", "Carbohidratos", "g"),
+        linea_nutriente("calorias_kcal", "Calorías", "kcal"),
+    ]
+    resumen = "\n".join(f for f in filas if f)
+
+    alimentos = datos.get("alimentos") or []
+    lista = "\n".join(f"- {a.get('nombre')} ({a.get('gramos')} g)" for a in alimentos[:40]) or "- (no registró alimentos)"
+
+    liquidos = ""
+    if datos.get("liquidos_ml") is not None:
+        meta_liq = datos.get("meta_liquidos_ml")
+        liquidos = (f"\nLíquidos: {datos['liquidos_ml']} de {meta_liq} ml"
+                    if meta_liq else f"\nLíquidos: {datos['liquidos_ml']} ml")
+
+    situacion = datos.get("situacion_clinica") or {}
+    ctx = ""
+    if situacion.get("declarada"):
+        ctx = f"\nSituación clínica: {situacion.get('etiqueta')}. {situacion.get('consideracion','')}"
+    if datos.get("riesgo_hiperkalemia"):
+        ctx += "\nTiene factores de riesgo de hiperkalemia (diabetes o fármacos que retienen potasio)."
+
+    return f"""Eres parte de una app de apoyo educativo para pacientes con enfermedad renal crónica.
+Escribe un comentario breve sobre cómo le fue hoy a este paciente con su alimentación.
+
+Lo que comió hoy:
+{lista}
+
+Totales del día, YA CALCULADOS con datos auditados:
+{resumen}{liquidos}{ctx}
+
+Reglas estrictas:
+- Usa SOLO las cifras de arriba. No sumes, no estimes, no corrijas ni inventes ningún número.
+- Háblale de tú, directo y cálido, sin sonar a regaño. Es alguien que convive con una enfermedad crónica, no un alumno.
+- Cálido no es descuidado: nada de "ni idea", "no sé" ni frases que suenen a que la app no se hizo cargo. Si falta un dato, dilo con precisión ("no registraste líquidos hoy") y sigue.
+- Empieza por lo que hizo bien, si hay algo.
+- Da UNA sola sugerencia concreta para mañana, con un alimento o una técnica, no una lista.
+- Si sugieres bajar el potasio de papa, zanahoria, zapallo o legumbres, usa EXACTAMENTE la
+  técnica que ya enseña esta app y no una versión propia: remojar en trozos al menos 2 horas
+  (o toda la noche) y cocer en agua nueva abundante, botando el agua de cocción. No inventes
+  tiempos ni temperaturas distintos: que la app diga dos cosas diferentes sobre la misma
+  técnica destruye la confianza del paciente en ambas.
+- No diagnostiques, no cambies indicaciones médicas ni menciones fármacos.
+- Si no registró alimentos, dilo con naturalidad e invítalo a registrar mañana.
+- Máximo 5 frases, en español de Chile.
+
+Responde SOLO el texto del comentario, sin encabezados ni comillas."""
+
+
+def call_claude_analisis_dia(datos):
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise RuntimeError("Falta ANTHROPIC_API_KEY en el servidor.")
+
+    body = json.dumps({
+        "model": ANTHROPIC_MODEL,
+        "max_tokens": 4096,
+        "output_config": {"effort": "low"},
+        "messages": [{"role": "user", "content": _build_prompt_analisis_dia(datos)}],
+    }).encode("utf-8")
+
+    req = urllib.request.Request(ANTHROPIC_URL, data=body, method="POST", headers={
+        "x-api-key": api_key,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Error de la API de Claude ({e.code}): {detail}") from e
+
+    _verificar_no_truncado(payload, "análisis del día")
+    texto = "".join(
+        b.get("text", "") for b in payload.get("content", []) if b.get("type") == "text"
+    ).strip()
+    if not texto:
+        raise RuntimeError("La IA no devolvió ningún comentario.")
+    return texto
+
+
+def handle_analisis_dia(handler):
+    """POST /api/analisis-dia — comentario en prosa sobre el día del paciente.
+    Las cifras llegan ya calculadas desde el cliente contra nutrientes.json; la
+    IA solo redacta. Mismas guardas que el resto: clave de app y cupo de uso."""
+    if APP_KEY:
+        provided = handler.headers.get("X-App-Key", "")
+        if not hmac.compare_digest(provided, APP_KEY):
+            handler._send_json(401, {"error": "Acceso no autorizado a la API."})
+            return
+
+    body = _leer_body_json(handler)
+    if body is None:
+        return
+    if not isinstance(body.get("totales"), dict):
+        handler._send_json(400, {"error": "Faltan los totales del día"})
+        return
+
+    ip = handler._client_ip()
+    permitido, retry_after, motivo = RATE_LIMITER.check(ip)
+    if not permitido:
+        handler._send_json(429, {"error": f"Demasiadas solicitudes. Vuelve en {format_espera(retry_after)}."})
+        return
+
+    try:
+        comentario = call_claude_analisis_dia(body)
+    except Exception as e:
+        handler._send_json(502, {"error": str(e)})
+        return
+    handler._send_json(200, {"comentario": comentario})
+
+
 def handle_generar_receta(handler):
     """POST /api/generar-receta — arma una receta con los ingredientes que el
     paciente tiene, ajustada al presupuesto de nutrientes que le queda en el
@@ -1583,6 +1714,7 @@ ROUTES = [
     ("POST", re.compile(r"^/api/identificar-ingredientes$"), handle_identificar_ingredientes),
     ("POST", re.compile(r"^/api/generar-receta$"), handle_generar_receta),
     ("POST", re.compile(r"^/api/leer-receta$"), handle_leer_receta),
+    ("POST", re.compile(r"^/api/analisis-dia$"), handle_analisis_dia),
     ("POST", re.compile(r"^/api/pacientes$"), handle_crear_paciente),
     ("GET", re.compile(r"^/api/pacientes/me$"), handle_get_paciente_me),
     ("GET", re.compile(r"^/api/pacientes/me/vinculos$"), handle_get_vinculos_paciente),

@@ -1475,10 +1475,13 @@ const els = {
   superItemNombre: document.getElementById("super-item-nombre"),
   superItemPrecio: document.getElementById("super-item-precio"),
   superAgregarStatus: document.getElementById("super-agregar-status"),
+  analisisDiaBtn: document.getElementById("analisis-dia-btn"),
+  analisisDiaStatus: document.getElementById("analisis-dia-status"),
+  analisisDiaResultado: document.getElementById("analisis-dia-resultado"),
   superCompartirBtn: document.getElementById("super-compartir-btn"),
   superImprimirBtn: document.getElementById("super-imprimir-btn"),
   superCompartirStatus: document.getElementById("super-compartir-status"),
-  superImpresion: document.getElementById("super-impresion"),
+  impresionBox: document.getElementById("impresion"),
   superAgregarBtn: document.getElementById("super-agregar-btn"),
   superCantidad: document.getElementById("super-cantidad"),
   superTotal: document.getElementById("super-total"),
@@ -1562,6 +1565,7 @@ async function init() {
     });
   });
 
+  els.analisisDiaBtn.addEventListener("click", analizarMiDia);
   els.superCompartirBtn.addEventListener("click", compartirListaSuper);
   els.superImprimirBtn.addEventListener("click", imprimirListaSuper);
   renderVinculacion();
@@ -2636,6 +2640,129 @@ function toggleSuperCustom(id, checked) {
   actualizarResumenSuper();
 }
 
+// --- Análisis del día -------------------------------------------------
+//
+// Dos piezas con responsabilidades separadas a propósito: el resumen sale de
+// sumar el historial contra nutrientes.json —determinista, auditable, sin IA—
+// y el comentario lo escribe la IA a partir de ESAS cifras, que le llegan ya
+// calculadas. La IA nunca suma ni corrige un número que el paciente vaya a
+// leer, igual que en las recetas.
+let analisisDiaTexto = "";
+
+function resumenDelDiaTexto() {
+  const alimentos = loadHistory().filter((h) => isToday(h.fecha));
+  const totales = totalesNutrientesHoy();
+  const fecha = new Date().toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long" });
+  const lineas = [`Tu día en KidneyChef — ${fecha}`, ""];
+
+  if (alimentos.length) {
+    lineas.push("LO QUE REGISTRASTE");
+    for (const a of alimentos) lineas.push(`- ${a.nombre} (${a.porcionG} g)`);
+  } else {
+    lineas.push("No registraste alimentos hoy.");
+  }
+  lineas.push("", "CÓMO TE FUE");
+
+  const unidadDe = (n) => (n === "carbohidratos_g" ? "g" : n === "calorias_kcal" ? "kcal" : "mg");
+  for (const n of [...nutrientesVisibles(), "calorias_kcal"]) {
+    const total = Math.round(totales[n] || 0);
+    const meta = metaDiaria(n);
+    const u = unidadDe(n);
+    lineas.push(meta
+      ? `- ${NUTRIENTE_LABEL[n]}: ${total} de ${Math.round(meta)} ${u} (${Math.round(total / meta * 100)}%)`
+      : `- ${NUTRIENTE_LABEL[n]}: ${total} ${u} — sin meta fijada`);
+  }
+
+  // metaLiquidos() devuelve {ml, esSupuesto}, no un número: cuando el paciente
+  // no declaró su diuresis la meta es una suposición y hay que decirlo, o
+  // estaría leyendo como suyo un límite que la app se inventó.
+  const metaLiq = metaLiquidos();
+  if (metaLiq) {
+    const nota = metaLiq.esSupuesto ? " (estimado: no has registrado tu diuresis)" : "";
+    lineas.push(`- Líquidos: ${Math.round(totalLiquidosHoy())} de ${Math.round(metaLiq.ml)} ml${nota}`);
+  }
+
+  lineas.push("");
+  lineas.push("Los totales salen de sumar lo que registraste con datos oficiales USDA.");
+  lineas.push("KidneyChef es apoyo educativo, no reemplaza a tu equipo de nefrología.");
+  return { texto: lineas.join("\n"), alimentos, totales };
+}
+
+async function analizarMiDia() {
+  const { texto, alimentos, totales } = resumenDelDiaTexto();
+  els.analisisDiaBtn.disabled = true;
+  setAnalisisDiaStatus("Revisando tu día…");
+
+  const metas = {};
+  for (const n of [...nutrientesVisibles(), "calorias_kcal"]) metas[n] = metaDiaria(n);
+
+  let comentario = "";
+  try {
+    const res = await fetch(`${API_BASE}/api/analisis-dia`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      body: JSON.stringify({
+        alimentos: alimentos.map((a) => ({ nombre: a.nombre, gramos: a.porcionG })),
+        totales,
+        metas,
+        liquidos_ml: metaLiquidos() ? Math.round(totalLiquidosHoy()) : null,
+        meta_liquidos_ml: metaLiquidos() ? Math.round(metaLiquidos().ml) : null,
+        situacion_clinica: situacionClinicaParaIA(),
+        riesgo_hiperkalemia: riesgoHiperkalemia(),
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Error desconocido");
+    comentario = data.comentario || "";
+    setAnalisisDiaStatus("");
+  } catch (err) {
+    // El resumen con datos NO depende de la IA: si el comentario falla, el
+    // paciente igual se lleva sus cifras. Perder las dos por una sería peor.
+    setAnalisisDiaStatus("No pudimos escribir el comentario, pero tu resumen está listo.", true);
+  }
+
+  analisisDiaTexto = comentario ? `${texto}\n\nCOMENTARIO\n${comentario}` : texto;
+  els.analisisDiaResultado.hidden = false;
+  els.analisisDiaResultado.innerHTML = `
+    <pre class="analisis-resumen">${escapeHtml(texto)}</pre>
+    ${comentario ? `<div class="analisis-comentario"><span aria-hidden="true">💬</span><p>${escapeHtml(comentario)}</p></div>` : ""}
+    <div class="super-compartir">
+      <button id="analisis-compartir-btn" class="btn btn-secondary">Compartir</button>
+      <button id="analisis-imprimir-btn" class="btn btn-ghost">Imprimir</button>
+    </div>`;
+
+  document.getElementById("analisis-compartir-btn").addEventListener("click", compartirAnalisisDia);
+  document.getElementById("analisis-imprimir-btn").addEventListener("click", () => {
+    els.impresionBox.textContent = analisisDiaTexto;
+    window.print();
+  });
+  els.analisisDiaBtn.disabled = false;
+}
+
+async function compartirAnalisisDia() {
+  if (!analisisDiaTexto) return;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "Mi día en KidneyChef", text: analisisDiaTexto });
+      return;
+    } catch (e) {
+      if (e && e.name === "AbortError") return;
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(analisisDiaTexto);
+    setAnalisisDiaStatus("Resumen copiado. Pégalo donde quieras.");
+  } catch {
+    setAnalisisDiaStatus("No pudimos compartir desde aquí. Prueba con Imprimir.", true);
+  }
+}
+
+function setAnalisisDiaStatus(msg, isError = false) {
+  if (!els.analisisDiaStatus) return;
+  els.analisisDiaStatus.textContent = msg;
+  els.analisisDiaStatus.classList.toggle("error", Boolean(msg) && isError);
+}
+
 // --- Compartir e imprimir la lista ------------------------------------
 //
 // El paciente arma la lista en el sillón y la compra en el supermercado, casi
@@ -2758,7 +2885,7 @@ function imprimirListaSuper() {
     return;
   }
   setSuperCompartirStatus("");
-  els.superImpresion.textContent = texto;
+  els.impresionBox.textContent = texto;
   window.print();
 }
 

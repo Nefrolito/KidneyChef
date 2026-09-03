@@ -1746,13 +1746,13 @@ h1, h2, h3 {
 .super-compartir .btn { flex: 1; }
 
 /* El bloque de impresión solo existe para eso: en pantalla no se ve nunca. */
-#super-impresion { display: none; }
+#impresion { display: none; }
 
 @media print {
   /* Se oculta todo lo demás para que la hoja salga con la lista y nada más:
      sin barra de pestañas, sin banderola de prueba, sin cabecera. */
-  body > *:not(#super-impresion) { display: none !important; }
-  #super-impresion {
+  body > *:not(#impresion) { display: none !important; }
+  #impresion {
     display: block !important;
     white-space: pre-wrap;
     font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -1859,3 +1859,26 @@ h1, h2, h3 {
 .onboarding-clinico p { margin: 0 0 0.7rem; font-size: 0.9rem; line-height: 1.5; }
 .onboarding-clinico .btn { width: 100%; }
 .onboarding-clinico[hidden] { display: none; }
+
+/* --- Análisis del día -------------------------------------------------- */
+.analisis-resumen {
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  margin: 0.8rem 0 0;
+  overflow-x: auto;
+}
+.analisis-comentario {
+  display: flex;
+  gap: 0.6rem;
+  background: var(--brand-100);
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  margin-top: 0.7rem;
+}
+.analisis-comentario p { margin: 0; font-size: 0.9rem; line-height: 1.5; }
