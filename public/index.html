@@ -49,6 +49,8 @@
   </div>
 
   <main class="container">
+    <section class="card aviso-dialisis" id="aviso-dialisis" data-tab="hoy" hidden></section>
+
     <section class="card capture-card" data-tab="hoy">
       <div id="preview-wrap" class="preview-wrap">
         <img id="preview" alt="Vista previa del alimento" hidden>
@@ -598,6 +600,16 @@
           <span class="etapa-circulo-valor" id="etapa-circulo-valor">—</span>
         </div>
         <span class="etapa-sello-label" id="etapa-sello-label">Sin etapa registrada</span>
+      </div>
+
+      <div class="clinical-field" id="campo-dias-dialisis" hidden>
+        <label>¿Qué días te toca diálisis?</label>
+        <div class="dialisis-presets">
+          <button type="button" class="btn btn-ghost" data-preset-dialisis="1,3,5">Lun · Mié · Vie</button>
+          <button type="button" class="btn btn-ghost" data-preset-dialisis="2,4,6">Mar · Jue · Sáb</button>
+        </div>
+        <div class="clinical-checks dialisis-dias" id="dialisis-dias"></div>
+        <small class="campo-ayuda">Sirve para recordarte el día antes. La víspera es cuando más se acumula el potasio, porque es el intervalo más largo sin dializar.</small>
       </div>
 
       <div class="clinical-field" id="campo-diuresis" hidden>

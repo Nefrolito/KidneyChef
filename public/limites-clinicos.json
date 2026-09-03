@@ -84,7 +84,9 @@
   "peso": {
     "_nota": "Solo se activa en diálisis. El paciente registra su peso corporal cada día para vigilar la ganancia de peso entre sesiones (indicador indirecto de sobrecarga de líquido), mismo principio que el registro de líquidos.",
     "ganancia_maxima_kg_por_defecto": 1.0,
-    "_PENDIENTE_VALIDAR": "Regla general de material educativo en diálisis (ganancia interdialítica ≤1 kg/día, equivalente aproximado a ≤1 L de sobrecarga). La guía clínica real expresa esto como porcentaje del peso seco (~4-4.5% KDOQI), que esta app todavía no calcula porque no registra el peso seco por separado del peso diario. Requiere confirmación clínica de Camilo — considerar más adelante agregar un campo de peso seco para usar el % en vez de una cifra fija en kg."
+    "ganancia_maxima_kg_intervalo_largo": 2.0,
+    "_validado_clinicamente": "Confirmado y graduado por Camilo el 2026-08-30: 1 kg en el intervalo entre semana y 2 kg en el intervalo largo de fin de semana. La graduación tiene sentido porque el intervalo largo es de tres días en vez de dos, así que se tolera más acumulación. Cuál de los dos umbrales aplica se deduce del calendario de diálisis que el paciente declara en su perfil (datosClinicos.diasDialisis): si el hueco entre la última sesión y la siguiente es de 3 días o más, es el intervalo largo.",
+    "_limitacion_conocida": "KDOQI expresa la ganancia interdialítica como PORCENTAJE del peso seco (~4-4.5%), no en kilos absolutos. Esta app usa kilos porque no registra el peso seco por separado del peso diario. Es una simplificación declarada, no la cifra de la guía: para un paciente de 50 kg y otro de 100 kg, el mismo kilo significa cosas distintas. Agregar un campo de peso seco y pasar al porcentaje queda pendiente."
   },
   "situaciones": {
     "_para_que_sirven": "Ya NO fijan límites de K ni P. Sirven para: (1) activar el registro de líquidos en diálisis, (2) orientar al tratante con la consideración clínica de cada caso cuando individualice los objetivos, y (3) mostrarle al paciente en qué situación está registrado.",

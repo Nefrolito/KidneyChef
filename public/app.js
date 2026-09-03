@@ -527,6 +527,40 @@ function textoEstadoSuscripcion() {
   return "Tu mes de prueba terminó.";
 }
 
+// "Mañana te toca diálisis". El día antes es cuando el potasio lleva más
+// tiempo acumulándose —es el intervalo más largo sin dializar— y es justo
+// cuando algunos pacientes relajan la dieta pensando que la sesión lo va a
+// limpiar. Pedido de Camilo: el texto clínico es suyo, no inventado acá.
+function renderAvisoDialisis() {
+  if (!els.avisoDialisis) return;
+  const d = ensurePerfil().datosClinicos || {};
+  const dias = d.diasDialisis || [];
+  if (situacionActual() !== "hemodialisis" || dias.length === 0) {
+    els.avisoDialisis.hidden = true;
+    return;
+  }
+
+  const manana = new Date();
+  manana.setDate(manana.getDate() + 1);
+  const esManana = dias.includes(manana.getDay());
+  const esHoy = dias.includes(new Date().getDay());
+
+  if (!esManana && !esHoy) {
+    els.avisoDialisis.hidden = true;
+    return;
+  }
+
+  els.avisoDialisis.hidden = false;
+  els.avisoDialisis.innerHTML = esManana
+    ? `<h2>Mañana te toca diálisis</h2>
+       <p class="clinical-note">Hoy es el día en que llevas más tiempo sin dializar, así que
+         es cuando más se te acumula el potasio. No aflojes la dieta pensando que la sesión
+         de mañana lo compensa: el riesgo está antes de dializar, no después.</p>`
+    : `<h2>Hoy te toca diálisis</h2>
+       <p class="clinical-note">Después de la sesión sigue cuidando el potasio y los
+         líquidos: lo que comes hoy ya cuenta para el próximo intervalo.</p>`;
+}
+
 function renderSuscripcion() {
   const { bloqueado } = estadoSuscripcion();
   const mostrar = bloqueado || paywallModoConsulta;
@@ -595,6 +629,7 @@ function datosClinicosPorDefecto() {
     diuresisMl: null,
     enDialisis: null,
     modoEtapa: "calculada",
+    diasDialisis: [],
     sexoBiologico: null,
     creatininaMgDl: null,
     cistatinaMgL: null,
@@ -823,6 +858,30 @@ function registrarPeso(kg) {
   localStorage.setItem(PESO_STORAGE_KEY, JSON.stringify(arr));
 }
 
+// Cuánto se tolera ganar entre sesiones: 1 kg entre semana, 2 kg en el
+// intervalo largo. Cuál aplica se deduce del calendario que declaró el
+// paciente — el hueco entre su última sesión y la siguiente. Con 3 días o más
+// es el intervalo largo (el clásico fin de semana de un esquema 3x/semana).
+// Cifras confirmadas por Camilo el 2026-08-30; ver _validado_clinicamente.
+function enIntervaloLargoDialisis() {
+  const dias = (ensurePerfil().datosClinicos.diasDialisis || []).slice().sort((a, b) => a - b);
+  if (dias.length < 2) return false;
+  const hoy = new Date().getDay();
+  // Días hacia atrás hasta la última sesión, y hacia adelante hasta la próxima.
+  let atras = 0;
+  while (atras < 7 && !dias.includes((hoy - atras + 7) % 7)) atras += 1;
+  let adelante = 0;
+  while (adelante < 7 && !dias.includes((hoy + adelante) % 7)) adelante += 1;
+  return atras + adelante >= 3;
+}
+
+function gananciaMaximaKg() {
+  if (!LIMITES || !LIMITES.peso) return null;
+  return enIntervaloLargoDialisis()
+    ? LIMITES.peso.ganancia_maxima_kg_intervalo_largo
+    : LIMITES.peso.ganancia_maxima_kg_por_defecto;
+}
+
 // Ganancia de peso interdialítica (kg), o null si no hay un peso anterior
 // con qué comparar todavía (primer registro).
 function gananciaPeso() {
@@ -911,6 +970,7 @@ function renderDatosClinicos() {
   actualizarVisibilidadEtapa();
   renderResultadoEgfr();
   renderEtapaSello();
+  renderDiasDialisis();
   actualizarVisibilidadDiuresis();
   renderPlanUpsell();
 }
@@ -985,6 +1045,22 @@ function renderEtapaSello() {
 
 function actualizarVisibilidadDiuresis() {
   els.campoDiuresis.hidden = !requiereDiuresis();
+  // El calendario solo tiene sentido en hemodiálisis: la peritoneal se hace a
+  // diario o cada noche, no en días señalados.
+  els.campoDiasDialisis.hidden = situacionActual() !== "hemodialisis";
+}
+
+const DIAS_SEMANA = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+function renderDiasDialisis() {
+  const seleccionados = ensurePerfil().datosClinicos.diasDialisis || [];
+  els.dialisisDias.innerHTML = DIAS_SEMANA
+    .map((nombre, i) => `
+      <label class="clinical-check">
+        <input type="checkbox" class="dialisis-dia" value="${i}" ${seleccionados.includes(i) ? "checked" : ""}>
+        <span>${nombre}</span>
+      </label>`)
+    .join("");
 }
 
 function guardarDatosClinicos() {
@@ -1000,6 +1076,7 @@ function guardarDatosClinicos() {
     trasplanteRenal: els.trasplanteRenal.checked,
     farmacosRetenedoresK: els.farmacosK.checked,
     diuresisMl: diuresisRaw === "" ? null : Number(diuresisRaw),
+    diasDialisis: [...document.querySelectorAll(".dialisis-dia:checked")].map((el) => Number(el.value)),
     enDialisis: els.enDialisis.value || null,
     modoEtapa: els.modoEtapaManual.checked ? "manual" : "calculada",
     sexoBiologico: els.egfrSexo.value || null,
@@ -1024,6 +1101,7 @@ function guardarDatosClinicos() {
   actualizarVisibilidadDiuresis();
   renderPlanUpsell();
   renderCalculadora();
+  renderAvisoDialisis();
 }
 
 function renderPlanUpsell() {
@@ -1271,6 +1349,9 @@ const els = {
   pesoAlerta: document.getElementById("peso-alerta"),
   liquidosDeshacerBtn: document.getElementById("liquidos-deshacer"),
   campoDiuresis: document.getElementById("campo-diuresis"),
+  campoDiasDialisis: document.getElementById("campo-dias-dialisis"),
+  dialisisDias: document.getElementById("dialisis-dias"),
+  avisoDialisis: document.getElementById("aviso-dialisis"),
   datoDiuresis: document.getElementById("dato-diuresis"),
   historyList: document.getElementById("history-list"),
   clearHistoryBtn: document.getElementById("clear-history"),
@@ -1452,6 +1533,19 @@ async function init() {
   );
   els.recetaExternaLeerBtn.addEventListener("click", leerRecetaExternaTexto);
   els.refrigeradorBuscador.addEventListener("input", filtrarChecklistRefrigerador);
+  renderAvisoDialisis();
+
+  // Presets de los horarios más frecuentes: marcar tres casillas a mano cada
+  // vez que se edita el perfil es fricción innecesaria.
+  els.campoDiasDialisis.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-preset-dialisis]");
+    if (!btn) return;
+    const dias = btn.dataset.presetDialisis.split(",").map(Number);
+    els.dialisisDias.querySelectorAll(".dialisis-dia").forEach((el) => {
+      el.checked = dias.includes(Number(el.value));
+    });
+  });
+
   els.superCompartirBtn.addEventListener("click", compartirListaSuper);
   els.superImprimirBtn.addEventListener("click", imprimirListaSuper);
   renderVinculacion();
@@ -3830,7 +3924,7 @@ function renderPeso() {
   els.pesoManual.value = hoy ? hoy.kg : "";
 
   const ganancia = gananciaPeso();
-  const maxGanancia = LIMITES ? LIMITES.peso.ganancia_maxima_kg_por_defecto : null;
+  const maxGanancia = gananciaMaximaKg();
   let nivel = "verde";
   let pct = hoy ? 15 : 0;
   if (ganancia != null && maxGanancia) {
