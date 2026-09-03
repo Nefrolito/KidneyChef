@@ -1787,3 +1787,49 @@ h1, h2, h3 {
   }
   @page { margin: 1.5cm; }
 }
+
+/* --- Lista de lo reconocido en la foto del refrigerador ---------------- */
+.reconocidos-nota { margin: 0 0 0.7rem; }
+.reconocidos-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.reconocido {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+}
+.reconocido-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.reconocido-nombre { font-weight: 700; }
+.reconocido-acciones { display: flex; align-items: center; gap: 0.3rem; flex: none; }
+.reconocido-cambiar { padding: 0.25rem 0.6rem; font-size: 0.8rem; }
+.reconocido-quitar {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.25rem 0.4rem;
+  cursor: pointer;
+}
+.reconocido-origen {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.reconocido .super-semaforos { margin-top: 0.45rem; }
+.reconocido-kcal {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}

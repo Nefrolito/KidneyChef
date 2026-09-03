@@ -2076,14 +2076,18 @@ async function identificarIngredientesRefrigerador() {
     // — acumular en silencio hacía que una receta generada mezclara
     // ingredientes de fotos distintas sin que se notara en la UI.
     ingredientesIdentificados = nuevos;
-    renderIngredientesIdentificados();
-
     // Marcarlos en el checklist es lo que le permite al paciente ver, en una
     // sola lista, qué detectó la IA y qué le falta agregar. Antes vivían en dos
     // sitios distintos —fichas arriba, casillas abajo— sin relación visible.
     const { marcados, fueraDeLista } = marcarIdentificadosEnChecklist(nuevos);
     if (marcados.length) abrirChecklistManual();
-    setRefrigeradorStatus(mensajeIdentificacion(nuevos, marcados, fueraDeLista, sinDato));
+    // El resumen va DENTRO de la lista, no en setRefrigeradorStatus: .status es
+    // un aviso flotante (position:fixed) y con una lista larga terminaba tapando
+    // una tarjeta. Además la lista ya trae su propia nota, así que había dos
+    // textos diciendo lo mismo.
+    resumenIdentificacion = mensajeIdentificacion(nuevos, marcados, fueraDeLista, sinDato);
+    setRefrigeradorStatus("");
+    renderIngredientesIdentificados();
   } catch (err) {
     setRefrigeradorStatus(err.message, true);
   } finally {
@@ -2134,11 +2138,82 @@ function mensajeIdentificacion(nuevos, marcados, fueraDeLista, sinDato) {
   return partes.join(" ");
 }
 
-function renderIngredientesIdentificados() {
-  els.refrigeradorIdentificados.innerHTML = ingredientesIdentificados
-    .map((item, idx) => `<button class="alt-chip alt-chip-removable" id="refrigerador-quitar-${idx}">${escapeHtml(item.match.nombre)} ✕</button>`)
+// Resumen de la última identificación: qué se reconoció, qué se marcó, qué no
+// tiene datos. Se pinta dentro de la lista.
+let resumenIdentificacion = "";
+
+function desmarcarEnChecklist(food) {
+  const ing = (INGREDIENTES_REFRIGERADOR || []).find((i) => i.nutrientes_id === food.id);
+  const casilla = ing && document.getElementById(`refrigerador-check-${ing.id}`);
+  if (casilla) casilla.checked = false;
+}
+
+// Qué tan "urgente" es este alimento PARA ESTE paciente. Solo pesan los
+// nutrientes que le importan de verdad: los que tienen meta diaria (sodio
+// siempre; potasio y fósforo cuando su situación se la da; carbohidratos si
+// declaró diabetes). Un alimento alto en fósforo sube arriba en alguien en
+// hemodiálisis y no distorsiona la lista de alguien que no restringe fósforo.
+// Se usan los mismos umbrales validados de clasificar(), no unos nuevos.
+function prioridadClinica(food) {
+  if (!food) return -1;
+  const peso = { rojo: 2, amarillo: 1, verde: 0 };
+  let score = 0;
+  for (const nutriente of nutrientesVisibles()) {
+    const densidad = food[nutriente];
+    if (densidad == null) continue;
+    const { nivel } = clasificar(nutriente, Math.round(densidad), densidad);
+    score += peso[nivel] || 0;
+  }
+  return score;
+}
+
+function sellosDeAlimento(food) {
+  return nutrientesVisibles()
+    .map((nutriente) => {
+      const densidad = food[nutriente];
+      if (densidad == null) return "";
+      const { nivel } = clasificar(nutriente, Math.round(densidad), densidad);
+      if (!nivel) return "";
+      return `<span class="super-semaforo nivel-${nivel}">${escapeHtml(NUTRIENTE_LABEL[nutriente])} ${escapeHtml(nivelTagContenido(nivel))}</span>`;
+    })
     .join("");
-  ingredientesIdentificados.forEach((_, idx) => {
+}
+
+function renderIngredientesIdentificados() {
+  // De mayor a menor prioridad clínica: lo que más puede comprometer las metas
+  // de ESTE paciente queda arriba, que es lo primero que debería revisar.
+  const orden = ingredientesIdentificados
+    .map((item, idx) => ({ item, idx }))
+    .sort((a, b) => prioridadClinica(b.item.match) - prioridadClinica(a.item.match));
+
+  els.refrigeradorIdentificados.innerHTML = orden.length
+    ? `<p class="clinical-note reconocidos-nota">${resumenIdentificacion
+          ? escapeHtml(resumenIdentificacion) + " "
+          : ""}Revisa que esté bien —puedes cambiar o quitar lo que no corresponda— y luego
+         genera la receta. Los sellos son por cada 100 g del alimento crudo.</p>
+       <ul class="reconocidos-lista">${orden.map(({ item, idx }) => {
+          const kcal = item.match.calorias_kcal;
+          return `
+          <li class="reconocido">
+            <div class="reconocido-cabecera">
+              <span class="reconocido-nombre">${escapeHtml(item.match.nombre)}</span>
+              <span class="reconocido-acciones">
+                <button class="btn btn-ghost reconocido-cambiar" id="refrigerador-cambiar-${idx}">Cambiar</button>
+                <button class="reconocido-quitar" id="refrigerador-quitar-${idx}" aria-label="Quitar ${escapeHtml(item.match.nombre)}">✕</button>
+              </span>
+            </div>
+            ${item.corregido || normalize(item.alimentoIA || "") === normalize(item.match.nombre)
+              ? ""
+              : `<p class="reconocido-origen">La IA vio: ${escapeHtml(item.alimentoIA)}</p>`}
+            <div class="super-semaforos">${sellosDeAlimento(item.match)}</div>
+            ${kcal != null ? `<p class="reconocido-kcal">${Math.round(kcal)} kcal por 100 g</p>` : ""}
+          </li>`;
+        }).join("")}</ul>`
+    : "";
+
+  orden.forEach(({ idx }) => {
+    const cambiar = document.getElementById(`refrigerador-cambiar-${idx}`);
+    if (cambiar) cambiar.addEventListener("click", () => openModal(idx, "refrigerador"));
     const btn = document.getElementById(`refrigerador-quitar-${idx}`);
     if (btn) btn.addEventListener("click", () => {
       // Desmarcar también la casilla: candidatosParaIA() une fichas y casillas,
@@ -2154,6 +2229,7 @@ function renderIngredientesIdentificados() {
 }
 
 function limpiarSeleccionRefrigerador() {
+  resumenIdentificacion = "";
   ingredientesIdentificados = [];
   renderIngredientesIdentificados();
   document.querySelectorAll(".refrigerador-ingrediente:checked").forEach((el) => { el.checked = false; });
@@ -3781,8 +3857,12 @@ function deshacerUltimoLiquido() {
   renderCalculadora();
 }
 
-function openModal(itemIndex) {
-  pendingManualTarget = itemIndex;
+// El modal se usa desde dos listas distintas: los alimentos de una comida
+// (pestaña Hoy) y los ingredientes del refrigerador. Antes estaba atado a
+// lastAnalysis, así que corregir desde el refrigerador habría reescrito la
+// comida del día.
+function openModal(itemIndex, lista = "hoy") {
+  pendingManualTarget = { lista, idx: itemIndex };
   els.manualSearch.value = "";
   els.modal.hidden = false;
   els.manualSearch.focus();
@@ -3801,9 +3881,28 @@ function confirmManualSelection() {
     els.manualSearch.reportValidity();
     return;
   }
-  lastAnalysis[pendingManualTarget].match = found;
-  lastAnalysis[pendingManualTarget].alternativas = [];
-  lastAnalysis[pendingManualTarget].confianza = null;
+  const { lista, idx } = pendingManualTarget;
+
+  if (lista === "refrigerador") {
+    // Al corregir hay que mover también la marca del checklist: la casilla del
+    // alimento equivocado se desmarca y se marca la del correcto, o el paciente
+    // termina con la receta hecha sobre lo que la IA se imaginó.
+    const previo = ingredientesIdentificados[idx];
+    if (previo) desmarcarEnChecklist(previo.match);
+    ingredientesIdentificados[idx] = {
+      alimentoIA: previo ? previo.alimentoIA : found.nombre,
+      match: found,
+      corregido: true,
+    };
+    marcarIdentificadosEnChecklist([ingredientesIdentificados[idx]]);
+    closeModal();
+    renderIngredientesIdentificados();
+    return;
+  }
+
+  lastAnalysis[idx].match = found;
+  lastAnalysis[idx].alternativas = [];
+  lastAnalysis[idx].confianza = null;
   closeModal();
   renderResults();
 }
