@@ -1786,6 +1786,20 @@ function normalize(str) {
     .trim();
 }
 
+// "aguja" está en "aguja de vacuno" pero no en "aguacate": el trozo tiene que
+// empezar y terminar donde termina una palabra, no en cualquier letra.
+function contienePalabra(texto, trozo) {
+  if (!trozo || trozo.length > texto.length) return false;
+  const esBorde = (ch) => ch === undefined || !/[a-z0-9]/.test(ch);
+  let desde = 0;
+  for (;;) {
+    const i = texto.indexOf(trozo, desde);
+    if (i === -1) return false;
+    if (esBorde(texto[i - 1]) && esBorde(texto[i + trozo.length])) return true;
+    desde = i + 1;
+  }
+}
+
 function matchFood(name) {
   if (!name) return null;
   const n = normalize(name);
@@ -1797,14 +1811,21 @@ function matchFood(name) {
 
   // No exact match: pick the most specific partial match (longest overlap wins),
   // so e.g. "papas fritas" prefers "Papas fritas / Chips" over "Papa / Patata".
+  //
+  // El parcial exige límite de palabra en las DOS direcciones. Con substring
+  // suelto, "papa" caía en "papaya" y "pollo" en "repollo" —y como el primero
+  // de la lista ganaba el empate, el paciente veía los 182 mg de potasio de la
+  // papaya donde había una papa de 425, o el fósforo del repollo (26 mg) donde
+  // había pechuga de pollo (200). Aquí un nombre mal resuelto no es un detalle
+  // cosmético: es la cifra que el paciente usa para decidir qué come.
   let best = null;
   let bestOverlap = 0;
   for (const food of FOODS) {
     const candidates = [food.nombre, ...(food.alias || [])].map(normalize);
     for (const c of candidates) {
       let overlap = 0;
-      if (n.includes(c)) overlap = c.length;
-      else if (c.includes(n)) overlap = n.length;
+      if (contienePalabra(n, c)) overlap = c.length;
+      else if (contienePalabra(c, n)) overlap = n.length;
       if (overlap > bestOverlap) {
         best = food;
         bestOverlap = overlap;
