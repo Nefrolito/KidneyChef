@@ -114,10 +114,11 @@
       <div class="capture-actions">
         <label class="btn btn-secondary btn-stacked">
           <svg class="btn-icon-bare" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h2.5l1.2-2h8.6l1.2 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.6"/></svg>
-          <span class="btn-text"><strong>Fotografiar ingredientes</strong><small>Cámara o galería</small></span>
-          <input id="refrigerador-camera-input" type="file" accept="image/*" hidden>
+          <span class="btn-text"><strong>Fotografiar ingredientes</strong><small>Cámara o galería — puedes elegir varias</small></span>
+          <input id="refrigerador-camera-input" type="file" accept="image/*" multiple hidden>
         </label>
       </div>
+      <p class="clinical-note" id="refrigerador-fotos-cuenta"></p>
       <button id="refrigerador-identificar-btn" class="btn btn-secondary" style="width:100%;margin-top:0.6rem;" disabled>Identificar ingredientes</button>
       <p id="refrigerador-ia-status" class="status" role="status" aria-live="polite"></p>
       <div id="refrigerador-identificados" class="alternatives-row"></div>

@@ -1448,6 +1448,7 @@ const els = {
   refrigeradorSinResultados: document.getElementById("refrigerador-sin-resultados"),
   refrigeradorPreviewWrap: document.getElementById("refrigerador-preview-wrap"),
   refrigeradorPreview: document.getElementById("refrigerador-preview"),
+  refrigeradorFotosCuenta: document.getElementById("refrigerador-fotos-cuenta"),
   refrigeradorCameraInput: document.getElementById("refrigerador-camera-input"),
   refrigeradorIdentificarBtn: document.getElementById("refrigerador-identificar-btn"),
   refrigeradorManual: document.getElementById("refrigerador-manual"),
@@ -1630,7 +1631,7 @@ async function init() {
   });
   els.activarPlanClinico.addEventListener("change", activarPlanClinico);
   els.copiarCodigoBtn.addEventListener("click", copiarCodigoCliente);
-  els.refrigeradorCameraInput.addEventListener("change", (e) => handleRefrigeradorFileSelected(e.target.files[0]));
+  els.refrigeradorCameraInput.addEventListener("change", (e) => handleRefrigeradorFileSelected(e.target.files));
   els.refrigeradorIdentificarBtn.addEventListener("click", identificarIngredientesRefrigerador);
   els.refrigeradorGenerarBtn.addEventListener("click", generarRecetaIA);
   els.refrigeradorLimpiarBtn.addEventListener("click", limpiarSeleccionRefrigerador);
@@ -2106,20 +2107,55 @@ function ingredientesSeleccionados() {
 }
 
 // --- Identificar ingredientes por foto y generar una receta a medida con IA ---
-let refrigeradorImagenDataUrl = null;
+// Varias fotos a la vez: refrigerador, despensa y congelador son tres fotos de
+// la misma pregunta, y obligar a repetir el ciclo entero por cada una era
+// pedirle al paciente que hiciera de secretario.
+//
+// Se mantiene la regla que ya estaba: una SELECCIÓN nueva reemplaza a la
+// anterior, no se acumula. "Esto es lo que tengo ahora", no "agrega esto a lo
+// de antes" — acumular en silencio hacía que una receta mezclara ingredientes
+// de fotos viejas sin que se notara. Lo que sí se acumula son las fotos de una
+// misma selección, porque son una sola respuesta.
+let refrigeradorImagenes = [];
 let ingredientesIdentificados = []; // [{ alimentoIA, match }], match siempre resuelto en FOODS
 
-function handleRefrigeradorFileSelected(file) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    refrigeradorImagenDataUrl = reader.result;
-    els.refrigeradorPreview.src = refrigeradorImagenDataUrl;
-    els.refrigeradorPreviewWrap.hidden = false;
-    els.refrigeradorIdentificarBtn.disabled = false;
-    setRefrigeradorStatus("");
-  };
-  reader.readAsDataURL(file);
+const MAX_FOTOS_REFRIGERADOR = 4;
+
+function leerComoDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleRefrigeradorFileSelected(files) {
+  const lista = [...(files || [])].filter(Boolean);
+  if (!lista.length) return;
+
+  const exceso = lista.length > MAX_FOTOS_REFRIGERADOR;
+  const usar = lista.slice(0, MAX_FOTOS_REFRIGERADOR);
+
+  try {
+    refrigeradorImagenes = await Promise.all(usar.map(leerComoDataUrl));
+  } catch {
+    setRefrigeradorStatus("No pudimos leer esas fotos. Inténtalo de nuevo.", true);
+    return;
+  }
+
+  els.refrigeradorPreview.src = refrigeradorImagenes[0];
+  els.refrigeradorPreviewWrap.hidden = false;
+  els.refrigeradorIdentificarBtn.disabled = false;
+  els.refrigeradorFotosCuenta.textContent = refrigeradorImagenes.length > 1
+    ? `${refrigeradorImagenes.length} fotos seleccionadas`
+    : "";
+  setRefrigeradorStatus(
+    exceso
+      ? `Usaremos las primeras ${MAX_FOTOS_REFRIGERADOR} fotos; el resto quedó fuera.`
+      : "",
+    exceso
+  );
 }
 
 // El checklist manual vive en un <details> colapsado para no ocupar la pantalla
@@ -2140,18 +2176,47 @@ function setRefrigeradorStatus(msg, isError = false, isLoading = false) {
 }
 
 async function identificarIngredientesRefrigerador() {
-  if (!refrigeradorImagenDataUrl) return;
+  if (!refrigeradorImagenes.length) return;
   els.refrigeradorIdentificarBtn.disabled = true;
-  setRefrigeradorStatus("Identificando ingredientes con IA…", false, true);
+  const varias = refrigeradorImagenes.length > 1;
+  setRefrigeradorStatus(
+    varias ? `Identificando ingredientes en ${refrigeradorImagenes.length} fotos…` : "Identificando ingredientes con IA…",
+    false, true
+  );
 
   try {
-    const res = await fetch(`${API_BASE}/api/identificar-ingredientes`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
-      body: JSON.stringify({ image: refrigeradorImagenDataUrl }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Error desconocido");
+    // Una llamada por foto, en paralelo. Si una falla, las otras siguen
+    // valiendo: perder los ingredientes del refrigerador porque la foto de la
+    // despensa salió movida no le sirve a nadie.
+    const respuestas = await Promise.all(
+      refrigeradorImagenes.map((imagen) =>
+        fetch(`${API_BASE}/api/identificar-ingredientes`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+          body: JSON.stringify({ image: imagen }),
+        })
+          .then(async (res) => {
+            const cuerpo = await res.json();
+            if (!res.ok) throw new Error(cuerpo.error || "Error desconocido");
+            return cuerpo;
+          })
+          .catch((e) => ({ _error: e.message }))
+      )
+    );
+
+    const fallidas = respuestas.filter((r) => r._error);
+    if (fallidas.length === respuestas.length) throw new Error(fallidas[0]._error);
+
+    // Fusionar sin repetir: el tomate que aparece en dos fotos es un tomate.
+    const vistos = new Set();
+    const items = [];
+    for (const r of respuestas) {
+      for (const item of (r.items || [])) {
+        const clave = normalize(item.alimento || "");
+        if (clave && !vistos.has(clave)) { vistos.add(clave); items.push(item); }
+      }
+    }
+    const data = { items, _fallidas: fallidas.length };
 
     // Antes esto era un .filter() que botaba en silencio todo lo que matchFood()
     // no supiera resolver: la IA reconocía "palta" y el paciente no se enteraba
@@ -2173,10 +2238,10 @@ async function identificarIngredientesRefrigerador() {
       setRefrigeradorStatus("No identificamos ningún ingrediente conocido en la foto. Márcalos a mano en la lista de abajo.", true);
       return;
     }
-    // Cada foto reemplaza a la anterior, no se acumulan: una foto nueva
-    // significa "esto es lo que tengo ahora", no "agrega esto a lo de antes"
-    // — acumular en silencio hacía que una receta generada mezclara
-    // ingredientes de fotos distintas sin que se notara en la UI.
+    // Cada selección reemplaza a la anterior (las fotos de una misma selección
+    // sí se suman entre ellas): elegir fotos de nuevo significa "esto es lo que
+    // tengo ahora", no "agrega esto a lo de antes" — acumular en silencio hacía
+    // que una receta mezclara ingredientes de fotos viejas sin que se notara.
     ingredientesIdentificados = nuevos;
     // Marcarlos en el checklist es lo que le permite al paciente ver, en una
     // sola lista, qué detectó la IA y qué le falta agregar. Antes vivían en dos
@@ -2187,7 +2252,8 @@ async function identificarIngredientesRefrigerador() {
     // un aviso flotante (position:fixed) y con una lista larga terminaba tapando
     // una tarjeta. Además la lista ya trae su propia nota, así que había dos
     // textos diciendo lo mismo.
-    resumenIdentificacion = mensajeIdentificacion(nuevos, marcados, fueraDeLista, sinDato);
+    resumenIdentificacion = mensajeIdentificacion(nuevos, marcados, fueraDeLista, sinDato)
+      + (data._fallidas ? ` No pudimos leer ${data._fallidas} de las fotos.` : "");
     setRefrigeradorStatus("");
     renderIngredientesIdentificados();
   } catch (err) {
@@ -2345,7 +2411,8 @@ function limpiarSeleccionRefrigerador() {
   renderIngredientesIdentificados();
   document.querySelectorAll(".refrigerador-ingrediente:checked").forEach((el) => { el.checked = false; });
   document.querySelectorAll('[id^="refrigerador-check-freq-"]:checked').forEach((el) => { el.checked = false; });
-  refrigeradorImagenDataUrl = null;
+  refrigeradorImagenes = [];
+  if (els.refrigeradorFotosCuenta) els.refrigeradorFotosCuenta.textContent = "";
   els.refrigeradorPreviewWrap.hidden = true;
   els.refrigeradorIdentificarBtn.disabled = true;
   els.refrigeradorRecetaIa.hidden = true;
