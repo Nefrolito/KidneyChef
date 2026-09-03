@@ -649,6 +649,38 @@ h1, h2, h3 {
 .refrigerador-categoria { margin-bottom: 1rem; }
 .refrigerador-categoria h4 { margin: 0 0 0.5rem; font-size: 0.82rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; }
 #refrigerador-resultados h3, #refrigerador-receta-ia h3 { margin: 1.1rem 0 0.6rem; font-size: 0.95rem; }
+/* Varias fotos: una tira de miniaturas en vez del preview único, para que se
+   vea de un vistazo qué eligió y pueda sacar la que salió movida antes de
+   gastar una llamada a la IA en ella. */
+.foto-tira {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.foto-tira figure {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--card-2, #1b2430);
+}
+.foto-tira img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.foto-tira .quitar-foto {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
 .preview-wrap-chica { height: 150px; margin-bottom: 0.75rem; }
 .preview-wrap-chica img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .refrigerador-manual { margin: 0.85rem 0; }

@@ -1449,6 +1449,7 @@ const els = {
   refrigeradorPreviewWrap: document.getElementById("refrigerador-preview-wrap"),
   refrigeradorPreview: document.getElementById("refrigerador-preview"),
   refrigeradorFotosCuenta: document.getElementById("refrigerador-fotos-cuenta"),
+  refrigeradorTira: document.getElementById("refrigerador-tira"),
   refrigeradorCameraInput: document.getElementById("refrigerador-camera-input"),
   refrigeradorIdentificarBtn: document.getElementById("refrigerador-identificar-btn"),
   refrigeradorManual: document.getElementById("refrigerador-manual"),
@@ -1631,7 +1632,19 @@ async function init() {
   });
   els.activarPlanClinico.addEventListener("change", activarPlanClinico);
   els.copiarCodigoBtn.addEventListener("click", copiarCodigoCliente);
-  els.refrigeradorCameraInput.addEventListener("change", (e) => handleRefrigeradorFileSelected(e.target.files));
+  els.refrigeradorCameraInput.addEventListener("change", (e) => {
+    handleRefrigeradorFileSelected(e.target.files);
+    // Sin esto, volver a elegir la misma foto no dispara "change" y el paciente
+    // cree que la app lo ignoró.
+    e.target.value = "";
+  });
+  els.refrigeradorTira.addEventListener("click", (e) => {
+    const btn = e.target.closest(".quitar-foto");
+    if (!btn) return;
+    refrigeradorImagenes.splice(Number(btn.dataset.i), 1);
+    renderTiraFotos();
+    setRefrigeradorStatus("");
+  });
   els.refrigeradorIdentificarBtn.addEventListener("click", identificarIngredientesRefrigerador);
   els.refrigeradorGenerarBtn.addEventListener("click", generarRecetaIA);
   els.refrigeradorLimpiarBtn.addEventListener("click", limpiarSeleccionRefrigerador);
@@ -2165,18 +2178,33 @@ async function handleRefrigeradorFileSelected(files) {
     return;
   }
 
-  els.refrigeradorPreview.src = refrigeradorImagenes[0];
-  els.refrigeradorPreviewWrap.hidden = false;
-  els.refrigeradorIdentificarBtn.disabled = false;
-  els.refrigeradorFotosCuenta.textContent = refrigeradorImagenes.length > 1
-    ? `${refrigeradorImagenes.length} fotos seleccionadas`
-    : "";
+  renderTiraFotos();
   setRefrigeradorStatus(
     exceso
       ? `Usaremos las primeras ${MAX_FOTOS_REFRIGERADOR} fotos; el resto quedó fuera.`
       : "",
     exceso
   );
+}
+
+// Con una sola foto se mantiene el preview grande de siempre; con varias se
+// muestran todas en miniatura, cada una con su ✕. Poder sacar la que salió
+// movida antes de identificar no es un lujo: cada foto es una llamada a la IA
+// que cuesta dinero, y una foto ilegible solo devuelve ruido.
+function renderTiraFotos() {
+  const n = refrigeradorImagenes.length;
+  els.refrigeradorPreviewWrap.hidden = n !== 1;
+  els.refrigeradorTira.hidden = n < 2;
+  els.refrigeradorIdentificarBtn.disabled = n === 0;
+  els.refrigeradorFotosCuenta.textContent = n > 1 ? `${n} fotos seleccionadas` : "";
+
+  if (n === 1) els.refrigeradorPreview.src = refrigeradorImagenes[0];
+
+  els.refrigeradorTira.innerHTML = n < 2 ? "" : refrigeradorImagenes.map((src, i) => `
+    <figure>
+      <img src="${src}" alt="Foto ${i + 1} de tus ingredientes">
+      <button type="button" class="quitar-foto" data-i="${i}" aria-label="Quitar la foto ${i + 1}">✕</button>
+    </figure>`).join("");
 }
 
 // El checklist manual vive en un <details> colapsado para no ocupar la pantalla
@@ -2433,7 +2461,7 @@ function limpiarSeleccionRefrigerador() {
   document.querySelectorAll(".refrigerador-ingrediente:checked").forEach((el) => { el.checked = false; });
   document.querySelectorAll('[id^="refrigerador-check-freq-"]:checked').forEach((el) => { el.checked = false; });
   refrigeradorImagenes = [];
-  if (els.refrigeradorFotosCuenta) els.refrigeradorFotosCuenta.textContent = "";
+  if (els.refrigeradorTira) renderTiraFotos();
   els.refrigeradorPreviewWrap.hidden = true;
   els.refrigeradorIdentificarBtn.disabled = true;
   els.refrigeradorRecetaIa.hidden = true;
