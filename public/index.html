@@ -44,10 +44,6 @@
   <!-- Banda de anuncios: el consejo del día y los días de prueba se desplazan
        en continuo de derecha a izquierda. La pista lleva el contenido DOS
        veces para que el bucle no tenga salto visible. -->
-  <div id="trial-banner" class="trial-banner" hidden>
-    <div id="banner-pista" class="banner-pista" aria-live="polite"></div>
-  </div>
-
   <main class="container">
     <section class="card aviso-dialisis" id="aviso-dialisis" data-tab="hoy" hidden></section>
 
@@ -90,6 +86,14 @@
         <svg class="btn-chevron" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </button>
       <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="card consejo-card" data-tab="hoy" id="consejo-card" hidden>
+      <img class="consejo-icono" src="icons/logo.png" width="40" height="40" alt="">
+      <div class="consejo-texto">
+        <span class="consejo-titulo">Consejo</span>
+        <p id="consejo-cuerpo"></p>
+      </div>
     </section>
 
     <section id="results" class="card results-card" data-tab="hoy" hidden>

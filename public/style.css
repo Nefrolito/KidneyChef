@@ -1207,41 +1207,19 @@ h1, h2, h3 {
   line-height: 1.35;
 }
 
-.trial-banner {
-  /* Más visible que antes: fondo de marca sólido en vez del tono claro. */
-  display: flex;
-  padding: 0.6rem 0;
-  background: var(--brand);
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 700;
-  overflow: hidden;
-  /* La banda se sale por los costados con un difuminado, para que el texto no
-     aparezca y desaparezca de golpe contra el borde. */
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
-}
-.banner-pista {
-  display: flex;
-  flex-shrink: 0;
-  white-space: nowrap;
-  will-change: transform;
-  animation: banner-desplaza 24s linear infinite;
-}
-.banner-item { padding: 0 2.5rem; }
+
+
+
 /* Recorre la mitad de la pista, que es una copia exacta de la otra mitad: al
    terminar, el fotograma final es idéntico al inicial y no se ve el corte. */
-@keyframes banner-desplaza {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
+
 /* Movimiento continuo puede molestar o marear; con reduced-motion la banda se
    queda quieta y el texto igual se lee. */
 @media (prefers-reduced-motion: reduce) {
-  .banner-pista { animation: none; }
+
 }
 
-.trial-banner[hidden] { display: none; }
+
 
 .terminos-overlay {
   position: fixed;
@@ -1854,3 +1832,19 @@ h1, h2, h3 {
 .aviso-dialisis h2 { margin: 0 0 0.3rem; font-size: 1.05rem; }
 .aviso-dialisis .clinical-note { margin: 0; }
 .aviso-dialisis[hidden] { display: none; }
+
+/* --- Consejo del día -------------------------------------------------- */
+.consejo-card { display: flex; align-items: flex-start; gap: 0.85rem; }
+.consejo-card[hidden] { display: none; }
+.consejo-icono { flex: none; border-radius: 10px; }
+.consejo-texto { min-width: 0; }
+.consejo-titulo {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brand);
+  margin-bottom: 0.15rem;
+}
+.consejo-texto p { margin: 0; font-size: 0.92rem; line-height: 1.5; }

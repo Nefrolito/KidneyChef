@@ -1393,8 +1393,8 @@ const els = {
   perfilEdadCalculada: document.getElementById("perfil-edad-calculada"),
   planUpsell: document.getElementById("plan-upsell"),
   planUpsellText: document.getElementById("plan-upsell-text"),
-  trialBanner: document.getElementById("trial-banner"),
-  bannerPista: document.getElementById("banner-pista"),
+  consejoCard: document.getElementById("consejo-card"),
+  consejoCuerpo: document.getElementById("consejo-cuerpo"),
   paywallOverlay: document.getElementById("paywall-overlay"),
   paywallPeriodoToggle: document.getElementById("paywall-periodo-toggle"),
   paywallNiveles: document.getElementById("paywall-niveles"),
@@ -1660,10 +1660,16 @@ function irATab(tab) {
   localStorage.setItem(TAB_STORAGE_KEY, tab);
 }
 
+// Rota cada tres horas en vez de una vez al día: alguien que abre la app en
+// cada comida veía el mismo consejo tres veces. Tres horas es suficiente para
+// que cambie entre comidas sin que se sienta inquieto — y no rota mientras
+// está leyendo, que sería peor que no rotar.
+const HORAS_POR_CONSEJO = 3;
+
 function consejoDelDia() {
-  const start = new Date(new Date().getFullYear(), 0, 0);
-  const dayOfYear = Math.floor((new Date() - start) / 86400000);
-  return TIPS_DEL_DIA[dayOfYear % TIPS_DEL_DIA.length];
+  if (!TIPS_DEL_DIA.length) return null;
+  const bloque = Math.floor(Date.now() / (HORAS_POR_CONSEJO * 3600 * 1000));
+  return TIPS_DEL_DIA[bloque % TIPS_DEL_DIA.length];
 }
 
 // --- Banda de anuncios de arriba --------------------------------------
@@ -1673,40 +1679,21 @@ function consejoDelDia() {
 //
 // La pista lleva el contenido DOS veces y la animación recorre exactamente la
 // mitad, así el final empalma con el principio y no se ve el salto.
-const BANNER_PX_POR_SEGUNDO = 55;
 
-function mensajesBanner() {
-  const { diasRestantes, enTrial, bloqueado } = estadoSuscripcion();
-  const mensajes = [];
-  if (enTrial && !bloqueado) {
-    mensajes.push(
-      diasRestantes === 1
-        ? "Te queda 1 día de prueba gratis"
-        : `Te quedan ${diasRestantes} días de prueba gratis`
-    );
-  }
-  const consejo = consejoDelDia();
-  if (consejo) mensajes.push(`💡 ${consejo}`);
-  return mensajes;
-}
 
+// El consejo estaba en una banda que se desplazaba sola. Camilo la quitó por
+// una razón buena: "no se lee, parece propaganda" — un texto en movimiento
+// dentro de una app de salud se lee como publicidad y el ojo lo esquiva.
+// Ahora es una tarjeta quieta con el ícono de la app, que es quien habla.
+//
+// Los días de prueba salían también en la banda y ya no: la tarjeta "Tu
+// suscripción" los dice más abajo, y repetirlos era ruido.
 function renderBanner() {
   const { bloqueado } = estadoSuscripcion();
-  const mensajes = mensajesBanner();
-
-  els.trialBanner.hidden = bloqueado || mensajes.length === 0;
-  if (els.trialBanner.hidden) return;
-
-  const grupo = mensajes.map((m) => `<span class="banner-item">${escapeHtml(m)}</span>`).join("");
-  els.bannerPista.innerHTML = grupo + grupo;
-
-  // La duración se calcula desde el ancho real para que la banda avance
-  // siempre a la misma velocidad, sea el consejo corto o largo.
-  requestAnimationFrame(() => {
-    const recorrido = els.bannerPista.scrollWidth / 2;
-    if (!recorrido) return;
-    els.bannerPista.style.animationDuration = `${recorrido / BANNER_PX_POR_SEGUNDO}s`;
-  });
+  const consejo = consejoDelDia();
+  els.consejoCard.hidden = bloqueado || !consejo;
+  if (els.consejoCard.hidden) return;
+  els.consejoCuerpo.textContent = consejo;
 }
 
 
