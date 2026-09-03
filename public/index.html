@@ -355,6 +355,18 @@
         </div>
         <p class="super-proyeccion" id="super-proyeccion"></p>
         <div id="super-totales-cadena" class="super-totales-cadena"></div>
+
+        <div class="super-compartir">
+          <button id="super-compartir-btn" class="btn btn-secondary">
+            <svg class="btn-icon-bare" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L8 8m4-4 4 4"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
+            Compartir
+          </button>
+          <button id="super-imprimir-btn" class="btn btn-ghost">
+            <svg class="btn-icon-bare" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="7" rx="1.5"/><path d="M7 16h10v5H7z"/></svg>
+            Imprimir
+          </button>
+        </div>
+        <p class="status" id="super-compartir-status" role="status" aria-live="polite"></p>
       </div>
 
       <button id="super-limpiar-btn" class="btn btn-ghost" style="width:100%;">Limpiar selección</button>
@@ -487,6 +499,11 @@
       </p>
     </div>
   </div>
+
+  <!-- Solo existe para imprimir: se llena al pulsar Imprimir y la hoja de
+       estilos de impresión oculta todo lo demás. Así la lista sale limpia,
+       sin barra de pestañas ni banderolas. -->
+  <pre id="super-impresion" aria-hidden="true"></pre>
 
   <div id="editar-clinico-overlay" class="sheet-overlay" hidden>
     <div class="sheet">

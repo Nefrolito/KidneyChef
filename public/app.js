@@ -1378,6 +1378,10 @@ const els = {
   superItemNombre: document.getElementById("super-item-nombre"),
   superItemPrecio: document.getElementById("super-item-precio"),
   superAgregarStatus: document.getElementById("super-agregar-status"),
+  superCompartirBtn: document.getElementById("super-compartir-btn"),
+  superImprimirBtn: document.getElementById("super-imprimir-btn"),
+  superCompartirStatus: document.getElementById("super-compartir-status"),
+  superImpresion: document.getElementById("super-impresion"),
   superAgregarBtn: document.getElementById("super-agregar-btn"),
   superCantidad: document.getElementById("super-cantidad"),
   superTotal: document.getElementById("super-total"),
@@ -1448,6 +1452,8 @@ async function init() {
   );
   els.recetaExternaLeerBtn.addEventListener("click", leerRecetaExternaTexto);
   els.refrigeradorBuscador.addEventListener("input", filtrarChecklistRefrigerador);
+  els.superCompartirBtn.addEventListener("click", compartirListaSuper);
+  els.superImprimirBtn.addEventListener("click", imprimirListaSuper);
   renderVinculacion();
   refrescarVinculos();
   refrescarMetasSincronizadas();
@@ -2454,6 +2460,138 @@ function toggleSuperCustom(id, checked) {
   if (item) item.checked = checked;
   saveSuperCustom(arr);
   actualizarResumenSuper();
+}
+
+// --- Compartir e imprimir la lista ------------------------------------
+//
+// El paciente arma la lista en el sillón y la compra en el supermercado, casi
+// siempre desde otro dispositivo o en papel. Sin una salida, la lista se queda
+// encerrada en la app.
+//
+// Los sellos van en el texto porque son la razón de ser de esta lista: quien
+// la recibe (una hija que hace la compra, por ejemplo) necesita ver que el
+// queso es alto en fósforo, no solo su precio.
+function textoSellos(food) {
+  if (!food) return "";
+  const factor = PORCION_REFERENCIA_SUPER_G / 100;
+  return ["potasio_mg", "fosforo_mg", "sodio_mg"]
+    .map((nutriente) => {
+      const densidad = food[nutriente];
+      if (densidad == null) return null;
+      const { nivel } = clasificar(nutriente, Math.round(densidad * factor), densidad);
+      return nivel ? `${NUTRIENTE_LABEL[nutriente]} ${nivelTagContenido(nivel)}` : null;
+    })
+    .filter(Boolean)
+    .join(" · ");
+}
+
+function listaSuperComoTexto() {
+  const seleccion = loadSuperSeleccion();
+  const itemsCatalogo = itemsPreciables().filter((i) => seleccion.has(i.id));
+  const itemsCustom = loadSuperCustom().filter((i) => i.checked);
+  if (itemsCatalogo.length + itemsCustom.length === 0) return null;
+
+  const lineas = ["Lista de supermercado — KidneyChef", ""];
+
+  const porCategoria = new Map();
+  for (const item of itemsCatalogo) {
+    const cat = item.categoria || categoriaDelPadre(item) || "Otros";
+    if (!porCategoria.has(cat)) porCategoria.set(cat, []);
+    porCategoria.get(cat).push(item);
+  }
+
+  for (const [categoria, items] of porCategoria) {
+    lineas.push(categoria.toUpperCase());
+    for (const item of items) {
+      const barata = cadenaMasBarata(item);
+      const cadena = CADENAS_SUPER.find((c) => c.id === barata.cadena);
+      const presentacion = item.presentacion ? ` (${item.presentacion})` : "";
+      lineas.push(`- ${item.nombre}${presentacion} — ${formatoCLP(barata.precio)} en ${cadena.label}`);
+      const sellos = textoSellos(foodDeItem(item));
+      if (sellos) lineas.push(`  ${sellos}`);
+    }
+    lineas.push("");
+  }
+
+  if (itemsCustom.length) {
+    lineas.push("AGREGADOS POR TI");
+    for (const item of itemsCustom) lineas.push(`- ${item.nombre} — ${formatoCLP(item.precio_clp)}`);
+    lineas.push("");
+  }
+
+  const totalMezclado = itemsCatalogo.reduce((acc, i) => acc + cadenaMasBarata(i).precio, 0)
+    + itemsCustom.reduce((acc, i) => acc + i.precio_clp, 0);
+  lineas.push(`Total comprando cada producto donde sea más barato: ${formatoCLP(totalMezclado)}`);
+
+  if (itemsCatalogo.length) {
+    const extra = itemsCustom.reduce((acc, i) => acc + i.precio_clp, 0);
+    const porCadena = CADENAS_SUPER
+      .map((c) => ({ c, total: itemsCatalogo.reduce((acc, i) => acc + i.precios[c.id], 0) + extra }))
+      .sort((a, b) => a.total - b.total);
+    lineas.push("");
+    lineas.push("Comprando todo en una sola cadena:");
+    porCadena.forEach((t, i) => {
+      lineas.push(`- ${t.c.label}: ${formatoCLP(t.total)}${i === 0 ? "  ← la más barata" : ""}`);
+    });
+  }
+
+  lineas.push("");
+  lineas.push("Los sellos indican cuánto aporta cada alimento por porción de "
+    + `${PORCION_REFERENCIA_SUPER_G} g, no si superas tu límite diario.`);
+  lineas.push("Precios de referencia: confirma en el local.");
+  return lineas.join("\n");
+}
+
+// Los cortes no llevan categoría propia: la heredan del producto padre.
+function categoriaDelPadre(corte) {
+  const padre = PRECIOS_REFERENCIA.find((p) => (p.cortes || []).some((c) => c.id === corte.id));
+  return padre ? padre.categoria : null;
+}
+
+async function compartirListaSuper() {
+  const texto = listaSuperComoTexto();
+  if (!texto) {
+    setSuperCompartirStatus("Marca al menos un producto antes de compartir la lista.", true);
+    return;
+  }
+  setSuperCompartirStatus("");
+
+  // navigator.share abre la hoja nativa: WhatsApp, Mail, Notas, lo que el
+  // paciente tenga instalado. No hay que integrar cada servicio por separado.
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "Lista de supermercado — KidneyChef", text: texto });
+      return;
+    } catch (e) {
+      // Cancelar no es un error: si el paciente cierra la hoja, no hay nada
+      // que decirle. Cualquier otra falla sí cae al respaldo de abajo.
+      if (e && e.name === "AbortError") return;
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(texto);
+    setSuperCompartirStatus("Lista copiada. Pégala en WhatsApp, en un correo o donde quieras.");
+  } catch {
+    setSuperCompartirStatus("No pudimos compartir la lista desde aquí. Prueba con Imprimir.", true);
+  }
+}
+
+function imprimirListaSuper() {
+  const texto = listaSuperComoTexto();
+  if (!texto) {
+    setSuperCompartirStatus("Marca al menos un producto antes de imprimir la lista.", true);
+    return;
+  }
+  setSuperCompartirStatus("");
+  els.superImpresion.textContent = texto;
+  window.print();
+}
+
+function setSuperCompartirStatus(msg, isError = false) {
+  if (!els.superCompartirStatus) return;
+  els.superCompartirStatus.textContent = msg;
+  els.superCompartirStatus.classList.toggle("error", Boolean(msg) && isError);
 }
 
 function setSuperAgregarStatus(msg, isError = false) {

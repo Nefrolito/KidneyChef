@@ -1758,3 +1758,32 @@ h1, h2, h3 {
   padding: 0.2rem 0;
 }
 .super-totales-cadena-fila.super-totales-cadena-min { color: var(--verde); }
+
+/* --- Compartir e imprimir la lista del supermercado ------------------- */
+.super-compartir {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.super-compartir .btn { flex: 1; }
+
+/* El bloque de impresión solo existe para eso: en pantalla no se ve nunca. */
+#super-impresion { display: none; }
+
+@media print {
+  /* Se oculta todo lo demás para que la hoja salga con la lista y nada más:
+     sin barra de pestañas, sin banderola de prueba, sin cabecera. */
+  body > *:not(#super-impresion) { display: none !important; }
+  #super-impresion {
+    display: block !important;
+    white-space: pre-wrap;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #000;
+    background: #fff;
+    padding: 0;
+    margin: 0;
+  }
+  @page { margin: 1.5cm; }
+}
