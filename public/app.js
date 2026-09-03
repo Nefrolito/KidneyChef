@@ -747,15 +747,12 @@ function metaPorDefectoDesdeEtapa(config) {
   const etapa = situacionActual();
   if (!etapa || !config.etapas_aplicables.includes(etapa)) return null;
 
-  // El fósforo gradúa la meta según cuánto fosfato remueve cada situación
-  // (etapa 4 conserva función renal residual; la diálisis peritoneal remueve
-  // menos que la hemodiálisis), así que usa un mapa por situación. El potasio
-  // sigue con un valor único más su variante estricta. Indicación de Camilo
-  // del 2026-08-30 — ver _nota_objetivo_por_situacion.
-  const porSituacion = config.objetivo_mg_dia_por_defecto_por_situacion;
-  if (porSituacion && porSituacion[etapa] != null) return porSituacion[etapa];
-
   if (config.objetivo_mg_dia_por_defecto == null) return null;
+
+  // No hay meta graduada por etapa a propósito: KDOQI 2020 no fija cifras de
+  // K ni P por etapa, solo rangos generales (K 1500-2000, P 800-1000 mg/día).
+  // Graduar sería inventar una estructura que la guía no tiene. Ver
+  // _nota_no_graduar_por_etapa en limites-clinicos.json.
 
   // El riesgo de hiperkalemia (diabetes o fármacos retenedores de K) aprieta
   // la meta en vez de borrarla: antes la anulaba y dejaba sin referencia justo
@@ -2048,9 +2045,17 @@ async function identificarIngredientesRefrigerador() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Error desconocido");
 
-    const nuevos = (data.items || [])
-      .map((item) => ({ alimentoIA: item.alimento, match: matchFood(item.alimento) }))
-      .filter((item) => item.match);
+    // Antes esto era un .filter() que botaba en silencio todo lo que matchFood()
+    // no supiera resolver: la IA reconocía "palta" y el paciente no se enteraba
+    // de que se había descartado. Ahora se separan y se le dice qué pasó con
+    // cada cosa.
+    const nuevos = [];
+    const sinDato = [];
+    for (const item of (data.items || [])) {
+      const match = matchFood(item.alimento);
+      if (match) nuevos.push({ alimentoIA: item.alimento, match });
+      else sinDato.push(item.alimento);
+    }
 
     if (nuevos.length === 0) {
       // Abrir el checklist, no solo nombrarlo: es la única salida que le queda
@@ -2065,13 +2070,62 @@ async function identificarIngredientesRefrigerador() {
     // — acumular en silencio hacía que una receta generada mezclara
     // ingredientes de fotos distintas sin que se notara en la UI.
     ingredientesIdentificados = nuevos;
-    setRefrigeradorStatus("");
     renderIngredientesIdentificados();
+
+    // Marcarlos en el checklist es lo que le permite al paciente ver, en una
+    // sola lista, qué detectó la IA y qué le falta agregar. Antes vivían en dos
+    // sitios distintos —fichas arriba, casillas abajo— sin relación visible.
+    const { marcados, fueraDeLista } = marcarIdentificadosEnChecklist(nuevos);
+    if (marcados.length) abrirChecklistManual();
+    setRefrigeradorStatus(mensajeIdentificacion(nuevos, marcados, fueraDeLista, sinDato));
   } catch (err) {
     setRefrigeradorStatus(err.message, true);
   } finally {
     els.refrigeradorIdentificarBtn.disabled = false;
   }
+}
+
+// La IA devuelve ids de nutrientes.json ("res", "aguacate") y el checklist usa
+// los suyos ("vacuno", "palta"), así que hay que traducir por nutrientes_id.
+// Lo que no esté en el checklist igual cuenta para la receta: solo no tiene
+// casilla que marcar, y por eso se nombra aparte en el mensaje.
+function marcarIdentificadosEnChecklist(identificados) {
+  const marcados = [];
+  const fueraDeLista = [];
+  for (const item of identificados) {
+    const ing = (INGREDIENTES_REFRIGERADOR || []).find((i) => i.nutrientes_id === item.match.id);
+    const casilla = ing && document.getElementById(`refrigerador-check-${ing.id}`);
+    if (casilla) {
+      casilla.checked = true;
+      marcados.push(ing.nombre);
+    } else {
+      fueraDeLista.push(item.match.nombre);
+    }
+  }
+  return { marcados, fueraDeLista };
+}
+
+function listaCorta(nombres, tope = 4) {
+  if (nombres.length > tope) {
+    return `${nombres.slice(0, tope).join(", ")} y ${nombres.length - tope} más`;
+  }
+  if (nombres.length <= 1) return nombres.join("");
+  // "ají verde y kiwi", no "ají verde, kiwi": lo lee un paciente, no un log.
+  return `${nombres.slice(0, -1).join(", ")} y ${nombres[nombres.length - 1]}`;
+}
+
+function mensajeIdentificacion(nuevos, marcados, fueraDeLista, sinDato) {
+  const partes = [`Reconocimos ${nuevos.length} ingrediente${nuevos.length === 1 ? "" : "s"}.`];
+  if (marcados.length) {
+    partes.push(`Marcamos ${marcados.length} en la lista de abajo — revísala y agrega lo que falte.`);
+  }
+  if (fueraDeLista.length) {
+    partes.push(`${listaCorta(fueraDeLista)} no está en la lista, pero se usará igual.`);
+  }
+  if (sinDato.length) {
+    partes.push(`No tenemos datos nutricionales de ${listaCorta(sinDato)}, así que no entra en la receta.`);
+  }
+  return partes.join(" ");
 }
 
 function renderIngredientesIdentificados() {
@@ -2081,6 +2135,12 @@ function renderIngredientesIdentificados() {
   ingredientesIdentificados.forEach((_, idx) => {
     const btn = document.getElementById(`refrigerador-quitar-${idx}`);
     if (btn) btn.addEventListener("click", () => {
+      // Desmarcar también la casilla: candidatosParaIA() une fichas y casillas,
+      // así que quitar solo la ficha dejaba el ingrediente igual de dentro.
+      const quitado = ingredientesIdentificados[idx];
+      const ing = quitado && (INGREDIENTES_REFRIGERADOR || []).find((i) => i.nutrientes_id === quitado.match.id);
+      const casilla = ing && document.getElementById(`refrigerador-check-${ing.id}`);
+      if (casilla) casilla.checked = false;
       ingredientesIdentificados.splice(idx, 1);
       renderIngredientesIdentificados();
     });
