@@ -743,9 +743,24 @@ function metaDiaria(nutriente) {
 // KDOQI/NKF. Solo el potasio lo declara, así que el fósforo queda desacoplado
 // de un factor que no altera la fosfatemia.
 function metaPorDefectoDesdeEtapa(config) {
-  if (!config || config.objetivo_mg_dia_por_defecto == null) return null;
+  if (!config) return null;
   const etapa = situacionActual();
   if (!etapa || !config.etapas_aplicables.includes(etapa)) return null;
+
+  // El fósforo gradúa la meta según cuánto fosfato remueve cada situación
+  // (etapa 4 conserva función renal residual; la diálisis peritoneal remueve
+  // menos que la hemodiálisis), así que usa un mapa por situación. El potasio
+  // sigue con un valor único más su variante estricta. Indicación de Camilo
+  // del 2026-08-30 — ver _nota_objetivo_por_situacion.
+  const porSituacion = config.objetivo_mg_dia_por_defecto_por_situacion;
+  if (porSituacion && porSituacion[etapa] != null) return porSituacion[etapa];
+
+  if (config.objetivo_mg_dia_por_defecto == null) return null;
+
+  // El riesgo de hiperkalemia (diabetes o fármacos retenedores de K) aprieta
+  // la meta en vez de borrarla: antes la anulaba y dejaba sin referencia justo
+  // al paciente de mayor riesgo. Solo el potasio declara variante estricta, así
+  // que el fósforo queda desacoplado de un factor que no altera la fosfatemia.
   if (config.objetivo_mg_dia_por_defecto_estricto != null && riesgoHiperkalemia()) {
     return config.objetivo_mg_dia_por_defecto_estricto;
   }
@@ -1365,6 +1380,7 @@ const els = {
   superChecklist: document.getElementById("super-checklist"),
   superItemNombre: document.getElementById("super-item-nombre"),
   superItemPrecio: document.getElementById("super-item-precio"),
+  superAgregarStatus: document.getElementById("super-agregar-status"),
   superAgregarBtn: document.getElementById("super-agregar-btn"),
   superCantidad: document.getElementById("super-cantidad"),
   superTotal: document.getElementById("super-total"),
@@ -1525,11 +1541,12 @@ async function init() {
 const TAB_STORAGE_KEY = "kidneyChefTabActiva";
 
 function initTabs() {
-  const tabGuardada = localStorage.getItem(TAB_STORAGE_KEY);
-  const tabs = Array.from(els.tabBar.querySelectorAll(".tab-btn"))
-    .filter((btn) => !btn.hidden)
-    .map((btn) => btn.dataset.tabTarget);
-  irATab(tabGuardada && tabs.includes(tabGuardada) ? tabGuardada : "hoy");
+  // Siempre se abre en Hoy, aunque la última sesión haya terminado en otra
+  // pestaña. Antes se restauraba la guardada y eso dejaba a alguien entrando
+  // directo a la lista del supermercado por la mañana, en vez de al panel del
+  // día, que es para lo que se abre esta app. La pestaña guardada se sigue
+  // escribiendo por si más adelante hace falta.
+  irATab("hoy");
 
   els.tabBar.querySelectorAll(".tab-btn").forEach((btn) => {
     btn.addEventListener("click", () => irATab(btn.dataset.tabTarget));
@@ -2379,16 +2396,46 @@ function toggleSuperCustom(id, checked) {
   actualizarResumenSuper();
 }
 
+function setSuperAgregarStatus(msg, isError = false) {
+  if (!els.superAgregarStatus) return;
+  els.superAgregarStatus.textContent = msg;
+  els.superAgregarStatus.classList.toggle("error", Boolean(msg) && isError);
+}
+
 function quitarItemCustom(id) {
   const arr = loadSuperCustom().filter((i) => i.id !== id);
   saveSuperCustom(arr);
   renderSuperChecklist();
 }
 
+// Un precio chileno se escribe "12.990", con el punto como separador de MILES.
+// El campo era type="number", donde el punto es el separador DECIMAL: "12.990"
+// entraba como 12,99 pesos y el total quedaba absurdamente bajo. Y "$12.990" o
+// "12,990" no se podían ni escribir, así que el botón no hacía nada sin decir
+// por qué. El peso chileno no usa centavos, así que quedarse con los dígitos es
+// exacto: "$12.990" y "12990" dan lo mismo.
+function precioClpDesdeTexto(texto) {
+  const digitos = String(texto).replace(/\D/g, "");
+  if (!digitos) return null;
+  const n = parseInt(digitos, 10);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
 function agregarItemPersonalizadoSuper() {
   const nombre = els.superItemNombre.value.trim();
-  const precio = Number(els.superItemPrecio.value);
-  if (!nombre || !precio || precio <= 0) return;
+  const precio = precioClpDesdeTexto(els.superItemPrecio.value);
+
+  // Antes esto era un return mudo: si el precio no se entendía, tocabas
+  // "Agregar" y no pasaba nada, sin ninguna explicación.
+  if (!nombre) {
+    setSuperAgregarStatus("Escribe el nombre del producto.", true);
+    return;
+  }
+  if (precio == null) {
+    setSuperAgregarStatus("No entendí el precio. Escríbelo en pesos, por ejemplo 12.990.", true);
+    return;
+  }
+  setSuperAgregarStatus("");
 
   const arr = loadSuperCustom();
   arr.push({ id: `custom-${Date.now()}`, nombre, precio_clp: precio, checked: true });

@@ -339,9 +339,10 @@
 
       <div class="super-agregar">
         <input type="text" id="super-item-nombre" placeholder="Otro producto (ej: yogurt bajo en sodio)">
-        <input type="number" id="super-item-precio" min="0" step="50" placeholder="$">
+        <input type="text" id="super-item-precio" inputmode="numeric" placeholder="$ precio">
         <button id="super-agregar-btn" class="btn btn-secondary">Agregar</button>
       </div>
+      <p class="status" id="super-agregar-status" role="status" aria-live="polite"></p>
 
       <div class="super-resumen">
         <div class="super-resumen-fila">

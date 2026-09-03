@@ -48,9 +48,16 @@
       "bajo_hasta": 50,
       "moderado_hasta": 150
     },
+    "objetivo_mg_dia_por_defecto_por_situacion": {
+      "4": 2000,
+      "5": 1000,
+      "hemodialisis": 1000,
+      "peritoneal": 1500
+    },
     "objetivo_mg_dia_por_defecto": 1000,
-    "etapas_aplicables": ["5", "hemodialisis"],
-    "_nota_objetivo_por_defecto": "Pedido por Camilo el 2026-08-02, revisado el 2026-08-30. Cifra basada en el rango de referencia general KDOQI/NKF (800-1000 mg/día) para cuando se necesita restringir por hiperfosfatemia. Aplicable SOLO cuando el tratante no fijó una meta propia. Dos cambios el 2026-08-30: (1) se DESACOPLA de factores_riesgo_hiperkalemia — ese bloque describe riesgo de hiperkalemia, y la diabetes o los fármacos retenedores de potasio no alteran la fosfatemia, así que no tenía fundamento clínico que borraran la meta de fósforo; venía heredado por copia de la nota de potasio. (2) las etapas aplicables pasan de 4/5/hemodiálisis a 5 y hemodiálisis: la hiperfosfatemia se vuelve el problema a controlar más tarde que la hiperkalemia."
+    "etapas_aplicables": ["4", "5", "hemodialisis", "peritoneal"],
+    "_nota_objetivo_por_defecto": "Aplicable SOLO cuando el tratante no fijó una meta propia. Desacoplado de factores_riesgo_hiperkalemia el 2026-08-30: ese bloque describe riesgo de POTASIO, y ni la diabetes ni los fármacos retenedores de K alteran la fosfatemia; la exclusión venía heredada por copia de la nota de potasio, sin fundamento propio. El campo plano objetivo_mg_dia_por_defecto (1000) se conserva solo como respaldo si una situación no está en el mapa por situación.",
+    "_nota_objetivo_por_situacion": "GRADUADO POR SITUACIÓN el 2026-08-30 a indicación de Camilo, que pidió explícitamente: etapa 4 → 2000 mg, etapa 5 y hemodiálisis → 1000 mg, diálisis peritoneal → 1500 mg. PROCEDENCIA, dicha con precisión: solo los 1000 mg caen dentro del rango de referencia general KDOQI/NKF (800-1000 mg/día) que cita _principio_rector. Los 2000 de etapa 4 y los 1500 de peritoneal están POR ENCIMA de ese rango y no salen de él ni de una tabla oficial por etapa (la guía KDOQI 2020 no fija cifras de P por etapa): son criterio clínico de Camilo, que gradúa la restricción según cuánto fosfato remueve cada situación — en etapa 4 todavía hay función renal residual, y la diálisis peritoneal remueve fosfato menos eficientemente que la hemodiálisis, de ahí que quede en un punto intermedio. Registrado con fecha y a su nombre, igual que el resto del contenido clínico de este archivo. La meta que fije el tratante sigue teniendo prioridad."
   },
   "carbohidratos": {
     "_nota": "Solo se activa si el paciente declara diabetes. El objetivo se individualiza (ADA); 180 g/día equivale a ~45 g por comida.",
