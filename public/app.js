@@ -2288,8 +2288,16 @@ function renderIngredientesIdentificados() {
     .map((item, idx) => ({ item, idx }))
     .sort((a, b) => prioridadClinica(b.item.match) - prioridadClinica(a.item.match));
 
+  // Plegada por defecto, y esto no es un detalle de estilo: desplegada, ocho
+  // tarjetas con sus sellos añaden ~1250 px y empujan "Generar receta a mi
+  // medida" más de dos pantallas hacia abajo. La revisión importa, pero no
+  // puede sepultar la acción por la que el paciente entró a esta pantalla.
   els.refrigeradorIdentificados.innerHTML = orden.length
-    ? `<p class="clinical-note reconocidos-nota">${resumenIdentificacion
+    ? `<details class="reconocidos-detalle">
+         <summary><strong>${orden.length} ingrediente${orden.length === 1 ? "" : "s"} reconocido${orden.length === 1 ? "" : "s"}</strong>
+           — ${escapeHtml(listaCorta(orden.map(({ item }) => item.match.nombre), 3))}.
+           Toca para revisar o corregir.</summary>
+       <p class="clinical-note reconocidos-nota">${resumenIdentificacion
           ? escapeHtml(resumenIdentificacion) + " "
           : ""}Revisa que esté bien —puedes cambiar o quitar lo que no corresponda— y luego
          genera la receta. Los sellos son por cada 100 g del alimento crudo.</p>
@@ -2310,7 +2318,8 @@ function renderIngredientesIdentificados() {
             <div class="super-semaforos">${sellosDeAlimento(item.match)}</div>
             ${kcal != null ? `<p class="reconocido-kcal">${Math.round(kcal)} kcal por 100 g</p>` : ""}
           </li>`;
-        }).join("")}</ul>`
+        }).join("")}</ul>
+       </details>`
     : "";
 
   orden.forEach(({ idx }) => {
@@ -3792,11 +3801,54 @@ function porcentajeDelDiaHtml(receta) {
   if (!filas) return "";
   return `
     <div class="receta-dia">
+      ${deDondeVieneHtml(receta)}
       <h4>Cuánto ocupa de tu día</h4>
       <p class="clinical-note">Los sellos de arriba dicen qué tan concentrada es la receta.
         Esto dice cuánto te gasta del límite diario, que es lo que decide si puedes comerla.</p>
       <div class="receta-dia-filas">${filas}</div>
     </div>`;
+}
+
+// De dónde sale el nutriente más comprometido del plato. Camilo lo pidió con
+// un ejemplo que lo explica bien: si a la carne le agregas cebolla y tomate,
+// tu exposición al potasio sube — y el paciente no tiene por qué deducirlo de
+// una cifra total. Nombrar los dos ingredientes que más aportan convierte el
+// número en algo accionable: ya sabe qué reducir.
+//
+// Los aportes se calculan de nutrientes.json por los gramos que propuso la
+// receta, nunca de algo que haya dicho la IA.
+function deDondeVieneHtml(receta) {
+  const conMeta = nutrientesVisibles().filter((n) => metaDiaria(n) != null);
+  if (!conMeta.length) return "";
+
+  // El nutriente que más porcentaje de su meta se lleva.
+  const critico = conMeta
+    .map((n) => ({ n, pct: (receta.totales[n] || 0) / metaDiaria(n) }))
+    .sort((a, b) => b.pct - a.pct)[0];
+  if (!critico || critico.pct < 0.25) return "";
+
+  const aportes = (receta.ingredientes || [])
+    .map((i) => {
+      const food = FOODS.find((f) => f.id === i.id);
+      const gramos = Number(i.gramos) || 0;
+      if (!food || food[critico.n] == null) return null;
+      return { nombre: food.nombre, aporte: (food[critico.n] * gramos) / 100 };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.aporte - a.aporte);
+
+  const total = aportes.reduce((acc, a) => acc + a.aporte, 0);
+  if (total <= 0) return "";
+
+  const top = aportes.slice(0, 2).filter((a) => a.aporte / total >= 0.15);
+  if (!top.length) return "";
+
+  const partes = top.map((a) => `${escapeHtml(a.nombre)} (${Math.round(a.aporte / total * 100)}%)`);
+  return `
+    <p class="receta-de-donde">
+      El ${escapeHtml(NUTRIENTE_LABEL[critico.n].toLowerCase())} de este plato viene sobre todo de
+      ${partes.join(" y ")}. Si quieres bajarlo, es por ahí.
+    </p>`;
 }
 
 // calculado por su cuenta — mismo criterio que el resto de la app.
