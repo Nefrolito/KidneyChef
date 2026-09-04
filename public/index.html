@@ -61,12 +61,19 @@
             <h3>Toma o sube una foto de tu comida</h3>
             <p>Analizamos al instante los nutrientes clave para tu salud renal.</p>
           </div>
-          <img
-            class="placeholder-illustration"
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Healthy_Gnocchi_Buddha_Bowl_-_49859053553.jpg/960px-Healthy_Gnocchi_Buddha_Bowl_-_49859053553.jpg"
-            alt=""
-            title="Foto: Jonas Zeschke — Wikimedia Commons (CC BY-SA 2.0)"
-            loading="lazy">
+          <!-- La foto es de Wikimedia Commons con licencia CC BY-SA 2.0, que exige
+               atribución VISIBLE: tenerla solo en el atributo title no cumple, porque
+               nadie la ve. Además se sirve desde public/ y no desde los servidores de
+               Wikimedia: enlazar en caliente desde una app nativa la deja rota sin
+               conexión y filtra una petición por paciente a un tercero. -->
+          <figure class="placeholder-figura">
+            <img
+              class="placeholder-illustration"
+              src="img/plato-ejemplo.jpg"
+              alt=""
+              loading="lazy">
+            <figcaption class="credito-foto">Foto: Jonas Zeschke · CC BY-SA 2.0</figcaption>
+          </figure>
         </div>
       </div>
 

@@ -687,6 +687,18 @@ h1, h2, h3 {
   border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
 }
 .puente-receta p { margin: 0 0 0.7rem; font-size: 0.9rem; color: var(--muted); }
+/* El crédito de la foto de ejemplo. CC BY-SA 2.0 exige atribución visible, así
+   que va bajo la imagen y no escondida en un title. Discreta, pero legible. */
+.placeholder-figura { margin: 0; position: relative; }
+.credito-foto {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.82);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+  letter-spacing: 0.01em;
+}
 .preview-wrap-chica { height: 150px; margin-bottom: 0.75rem; }
 .preview-wrap-chica img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .refrigerador-manual { margin: 0.85rem 0; }
