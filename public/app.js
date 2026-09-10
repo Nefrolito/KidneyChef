@@ -118,31 +118,53 @@ function productIdSeleccionado() {
   return `com.kidneychef.app.${sufijo}`;
 }
 
-// Dispara la compra real si RevenueCat ya está configurado (requiere las API
-// keys de arriba y el producto ya creado en las tiendas); si no, deja un
-// mensaje de que todavía no está disponible en vez de romper la app.
+// Dispara la compra real a través de RevenueCat.
+//
+// Cualquier salida que no sea la compra hecha tiene que decir qué pasó y, sobre
+// todo, que no se cobró nada. Antes los tres finales distintos —no hay tienda,
+// la offering no trae el producto, la llamada falló— terminaban en el mismo
+// "estará disponible muy pronto", que para App Review es una compra rota y para
+// el paciente es un botón que no hace nada.
 async function comprarSuscripcion() {
   const platform = esAppNativa() && window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : null;
   const apiKey = platform === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
-  if (apiKey) {
-    try {
-      const Purchases = window.Capacitor.Plugins.Purchases;
-      const { current } = await Purchases.getOfferings();
-      const idProducto = productIdSeleccionado();
-      const paquete = current?.availablePackages?.find((pkg) => pkg.product?.identifier === idProducto);
-      if (paquete) {
-        await Purchases.purchasePackage({ aPackage: paquete });
-        // Si se compró desde "Ver planes", el paywall ya cumplió su función.
-        paywallModoConsulta = false;
-        await sincronizarSuscripcionRevenueCat();
-        return;
-      }
-    } catch (e) {
-      console.warn("No se pudo completar la compra de la suscripción", e);
-    }
-  }
   els.paywallMsg.hidden = false;
-  els.paywallMsg.textContent = "La suscripción estará disponible muy pronto en esta app.";
+  if (!apiKey) {
+    els.paywallMsg.textContent = "Las suscripciones se compran desde la app de iPhone o Android, no desde el navegador.";
+    return;
+  }
+
+  els.paywallSuscribirBtn.disabled = true;
+  els.paywallMsg.textContent = "Conectando con la tienda…";
+  try {
+    const Purchases = window.Capacitor.Plugins.Purchases;
+    const { current } = await Purchases.getOfferings();
+    const idProducto = productIdSeleccionado();
+    const paquete = current?.availablePackages?.find((pkg) => pkg.product?.identifier === idProducto);
+    if (!paquete) {
+      // Falta configurar el producto en RevenueCat o todavía no lo aprueba la
+      // tienda. No es culpa del paciente y no se le cobró nada.
+      els.paywallMsg.textContent = "Ese plan no está disponible en la tienda en este momento. No se te cobró nada. Prueba con otro plan o inténtalo más tarde.";
+      return;
+    }
+    await Purchases.purchasePackage({ aPackage: paquete });
+    // Si se compró desde "Ver planes", el paywall ya cumplió su función.
+    paywallModoConsulta = false;
+    await sincronizarSuscripcionRevenueCat();
+    els.paywallMsg.textContent = "¡Listo! Tu suscripción quedó activa.";
+  } catch (e) {
+    // Que el paciente cierre la hoja de compra de Apple no es un error: ya sabe
+    // lo que hizo, y mostrarle una alarma sería confundirlo.
+    if (e && (e.code === "1" || e.userCancelled || e.message?.includes("cancel"))) {
+      els.paywallMsg.hidden = true;
+      els.paywallMsg.textContent = "";
+    } else {
+      console.warn("No se pudo completar la compra de la suscripción", e);
+      els.paywallMsg.textContent = "No se pudo completar la compra. No se te cobró nada. Revisa tu conexión e inténtalo de nuevo.";
+    }
+  } finally {
+    els.paywallSuscribirBtn.disabled = false;
+  }
 }
 
 // Restaurar compras. Apple lo exige (guía 3.1.1) para que alguien que cambia
@@ -154,7 +176,7 @@ async function restaurarCompras() {
   const apiKey = platform === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
   els.paywallMsg.hidden = false;
   if (!apiKey) {
-    els.paywallMsg.textContent = "La suscripción estará disponible muy pronto en esta app.";
+    els.paywallMsg.textContent = "Las compras se restauran desde la app de iPhone o Android, no desde el navegador.";
     return;
   }
   els.paywallMsg.textContent = "Buscando tus compras anteriores…";

@@ -177,9 +177,15 @@ Lo que falta:
 2. La cuenta de Google Play Developer y el equivalente Android: completar
    `REVENUECAT_API_KEY_ANDROID` en `public/app.js`.
 
-Mientras una key esté vacía, `initRevenueCat()` no hace nada en esa
-plataforma y el botón del paywall solo muestra "disponible muy pronto" — la
+Mientras una key esté vacía, `initRevenueCat()` no hace nada en esa plataforma
+y el paywall avisa que la compra se hace desde la app de iPhone o Android — la
 app sigue funcionando con el trial local.
+
+Ninguna salida de `comprarSuscripcion()` puede quedar en un mensaje vago: si no
+hay tienda, si la offering no trae el producto o si la llamada falla, se dice
+qué pasó y que **no se cobró nada**. Un botón de comprar que no compra y no
+explica nada es una compra rota para App Review (guía 3.1.2). Que el paciente
+cierre la hoja de compra de Apple no es un error y no muestra ninguna alarma.
 
 ## Modo robot de cocina (nivel Diamond)
 
