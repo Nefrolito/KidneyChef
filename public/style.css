@@ -1535,6 +1535,26 @@ h1, h2, h3 {
 }
 .receta-guardada-item span { font-size: 0.88rem; font-weight: 600; }
 .receta-guardada-item .receta-guardada-fecha { display: block; font-size: 0.72rem; font-weight: 500; color: var(--muted); margin-top: 0.1rem; }
+/* El nombre de la receta guardada es el botón que la vuelve a abrir, pero se
+   ve como texto: el recuadro ya es la tarjeta de la receta. */
+.receta-guardada-abrir {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.receta-guardada-flecha { font-size: 1.2rem; font-weight: 600; color: var(--muted); line-height: 1; }
+.receta-ia-guardada-nota { margin: 0.9rem 0 0; font-size: 0.78rem; color: var(--muted); text-align: center; }
 .btn-guardar-receta { width: 100%; margin-top: 0.9rem; }
 .btn-guardar-receta.guardada { background: var(--verde); border-color: var(--verde); color: white; cursor: default; }
 

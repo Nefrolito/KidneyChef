@@ -4009,11 +4009,17 @@ function deDondeVieneHtml(receta) {
 }
 
 // calculado por su cuenta — mismo criterio que el resto de la app.
-function renderRecetaIA(receta) {
+// `yaGuardada` marca las recetas que el paciente vuelve a abrir desde su
+// lista: se muestran igual (semáforo, pasos, bloque del robot, botón de
+// copiar) pero sin ofrecer guardarlas de nuevo, para no duplicarlas.
+function renderRecetaIA(receta, { yaGuardada = false } = {}) {
   els.refrigeradorRecetaIa.hidden = false;
+  // También para una receta guardada: es la que está a la vista, y de ella
+  // sale el texto del botón "Copiar receta".
   recetaActualIA = receta;
-  const densidad100g = (n) => (receta.total_gramos > 0 ? (receta.totales[n] / receta.total_gramos) * 100 : 0);
-  const valorPorcion = (n) => Math.round(receta.totales[n] || 0);
+  const totales = receta.totales || {};
+  const densidad100g = (n) => (receta.total_gramos > 0 ? (totales[n] / receta.total_gramos) * 100 : 0);
+  const valorPorcion = (n) => Math.round(totales[n] || 0);
   const semaforo = nutrientesVisibles()
     .map((n) => badge(n, valorPorcion(n), densidad100g(n)))
     .join("");
@@ -4045,9 +4051,14 @@ function renderRecetaIA(receta) {
       ${consejoHtml}
       <ol class="refrigerador-receta-lista">${pasos}</ol>
       ${pasosRobotHtml(receta)}
-      <button id="receta-ia-guardar-btn" class="btn btn-secondary btn-guardar-receta">Guardar receta</button>
+      ${
+        yaGuardada
+          ? `<p class="receta-ia-guardada-nota">Guardada el ${fechaRecetaGuardada(receta.guardadaEn)} en este dispositivo.</p>`
+          : `<button id="receta-ia-guardar-btn" class="btn btn-secondary btn-guardar-receta">Guardar receta</button>`
+      }
     </div>`;
-  document.getElementById("receta-ia-guardar-btn").addEventListener("click", guardarRecetaIA);
+  const guardarBtn = document.getElementById("receta-ia-guardar-btn");
+  if (guardarBtn) guardarBtn.addEventListener("click", guardarRecetaIA);
   const copiarBtn = document.getElementById("robot-copiar-btn");
   if (copiarBtn) copiarBtn.addEventListener("click", copiarRecetaRobot);
 }
@@ -4078,11 +4089,36 @@ function guardarRecetaIA() {
   }
 }
 
+function fechaRecetaGuardada(iso) {
+  const fecha = new Date(iso);
+  if (isNaN(fecha)) return "";
+  return fecha.toLocaleDateString("es-CL", { day: "numeric", month: "short" });
+}
+
+// Volver a abrir una receta guardada. Se vuelve a dibujar con el mismo render
+// de la receta generada, así que el paciente ve otra vez el semáforo, los
+// pasos y —si la receta se generó con un robot— el bloque de esa máquina con
+// sus tiempos y velocidades, aunque hoy tenga otro robot seleccionado (o
+// ninguno): esos datos vienen de la receta guardada, no del perfil.
+function abrirRecetaGuardada(idx) {
+  const receta = loadRecetasGuardadas()[idx];
+  if (!receta) return;
+  renderRecetaIA(receta, { yaGuardada: true });
+  els.refrigeradorRecetaIa.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
 function eliminarRecetaGuardada(idx) {
   const arr = loadRecetasGuardadas();
-  arr.splice(idx, 1);
+  const [eliminada] = arr.splice(idx, 1);
   localStorage.setItem(RECETAS_GUARDADAS_STORAGE_KEY, JSON.stringify(arr));
   renderRecetasGuardadas();
+  // Si la receta borrada era justo la que estaba abierta, se cierra: dejarla
+  // a la vista con el cartel "Guardada el ..." sería mentira.
+  if (eliminada && recetaActualIA && recetaActualIA.guardadaEn === eliminada.guardadaEn) {
+    els.refrigeradorRecetaIa.hidden = true;
+    els.refrigeradorRecetaIa.innerHTML = "";
+    recetaActualIA = null;
+  }
 }
 
 function renderRecetasGuardadas() {
@@ -4092,16 +4128,20 @@ function renderRecetasGuardadas() {
 
   els.recetasGuardadasList.innerHTML = arr
     .map((r, idx) => {
-      const fecha = new Date(r.guardadaEn).toLocaleDateString("es-CL", { day: "numeric", month: "short" });
+      const fecha = fechaRecetaGuardada(r.guardadaEn);
       return `
         <div class="receta-guardada-item">
-          <span>${escapeHtml(r.nombre)}<span class="receta-guardada-fecha">Guardada el ${fecha}</span></span>
+          <button class="receta-guardada-abrir" id="receta-guardada-abrir-${idx}" aria-label="Ver la receta ${escapeHtml(r.nombre)}">
+            <span>${escapeHtml(r.nombre)}<span class="receta-guardada-fecha">Guardada el ${fecha}</span></span>
+            <span class="receta-guardada-flecha" aria-hidden="true">›</span>
+          </button>
           <button class="super-item-quitar" id="receta-guardada-quitar-${idx}" aria-label="Eliminar receta guardada">✕</button>
         </div>`;
     })
     .join("");
 
   arr.forEach((_, idx) => {
+    document.getElementById(`receta-guardada-abrir-${idx}`).addEventListener("click", () => abrirRecetaGuardada(idx));
     document.getElementById(`receta-guardada-quitar-${idx}`).addEventListener("click", () => eliminarRecetaGuardada(idx));
   });
 }

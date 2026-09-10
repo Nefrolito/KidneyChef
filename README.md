@@ -218,6 +218,13 @@ ningún fabricante, y no conviene prometerla.
   `recetaRobotComoTexto()`, `copiarRecetaRobot()`. El selector aparece solo
   con nivel Diamond (o durante el mes de prueba). `perfil.robotCocina` guarda
   la máquina elegida.
+- Al guardar una receta se guardan también su `robot` y sus `pasos_robot`, y
+  tocarla en "Recetas guardadas" la vuelve a abrir entera
+  (`abrirRecetaGuardada()` → `renderRecetaIA(receta, { yaGuardada: true })`):
+  mismo semáforo, mismos pasos, mismo bloque del robot y mismo botón de
+  copiar, pero sin ofrecer guardarla de nuevo. El bloque del robot sale de la
+  receta guardada, no del perfil, así que sigue mostrando la máquina con la
+  que se generó aunque el paciente haya cambiado de robot después.
 
 **Criterio de seguridad deliberado:** el catálogo no expone modos sobre 120 °C
 aunque la máquina llegue más arriba (el MyCook llega a 140, el Monsieur
