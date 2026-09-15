@@ -1975,3 +1975,16 @@ h1, h2, h3 {
   border-radius: 10px;
   padding: 0.6rem 0.75rem;
 }
+
+/* Citas visibles de las fuentes (guía 1.4.1 de Apple). */
+.fuente-dato { margin: -0.35rem 0 0.7rem; font-size: 0.76rem; color: var(--muted); }
+.consejo-fuente { margin: 0.35rem 0 0; font-size: 0.76rem; color: var(--muted); }
+.consejo-fuente[hidden] { display: none; }
+.fuente-dato a,
+.consejo-fuente a,
+.nota-sin-meta a,
+.disclaimer a,
+.summary-caption a,
+.campo-ayuda a,
+.clinical-note a { color: var(--brand); font-weight: 600; }
+.calculadora-card .summary-caption span { min-width: 0; }

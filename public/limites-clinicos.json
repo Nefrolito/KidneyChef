@@ -1,132 +1,246 @@
 {
-  "_fuente": "KDIGO 2024 / KDOQI 2020, según el resumen aportado por Camilo Ulloa.",
-  "_principio_rector": "La guía KDOQI 2020 vigente NO fija cifras de K ni P por etapa: recomienda ajustar la ingesta para mantener la kalemia/fosfatemia en rango normal, según laboratorio y criterio clínico. Por eso el semáforo básico solo clasifica el CONTENIDO relativo del alimento, no una meta diaria. A partir de 2026-08-02, y como excepción explícita pedida por Camilo, potasio y fósforo SÍ tienen una meta diaria por defecto desde ciertas etapas (ver 'objetivo_mg_dia_por_defecto' en cada nutriente) — basada en los rangos de referencia general más citados en material educativo renal (KDOQI/NKF: K 1500-2000 mg/día, P 800-1000 mg/día), no en una cifra oficial por etapa de la guía. Sigue teniendo prioridad la meta que el tratante fije a mano para un paciente puntual.",
-  "_validado_clinicamente": "Umbrales de contenido de K/P y consideraciones de etapa 3a/3b confirmados por Camilo el 2026-07-22. Metas automáticas de K/P por etapa (objetivo_mg_dia_por_defecto) confirmadas por Camilo el 2026-08-02.",
-  "regla_porcion": {
-    "_nota": "Para los nutrientes CON meta diaria (sodio, y los que el tratante individualice), el umbral por porción se deriva del límite diario: el día se reparte en 4 ocasiones de comida y un alimento que consume hasta la mitad de ese presupuesto es verde; hasta el total, amarillo; por encima, rojo.",
-    "comidas_por_dia": 4,
-    "fraccion_verde": 0.5
+  "_principio": "Cada cifra de este archivo sale de una fuente publicada, listada en 'fuentes' y citada en su bloque con 'fuente'. Decisión de Camilo del 2026-09-14, tras el rechazo 1.4.1 de Apple (información médica sin citas): donde una fuente dice otra cifra se adopta la de la fuente, y lo que no tiene fuente publicada deja de ser automático y queda para que lo fije el equipo tratante. La meta que fije el tratante siempre prima. La página public/fuentes.html muestra estas mismas fuentes al paciente; si cambias una cifra aquí, cámbiala también allá.",
+  "_actualizado": "2026-09-14",
+  "fuentes": {
+    "usda_fdc": {
+      "nombre_corto": "USDA FoodData Central",
+      "cita": "U.S. Department of Agriculture, Agricultural Research Service. FoodData Central, SR Legacy (abril de 2018).",
+      "url": "https://fdc.nal.usda.gov/"
+    },
+    "atkinson_2021": {
+      "nombre_corto": "Atkinson et al., 2021",
+      "cita": "Atkinson FS, Brand-Miller JC, Foster-Powell K, Buyken AE, Goletzke J. International tables of glycemic index and glycemic load values 2021: a systematic review. Am J Clin Nutr. 2021;114(5):1625-1632.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/34258626/"
+    },
+    "nkf_potasio_folleto": {
+      "nombre_corto": "National Kidney Foundation",
+      "cita": "National Kidney Foundation. Si debe limitar el potasio (folleto educativo). 2013.",
+      "url": "https://www.kidney.org/sites/default/files/NutritionFlyers_SPAN_POTASSIUM.pdf"
+    },
+    "nkf_potasio_web": {
+      "nombre_corto": "National Kidney Foundation",
+      "cita": "National Kidney Foundation. Potassium in Your CKD Diet.",
+      "url": "https://www.kidney.org/kidney-topics/potassium-your-ckd-diet"
+    },
+    "nkf_fosforo_folleto": {
+      "nombre_corto": "National Kidney Foundation",
+      "cita": "National Kidney Foundation. If you need to limit phosphorus (folleto educativo). 2011.",
+      "url": "https://www.kidney.org/sites/default/files/02-10-0411_ABB_Phosphorus.pdf"
+    },
+    "nkf_fosforo_web": {
+      "nombre_corto": "National Kidney Foundation",
+      "cita": "National Kidney Foundation. Phosphorus and Your CKD Diet.",
+      "url": "https://www.kidney.org/kidney-topics/phosphorus-and-your-ckd-diet"
+    },
+    "nkf_sodio_web": {
+      "nombre_corto": "National Kidney Foundation",
+      "cita": "National Kidney Foundation. Sodium and Your CKD Diet: How to Spice Up Your Cooking.",
+      "url": "https://www.kidney.org/kidney-topics/sodium-and-your-ckd-diet-how-to-spice-your-cooking"
+    },
+    "fda_sodio": {
+      "nombre_corto": "FDA, 21 CFR 101.61",
+      "cita": "U.S. Food and Drug Administration. 21 CFR 101.61, Nutrient content claims for the sodium content of foods.",
+      "url": "https://www.law.cornell.edu/cfr/text/21/101.61"
+    },
+    "hospital_del_mar_2017": {
+      "nombre_corto": "Hospital del Mar, 2017",
+      "cita": "Hospital del Mar (Barcelona), Servicio de Nefrología. Clasificación de los alimentos para dietas bajas en potasio, fósforo y sodio. Educación sanitaria, 2017.",
+      "url": "https://www.hospitaldelmar.cat/media/upload/arxius/nefrologia/educacio_salut/Classificacio_aliments_dietes_baixes_potasi_fosfor_sodiCAST.pdf"
+    },
+    "nkf_potasio_2000": {
+      "nombre_corto": "National Kidney Foundation, 2022",
+      "cita": "National Kidney Foundation. Potassium and Plant-Based Diets for People with Kidney Disease. 2022.",
+      "url": "https://www.kidney.org/news-stories/potassium-and-plant-based-diets-people-kidney-disease"
+    },
+    "ebpg_2007": {
+      "nombre_corto": "Guía europea EBPG, 2007",
+      "cita": "Fouque D, Vennegoor M, ter Wee P, et al. EBPG guideline on nutrition. Nephrol Dial Transplant. 2007;22(Suppl 2):ii45-ii87.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/17507426/"
+    },
+    "kdoqi_2003": {
+      "nombre_corto": "K/DOQI, 2003",
+      "cita": "National Kidney Foundation. K/DOQI clinical practice guidelines for bone metabolism and disease in chronic kidney disease. Am J Kidney Dis. 2003;42(4 Suppl 3):S1-S201.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/14520607/"
+    },
+    "kdoqi_2020": {
+      "nombre_corto": "KDOQI, 2020",
+      "cita": "Ikizler TA, Burrowes JD, Byham-Gray LD, et al. KDOQI Clinical Practice Guideline for Nutrition in CKD: 2020 Update. Am J Kidney Dis. 2020;76(3 Suppl 1):S1-S107.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/32829751/"
+    },
+    "kdigo_2024": {
+      "nombre_corto": "KDIGO, 2024",
+      "cita": "Kidney Disease: Improving Global Outcomes (KDIGO) CKD Work Group. KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease. Kidney Int. 2024;105(4S):S117-S314.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38490803/"
+    },
+    "ckd_epi_2021": {
+      "nombre_corto": "CKD-EPI 2021",
+      "cita": "Inker LA, et al. New Creatinine- and Cystatin C-Based Equations to Estimate GFR without Race. N Engl J Med. 2021;385:1737-1749.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/34554658/"
+    },
+    "nkf_ckd_epi": {
+      "nombre_corto": "National Kidney Foundation",
+      "cita": "National Kidney Foundation. CKD-EPI Creatinine Equation (2021).",
+      "url": "https://www.kidney.org/ckd-epi-creatinine-equation-2021"
+    },
+    "nutricion_hd_2020": {
+      "nombre_corto": "Indian J Nephrol, 2020",
+      "cita": "Nutrition and Hemodialysis. Indian J Nephrol. 2020;30(Suppl 1):S55-S66.",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7598408/"
+    },
+    "nkf_peso_seco": {
+      "nombre_corto": "National Kidney Foundation",
+      "cita": "National Kidney Foundation. What Is Dry Weight?",
+      "url": "https://www.kidney.org/kidney-topics/what-dry-weight"
+    },
+    "hunter_bailey_2019": {
+      "nombre_corto": "Hunter y Bailey, 2019",
+      "cita": "Hunter RW, Bailey MA. Hyperkalemia: pathophysiology, risk factors and consequences. Nephrol Dial Transplant. 2019. doi:10.1093/ndt/gfz206.",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6892421/"
+    },
+    "bem_2021": {
+      "nombre_corto": "Bem et al., 2021",
+      "cita": "Bem D, Sugrue D, Wilding B, et al. The effect of hyperkalemia and long inter-dialytic interval on morbidity and mortality in patients receiving hemodialysis: a systematic review. Ren Fail. 2021.",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7833048/"
+    },
+    "hamad_2019": {
+      "nombre_corto": "Hamad et al., 2019",
+      "cita": "Hamad A, Hussain ME, Elsanousi S, et al. Prevalence and Management of Hypokalemia in Peritoneal Dialysis Patients in Qatar. Int J Nephrol. 2019.",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6935807/"
+    },
+    "ada_carbohidratos": {
+      "nombre_corto": "American Diabetes Association",
+      "cita": "American Diabetes Association. Carb Counting and Diabetes.",
+      "url": "https://diabetes.org/food-nutrition/understanding-carbs/carb-counting-and-diabetes"
+    }
+  },
+  "porcion": {
+    "_nota": "Semáforo de un alimento según los mg de la PORCIÓN (foto, Súper, historial). Cortes inclusivos: hasta 'verde' es bajo, hasta 'amarillo' es medio, sobre eso es alto. Reemplaza a la antigua regla_porcion, que repartía la meta diaria en 4 comidas sin fuente publicada.",
+    "potasio_mg": {
+      "verde": 100,
+      "amarillo": 200,
+      "fuente": ["nkf_potasio_folleto", "nkf_potasio_web"],
+      "_nota": "NKF: bajo menos de 100 mg, medio 101 a 200 mg, alto sobre 200 mg por porción. La página web de la NKF también llama alto a 200 mg o más por porción. Antes: 200/400 sin fuente."
+    },
+    "fosforo_mg": {
+      "verde": 50,
+      "amarillo": 100,
+      "fuente": ["nkf_fosforo_folleto"],
+      "_nota": "NKF: bajo menos de 50 mg, medio 51 a 100 mg, alto sobre 100 mg por porción. Antes: 100/200, el doble de permisivo que la NKF."
+    },
+    "sodio_mg": {
+      "verde": 140,
+      "amarillo": 239,
+      "fuente": ["fda_sodio", "nkf_sodio_web"],
+      "_nota": "FDA y NKF: 'bajo en sodio' es 140 mg o menos por porción. NKF: desde 240 mg por porción en general no se recomienda. Antes: 140/400, el 400 sin fuente."
+    }
+  },
+  "plato_por_100g": {
+    "_nota": "Semáforo de platos, recetas e ingredientes vistos por 100 g. La densidad se redondea a mg enteros antes de comparar. Antes eran potasio 100/250 (estricto 75/175) y fósforo 50/150, sin fuente.",
+    "potasio_mg": {
+      "verde": 149,
+      "amarillo": 300,
+      "fuente": ["hospital_del_mar_2017"],
+      "_nota": "Hospital del Mar: menos de 150, de 150 a 300 y más de 300 mg por 100 g de alimento comestible."
+    },
+    "fosforo_mg": {
+      "verde": 149,
+      "amarillo": 300,
+      "fuente": ["hospital_del_mar_2017"],
+      "_nota": "La misma tabla usa los mismos cortes para fósforo."
+    },
+    "sodio_mg": {
+      "verde": 140,
+      "amarillo": null,
+      "fuente": ["fda_sodio"],
+      "_nota": "FDA 21 CFR 101.61(b)(5): una comida o plato principal es 'bajo en sodio' con 140 mg o menos por 100 g. No hay un corte publicado de 'alto' por 100 g, así que sobre 140 se marca medio y nunca rojo."
+    }
   },
   "sodio": {
-    "_nota": "Único nutriente con meta numérica universal. KDIGO <2 g/día; KDOQI <2,3 g/día. Se unifica en 2000 mg/día para todos, con o sin hipertensión.",
     "modo": "meta_diaria",
-    "objetivo_mg_dia": 2000
+    "objetivo_mg_dia": 2000,
+    "fuente": ["kdigo_2024", "hospital_del_mar_2017", "ebpg_2007"],
+    "_nota": "KDIGO 2024 (recomendación 3.3.2.1, citada en PMC12156285): menos de 2 g de sodio al día en ERC. Hospital del Mar: máximo diario recomendado de 2000 mg. EBPG 2007: en hemodiálisis, 80 a 100 mmol al día (unos 1840 a 2300 mg)."
   },
   "potasio": {
-    "_nota": "Sin cifra universal (KDIGO/KDOQI). En el plan básico se clasifica el CONTENIDO del alimento, sin afirmar que el paciente excedió un límite personal. En el plan clínico, cuando el tratante ingresa un objetivo individualizado según kalemia, pasa a modo meta_diaria y el semáforo mide contra ese límite real.",
-    "modo_por_defecto": "contenido_relativo",
-    "clasificacion_contenido": {
-      "_nota": "Umbrales descriptivos en mg por 100 g, del tipo usado en material educativo renal para decir si un alimento es alto o bajo en potasio. Validado por Camilo, 2026-07-22.",
-      "unidad": "mg_por_100g",
-      "bajo_hasta": 100,
-      "moderado_hasta": 250
-    },
-    "clasificacion_contenido_estricta": {
-      "_nota": "Se aplica cuando hay factores de riesgo de hiperkalemia: los alimentos se marcan como altos en potasio antes que con los umbrales normales. Validado por Camilo, 2026-07-22.",
-      "unidad": "mg_por_100g",
-      "bajo_hasta": 75,
-      "moderado_hasta": 175
-    },
-    "factores_riesgo_hiperkalemia": {
-      "_nota": "Camilo indicó que la diabetes justifica un nivel superior de restricción de potasio. Se unifica con los fármacos retenedores bajo el mismo mecanismo, porque clínicamente apuntan al mismo riesgo: en el diabético se suma la acidosis tubular renal tipo 4 / hipoaldosteronismo hiporreninémico, y con frecuencia además recibe bloqueo del SRAA.",
-      "activadores": ["diabetes", "farmacos_retenedores_de_potasio"],
-      "efecto": "usar_clasificacion_estricta_y_advertir"
-    },
     "objetivo_mg_dia_por_defecto": 2000,
-    "objetivo_mg_dia_por_defecto_estricto": 1500,
     "etapas_aplicables": ["4", "5", "hemodialisis"],
-    "_nota_objetivo_por_defecto": "Meta diaria automática pedida por Camilo el 2026-08-02, aplicable SOLO cuando el tratante no fijó una meta propia. Se activa desde etapa 4 (eGFR <30) y en hemodiálisis. NO se activa en diálisis peritoneal (ver situaciones.peritoneal: ahí el potasio suele poder liberalizarse, a veces incluso requiere aporte) ni en 3a/3b (siguen sin meta automática). Ambas cifras salen del mismo rango de referencia general KDOQI/NKF (1500-2000 mg/día), no de una tabla oficial por etapa (la guía 2020 no la tiene, ver _principio_rector).",
-    "_nota_meta_estricta": "CORREGIDO el 2026-08-30 por Camilo. Hasta esta fecha, tener factores_riesgo_hiperkalemia (diabetes o fármacos retenedores de K) ANULABA la meta diaria: el paciente de mayor riesgo era el único que se quedaba sin referencia, y eso contradecía el propio 'efecto' declarado de ese bloque ('usar_clasificacion_estricta_y_advertir') y la nota de que la diabetes justifica un nivel superior de restricción. Un nivel superior de restricción es un número más bajo, no ningún número. Ahora esos pacientes reciben objetivo_mg_dia_por_defecto_estricto (1500 mg), el extremo estricto del MISMO rango KDOQI/NKF ya citado — no una cifra nueva. La meta que fije el tratante sigue teniendo prioridad sobre ambas."
+    "fuente": ["hospital_del_mar_2017", "nkf_potasio_2000", "ebpg_2007"],
+    "_nota": "Hospital del Mar: máximo diario recomendado de 2000 mg en insuficiencia renal. NKF: quienes restringen potasio suelen limitarlo a 2000 mg al día. EBPG 2007: en hemodiálisis, 50 a 70 mmol al día (unos 1950 a 2740 mg). No se activa en 3a/3b ni en peritoneal, donde la hipopotasemia es frecuente (hamad_2019). La meta estricta de 1500 mg y la clasificación estricta por diabetes o fármacos se quitaron el 2026-09-14 por no tener fuente publicada."
   },
   "fosforo": {
-    "_nota": "Sin cifra universal. La guía prioriza REDUCIR ADITIVOS FOSFATADOS por sobre el conteo de fósforo total: el fósforo inorgánico añadido se absorbe mucho más que el orgánico de los alimentos naturales.",
-    "modo_por_defecto": "contenido_relativo",
-    "prioridad_aditivos": true,
-    "clasificacion_contenido": {
-      "_nota": "Umbrales descriptivos en mg por 100 g. Validado por Camilo, 2026-07-22.",
-      "unidad": "mg_por_100g",
-      "bajo_hasta": 50,
-      "moderado_hasta": 150
-    },
     "objetivo_mg_dia_por_defecto": 1000,
     "etapas_aplicables": ["4", "5", "hemodialisis", "peritoneal"],
-    "_nota_objetivo_por_defecto": "Aplicable SOLO cuando el tratante no fijó una meta propia. Desacoplado de factores_riesgo_hiperkalemia el 2026-08-30: ese bloque describe riesgo de POTASIO, y ni la diabetes ni los fármacos retenedores de K alteran la fosfatemia; la exclusión venía heredada por copia de la nota de potasio, sin fundamento propio. El campo plano objetivo_mg_dia_por_defecto (1000) se conserva solo como respaldo si una situación no está en el mapa por situación.",
-    "_nota_no_graduar_por_etapa": "El 2026-08-30 se probó graduar el fósforo por situación (etapa 4 → 2000, etapa 5 y hemodiálisis → 1000, peritoneal → 1500) y se revirtió el mismo día por decisión de Camilo: prefiere ceñirse a las recomendaciones internacionales antes que a su propio criterio. Y la graduación no se puede sostener en la guía, porque KDOQI 2020 NO fija cifras de fósforo por etapa — recomienda ajustar la ingesta para mantener la fosfatemia en rango según laboratorio y criterio clínico (ver _principio_rector). Lo único citable como referencia internacional es el rango general 800-1000 mg/día, así que se usa un valor único de ese rango. Si en el futuro se quiere volver a graduar, hay que traer una fuente que gradúe: no se puede derivar de KDOQI."
+    "prioridad_aditivos": true,
+    "fuente": ["kdoqi_2003", "ebpg_2007", "hospital_del_mar_2017", "nkf_fosforo_web"],
+    "_nota": "K/DOQI 2003: 800 a 1000 mg al día en etapas 3 a 5 con fósforo o PTH elevados. EBPG 2007: 800 a 1000 mg en hemodiálisis. Hospital del Mar: máximo 1000 mg. NKF: el fósforo de los aditivos se absorbe por completo."
   },
   "carbohidratos": {
-    "_nota": "Solo se activa si el paciente declara diabetes. El objetivo se individualiza (ADA); 180 g/día equivale a ~45 g por comida.",
-    "modo": "meta_diaria",
-    "objetivo_g_dia_por_defecto": 180
+    "objetivo_g_dia_por_defecto": null,
+    "fuente": ["ada_carbohidratos"],
+    "_nota": "Sin meta automática desde el 2026-09-14: la ADA dice que no hay una cifra única de carbohidratos por comida. Antes eran 180 g/día sin fuente. Solo cuenta la meta que fije el tratante."
   },
   "calorias": {
-    "_nota": "Sin cifra universal: KDOQI 2020 recomienda individualizar el aporte calórico según peso corporal, edad, sexo, actividad física y objetivo nutricional. Se usa como meta por defecto peso_kg × kcal_por_kg_dia_por_defecto, recalculada cada vez que el paciente registra un peso nuevo.",
     "modo": "meta_por_kg_peso",
     "kcal_por_kg_dia_por_defecto": 30,
-    "_PENDIENTE_VALIDAR": "30 kcal/kg/día es el punto medio del rango de referencia general más citado en material educativo renal para diálisis (25-35 kcal/kg/día, KDOQI/material educativo NKF), NO una cifra de una tabla oficial por paciente. Requiere confirmación clínica de Camilo antes de considerarse validada, igual que los demás '_nota_objetivo_por_defecto' de este archivo."
+    "fuente": ["kdoqi_2020"],
+    "_nota": "KDOQI 2020: 25 a 35 kcal por kg de peso al día en adultos con ERC 1-5D metabólicamente estables. 30 está dentro del rango. Solo se usa en diálisis, con el peso registrado hoy."
   },
   "liquidos": {
-    "_nota": "Solo se activa en diálisis. No es una cifra fija: se calcula desde la diuresis residual real del paciente, según la regla clínica aportada por Camilo. Se registra manualmente porque la cámara no puede ver el agua.",
     "modo": "formula_diuresis",
     "formula": "diuresis_residual_ml + margen_ml",
     "margen_ml": 500,
-    "_ejemplos": [
-      "Anúrico (0 ml) -> 500 ml/día",
-      "Diuresis 400 ml -> 900 ml/día",
-      "Diuresis 1200 ml -> 1700 ml/día"
-    ],
-    "_requiere": "El paciente (o su tratante) registra su diuresis residual en ml/día. Ese mismo número define la meta y permite saber si conserva más o menos de 1 L, sin pedirle que se autoclasifique.",
+    "situaciones_aplicables": ["hemodialisis"],
+    "fuente": ["nutricion_hd_2020"],
+    "_nota": "Guía de nutrición en hemodiálisis (Indian J Nephrol 2020, guideline 8): ingesta de líquidos = diuresis de 24 h + 500 ml. Es para hemodiálisis; en peritoneal no hay fórmula publicada, así que ahí se registra lo que toma sin meta automática.",
     "sin_dato": {
-      "_nota": "Si el paciente en diálisis no sabe su diuresis, se asume anúrico (0 ml) por seguridad: es el supuesto más restrictivo frente a sobrecarga hídrica.",
-      "asumir_diuresis_ml": 0,
-      "_ADVERTIR_AL_PACIENTE": "La app DEBE mostrar que 500 ml/día es un supuesto provisional y no su límite real. Una restricción hídrica excesiva en alguien que sí conserva diuresis también hace daño (deshidratación, hipotensión). El mensaje debe empujar a confirmar la cifra con su equipo tratante."
+      "_nota": "Si el paciente en hemodiálisis no sabe su diuresis, se aplica la misma fórmula con 0 ml, el supuesto más restrictivo, y la app lo muestra como provisional.",
+      "asumir_diuresis_ml": 0
     }
   },
   "peso": {
-    "_nota": "Solo se activa en diálisis. El paciente registra su peso corporal cada día para vigilar la ganancia de peso entre sesiones (indicador indirecto de sobrecarga de líquido), mismo principio que el registro de líquidos.",
-    "ganancia_maxima_kg_por_defecto": 1.0,
-    "ganancia_maxima_kg_intervalo_largo": 2.0,
-    "_validado_clinicamente": "Confirmado y graduado por Camilo el 2026-08-30: 1 kg en el intervalo entre semana y 2 kg en el intervalo largo de fin de semana. La graduación tiene sentido porque el intervalo largo es de tres días en vez de dos, así que se tolera más acumulación. Cuál de los dos umbrales aplica se deduce del calendario de diálisis que el paciente declara en su perfil (datosClinicos.diasDialisis): si el hueco entre la última sesión y la siguiente es de 3 días o más, es el intervalo largo.",
-    "_limitacion_conocida": "KDOQI expresa la ganancia interdialítica como PORCENTAJE del peso seco (~4-4.5%), no en kilos absolutos. Esta app usa kilos porque no registra el peso seco por separado del peso diario. Es una simplificación declarada, no la cifra de la guía: para un paciente de 50 kg y otro de 100 kg, el mismo kilo significa cosas distintas. Agregar un campo de peso seco y pasar al porcentaje queda pendiente."
+    "ganancia_maxima_kg_por_dia": 1.0,
+    "fuente": ["nkf_peso_seco"],
+    "_nota": "NKF: la mayoría de los pacientes en hemodiálisis debe limitar la ganancia a no más de 1 kg por día entre sesiones. La app compara la ganancia desde el registro anterior contra 1 kg por cada día entre ambos registros. Antes eran 1 kg entre semana y 2 kg en el intervalo largo, sin fuente y más estricto que la NKF.",
+    "_limitacion_conocida": "KDOQI expresa la ganancia interdialítica como porcentaje del peso seco (~4-4.5%). La app usa kilos porque no registra el peso seco por separado."
   },
   "situaciones": {
-    "_para_que_sirven": "Ya NO fijan límites de K ni P. Sirven para: (1) activar el registro de líquidos en diálisis, (2) orientar al tratante con la consideración clínica de cada caso cuando individualice los objetivos, y (3) mostrarle al paciente en qué situación está registrado.",
+    "_para_que_sirven": "Activar el registro de líquidos y peso en diálisis, dar contexto a la IA al armar recetas y resumir el día, y mostrarle al paciente en qué situación está registrado. Las 'consideracion' solo afirman lo que está en las fuentes de arriba.",
     "3a": {
       "etiqueta": "ERC etapa 3a",
-      "_nota": "Split de la antigua etapa 3 según eGFR 45-59. Validado por Camilo, 2026-07-22.",
-      "consideracion": "Sodio <2 g/día. Sin restricción automática de potasio: individualizar para mantener kalemia normal. En fósforo, priorizar la reducción de aditivos fosfatados."
+      "consideracion": "Sodio: meta de 2000 mg al día. Potasio y fósforo sin meta automática: los fija el equipo tratante según los exámenes. En fósforo, conviene evitar los aditivos con fósforo."
     },
     "3b": {
       "etiqueta": "ERC etapa 3b",
-      "_nota": "Split de la antigua etapa 3 según eGFR 30-44. Validado por Camilo, 2026-07-22.",
-      "consideracion": "Sodio <2 g/día. Vigilar potasio y fósforo con mayor frecuencia que en 3a: el riesgo de hiperpotasemia e hiperfosfatemia aumenta al bajar el eGFR. Individualizar según laboratorio."
+      "consideracion": "Sodio: meta de 2000 mg al día. Potasio y fósforo sin meta automática: los fija el equipo tratante según los exámenes. En fósforo, conviene evitar los aditivos con fósforo."
     },
     "4": {
       "etiqueta": "ERC etapa 4",
-      "consideracion": "Sodio <2 g/día. Potasio y fósforo con meta automática (2000 mg / 1000 mg) salvo diabetes o fármacos retenedores de potasio, donde se individualiza según laboratorio en vez de aplicar la cifra fija."
+      "consideracion": "Sodio 2000 mg, potasio 2000 mg y fósforo 1000 mg al día como referencia, salvo que el equipo tratante fije otras metas."
     },
     "5": {
       "etiqueta": "ERC etapa 5 (sin diálisis)",
-      "consideracion": "Sodio <2 g/día. Potasio y fósforo con meta automática (2000 mg / 1000 mg) salvo diabetes o fármacos retenedores de potasio, donde se individualiza según laboratorio en vez de aplicar la cifra fija."
+      "consideracion": "Sodio 2000 mg, potasio 2000 mg y fósforo 1000 mg al día como referencia, salvo que el equipo tratante fije otras metas."
     },
     "hemodialisis": {
       "etiqueta": "En hemodiálisis",
       "requiere_diuresis": true,
-      "consideracion": "Potasio y fósforo con meta automática (2000 mg / 1000 mg) salvo diabetes o fármacos retenedores de potasio, donde se individualiza según kalemia predialítica, diuresis residual y pauta de diálisis en vez de la cifra fija. Terapia intermitente: el potasio se acumula entre sesiones. Fósforo: coordinar dieta con quelantes. La meta de líquidos se calcula desde la diuresis registrada."
+      "consideracion": "Sodio 2000 mg, potasio 2000 mg y fósforo 1000 mg al día como referencia, salvo que el equipo tratante fije otras metas. El potasio se acumula entre sesiones y la hiperpotasemia es más frecuente después del intervalo largo. Líquidos: lo que orina en 24 horas más 500 ml."
     },
     "peritoneal": {
       "etiqueta": "En diálisis peritoneal",
       "requiere_diuresis": true,
-      "consideracion": "Terapia continua: el potasio suele poder liberalizarse más que en hemodiálisis, e incluso puede requerir aporte si hay hipopotasemia. Fósforo individualizado según depuración. La meta de líquidos se calcula desde la diuresis registrada."
+      "consideracion": "Sodio 2000 mg y fósforo 1000 mg al día como referencia. Potasio sin meta automática: la hipopotasemia es frecuente en diálisis peritoneal (cerca de un tercio de los pacientes), así que lo individualiza el equipo tratante. Líquidos sin meta automática."
     },
     "sin_declarar": {
       "etiqueta": "Prefiero no decirlo",
-      "consideracion": "Sin situación declarada: solo se aplica la meta de sodio y la clasificación de contenido de potasio y fósforo."
+      "consideracion": "Sin situación declarada: solo se aplica la meta de sodio. Los colores describen el contenido de cada alimento."
     }
   },
   "farmacos": {
     "retenedores_de_potasio": {
-      "_nota": "No fijan una cifra (no existe cifra universal), pero son una señal clínica relevante: elevan el potasio sérico. La app se lo advierte al paciente y se lo destaca al tratante al individualizar el objetivo de potasio.",
       "efecto": "advertencia",
+      "fuente": ["hunter_bailey_2019"],
+      "_nota": "Hunter y Bailey 2019: los IECA, ARA-II, diuréticos ahorradores de potasio y antagonistas del receptor mineralocorticoide son factores de riesgo de hiperkalemia. Solo se avisa al paciente y a la IA; no cambian ninguna cifra.",
       "lista": [
         "Espironolactona",
         "Eplerenona",
@@ -136,8 +250,12 @@
         "Inhibidores directos de renina (aliskiren)"
       ]
     },
+    "diabetes_y_potasio": {
+      "fuente": ["hunter_bailey_2019"],
+      "_nota": "Hunter y Bailey 2019: la diabetes es factor de riesgo de hiperkalemia, independiente del bloqueo del SRAA, por su asociación con hipoaldosteronismo hiporreninémico. Solo se le avisa a la IA; no cambia cifras."
+    },
     "quelantes_de_potasio": {
-      "_FUERA_DE_ALCANCE": "Decisión de Camilo: no se modelan por ahora (patirómero, ciclosilicato de sodio y zirconio). Serían el caso inverso, permitirían mayor ingesta de potasio. Si se agregan más adelante, el paciente que los usa hoy simplemente ve la clasificación estándar, que es el lado seguro."
+      "_FUERA_DE_ALCANCE": "Decisión de Camilo: no se modelan por ahora (patirómero, ciclosilicato de sodio y zirconio)."
     }
   }
 }

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fuentes y referencias — KidneyChef</title>
+<style>
+  :root {
+    --brand: #0e7490;
+    --brand-dark: #0b5a70;
+    --bg: #f4f8fa;
+    --card: #ffffff;
+    --text: #17262c;
+    --muted: #5b7280;
+    --border: #dfe7eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b1418;
+      --card: #101c22;
+      --text: #e8f1f4;
+      --muted: #93a5ae;
+      --border: #223038;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+  h1 { color: var(--brand-dark); font-size: 1.6rem; margin-bottom: 0.2rem; }
+  .fecha { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+  h2 { color: var(--brand); font-size: 1.05rem; margin-top: 2.2rem; scroll-margin-top: 1rem; }
+  p, li { font-size: 0.95rem; }
+  ul { padding-left: 1.3rem; }
+  li { margin-bottom: 0.6rem; }
+  a { color: var(--brand); overflow-wrap: anywhere; }
+  .indice { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 0.8rem 1.1rem; }
+  .indice ul { margin: 0.3rem 0; }
+  .indice li { margin-bottom: 0.2rem; }
+  .cita { display: block; color: var(--muted); font-size: 0.85rem; }
+  .tabla-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; margin: 0.6rem 0 0.4rem; }
+  th, td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+  th { background: var(--card); }
+  footer { margin-top: 3rem; color: var(--muted); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Fuentes y referencias</h1>
+  <p class="fecha">Última actualización: 14 de septiembre de 2026</p>
+
+  <p>
+    Cada cifra que muestra KidneyChef sale de una fuente publicada. Aquí están todas, agrupadas
+    según lo que respaldan. Si tu equipo tratante fijó metas para ti, esas metas prevalecen sobre
+    cualquier valor de referencia de esta página.
+  </p>
+
+  <nav class="indice" aria-label="Contenido">
+    <ul>
+      <li><a href="#alimentos">Nutrientes de los alimentos</a></li>
+      <li><a href="#semaforo">Colores del semáforo</a></li>
+      <li><a href="#metas">Metas diarias de referencia</a></li>
+      <li><a href="#liquidos-peso">Líquidos y peso en diálisis</a></li>
+      <li><a href="#funcion-renal">Función renal y etapas</a></li>
+      <li><a href="#dialisis">Potasio en diálisis</a></li>
+      <li><a href="#medicamentos">Medicamentos y diabetes</a></li>
+      <li><a href="#consejos">Consejos</a></li>
+    </ul>
+  </nav>
+
+  <h2 id="alimentos">Nutrientes de los alimentos</h2>
+  <p>
+    El potasio, fósforo, sodio, carbohidratos y calorías de cada alimento vienen de la base de
+    datos oficial del Departamento de Agricultura de Estados Unidos. Cada resultado de la app
+    enlaza a la ficha exacta del alimento. Las preparaciones chilenas se calculan sumando sus
+    ingredientes de esa misma base.
+  </p>
+  <ul>
+    <li><a href="https://fdc.nal.usda.gov/" target="_blank" rel="noopener">USDA FoodData Central, SR Legacy</a>
+      <span class="cita">U.S. Department of Agriculture, Agricultural Research Service. FoodData Central, SR Legacy (abril de 2018).</span></li>
+    <li>Índice glucémico: <a href="https://pubmed.ncbi.nlm.nih.gov/34258626/" target="_blank" rel="noopener">tablas internacionales de índice glucémico</a>
+      <span class="cita">Atkinson FS, Brand-Miller JC, Foster-Powell K, Buyken AE, Goletzke J. International tables of glycemic index and glycemic load values 2021: a systematic review. Am J Clin Nutr. 2021;114(5):1625-1632.</span></li>
+  </ul>
+
+  <h2 id="semaforo">Colores del semáforo</h2>
+  <p>
+    Los colores describen cuánto de cada nutriente tiene lo que vas a comer. No dicen si superaste
+    tu límite del día: eso lo muestra la sección "Así va tu día".
+  </p>
+  <p><strong>Un alimento, según su porción:</strong></p>
+  <div class="tabla-wrap">
+    <table>
+      <tr><th>Nutriente</th><th>Bajo</th><th>Medio</th><th>Alto</th></tr>
+      <tr><td>Potasio</td><td>hasta 100 mg</td><td>101 a 200 mg</td><td>más de 200 mg</td></tr>
+      <tr><td>Fósforo</td><td>hasta 50 mg</td><td>51 a 100 mg</td><td>más de 100 mg</td></tr>
+      <tr><td>Sodio</td><td>hasta 140 mg</td><td>141 a 239 mg</td><td>240 mg o más</td></tr>
+    </table>
+  </div>
+  <ul>
+    <li>Potasio: <a href="https://www.kidney.org/sites/default/files/NutritionFlyers_SPAN_POTASSIUM.pdf" target="_blank" rel="noopener">National Kidney Foundation, "Si debe limitar el potasio"</a>
+      y <a href="https://www.kidney.org/kidney-topics/potassium-your-ckd-diet" target="_blank" rel="noopener">"Potassium in Your CKD Diet"</a>, que considera alto un alimento con 200 mg o más por porción.</li>
+    <li>Fósforo: <a href="https://www.kidney.org/sites/default/files/02-10-0411_ABB_Phosphorus.pdf" target="_blank" rel="noopener">National Kidney Foundation, "If you need to limit phosphorus"</a>.</li>
+    <li>Sodio: <a href="https://www.law.cornell.edu/cfr/text/21/101.61" target="_blank" rel="noopener">FDA, 21 CFR 101.61</a>, que define "bajo en sodio" como 140 mg o menos por porción,
+      y <a href="https://www.kidney.org/kidney-topics/sodium-and-your-ckd-diet-how-to-spice-your-cooking" target="_blank" rel="noopener">National Kidney Foundation</a>, que en general no recomienda productos con 240 mg o más por porción.</li>
+  </ul>
+  <p><strong>Un plato, una receta o un ingrediente, por cada 100 g:</strong></p>
+  <div class="tabla-wrap">
+    <table>
+      <tr><th>Nutriente</th><th>Bajo</th><th>Medio</th><th>Alto</th></tr>
+      <tr><td>Potasio</td><td>menos de 150 mg</td><td>150 a 300 mg</td><td>más de 300 mg</td></tr>
+      <tr><td>Fósforo</td><td>menos de 150 mg</td><td>150 a 300 mg</td><td>más de 300 mg</td></tr>
+      <tr><td>Sodio</td><td>hasta 140 mg</td><td>más de 140 mg</td><td>sin corte publicado</td></tr>
+    </table>
+  </div>
+  <ul>
+    <li>Potasio y fósforo: <a href="https://www.hospitaldelmar.cat/media/upload/arxius/nefrologia/educacio_salut/Classificacio_aliments_dietes_baixes_potasi_fosfor_sodiCAST.pdf" target="_blank" rel="noopener">Hospital del Mar, Servicio de Nefrología (2017)</a>, clasificación calculada por 100 g de alimento.</li>
+    <li>Sodio: <a href="https://www.law.cornell.edu/cfr/text/21/101.61" target="_blank" rel="noopener">FDA, 21 CFR 101.61(b)(5)</a>, que llama "bajo en sodio" a una comida o plato principal con 140 mg o menos por 100 g.</li>
+    <li>Aditivos con fósforo: <a href="https://www.kidney.org/kidney-topics/phosphorus-and-your-ckd-diet" target="_blank" rel="noopener">National Kidney Foundation, "Phosphorus and Your CKD Diet"</a>, que explica que el fósforo de los aditivos se absorbe por completo.</li>
+  </ul>
+
+  <h2 id="metas">Metas diarias de referencia</h2>
+  <div class="tabla-wrap">
+    <table>
+      <tr><th>Meta</th><th>Cuándo se usa</th><th>Fuentes</th></tr>
+      <tr><td>Sodio: 2000 mg al día</td><td>Siempre</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/38490803/" target="_blank" rel="noopener">KDIGO (2024)</a>, que indica menos de 2 g al día; <a href="https://www.hospitaldelmar.cat/media/upload/arxius/nefrologia/educacio_salut/Classificacio_aliments_dietes_baixes_potasi_fosfor_sodiCAST.pdf" target="_blank" rel="noopener">Hospital del Mar (2017)</a>; <a href="https://pubmed.ncbi.nlm.nih.gov/17507426/" target="_blank" rel="noopener">guía europea EBPG (2007)</a></td></tr>
+      <tr><td>Potasio: 2000 mg al día</td><td>Etapas 4 y 5, y hemodiálisis</td><td><a href="https://www.hospitaldelmar.cat/media/upload/arxius/nefrologia/educacio_salut/Classificacio_aliments_dietes_baixes_potasi_fosfor_sodiCAST.pdf" target="_blank" rel="noopener">Hospital del Mar (2017)</a>; <a href="https://www.kidney.org/news-stories/potassium-and-plant-based-diets-people-kidney-disease" target="_blank" rel="noopener">National Kidney Foundation (2022)</a>; <a href="https://pubmed.ncbi.nlm.nih.gov/17507426/" target="_blank" rel="noopener">guía europea EBPG (2007)</a></td></tr>
+      <tr><td>Fósforo: 1000 mg al día</td><td>Etapas 4 y 5, y diálisis</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/14520607/" target="_blank" rel="noopener">K/DOQI (2003)</a>, que indica 800 a 1000 mg; <a href="https://pubmed.ncbi.nlm.nih.gov/17507426/" target="_blank" rel="noopener">guía europea EBPG (2007)</a>; <a href="https://www.hospitaldelmar.cat/media/upload/arxius/nefrologia/educacio_salut/Classificacio_aliments_dietes_baixes_potasi_fosfor_sodiCAST.pdf" target="_blank" rel="noopener">Hospital del Mar (2017)</a></td></tr>
+      <tr><td>Calorías: 30 kcal por kilo de peso</td><td>Diálisis, con tu peso de hoy</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/32829751/" target="_blank" rel="noopener">KDOQI (2020)</a>, que recomienda 25 a 35 kcal por kilo</td></tr>
+      <tr><td>Carbohidratos: sin meta automática</td><td>Solo la que fije tu equipo</td><td><a href="https://diabetes.org/food-nutrition/understanding-carbs/carb-counting-and-diabetes" target="_blank" rel="noopener">American Diabetes Association</a>, que indica que no hay una cifra única</td></tr>
+    </table>
+  </div>
+  <ul>
+    <li><span class="cita">Fouque D, Vennegoor M, ter Wee P, et al. EBPG guideline on nutrition. Nephrol Dial Transplant. 2007;22(Suppl 2):ii45-ii87.</span></li>
+    <li><span class="cita">National Kidney Foundation. K/DOQI clinical practice guidelines for bone metabolism and disease in chronic kidney disease. Am J Kidney Dis. 2003;42(4 Suppl 3):S1-S201.</span></li>
+    <li><span class="cita">Ikizler TA, Burrowes JD, Byham-Gray LD, et al. KDOQI Clinical Practice Guideline for Nutrition in CKD: 2020 Update. Am J Kidney Dis. 2020;76(3 Suppl 1):S1-S107.</span></li>
+  </ul>
+
+  <h2 id="liquidos-peso">Líquidos y peso en diálisis</h2>
+  <ul>
+    <li>En hemodiálisis, el límite de líquidos es lo que orinas en 24 horas más 500 ml.
+      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7598408/" target="_blank" rel="noopener">Fuente: "Nutrition and Hemodialysis"</a>
+      <span class="cita">Indian J Nephrol. 2020;30(Suppl 1):S55-S66.</span>
+      Si no registraste cuánto orinas, la app calcula con 0 ml, el caso más restrictivo, y lo marca como provisional.</li>
+    <li>En diálisis peritoneal no hay una fórmula publicada equivalente, así que la app registra lo que tomas sin meta automática.</li>
+    <li>Ganancia de peso: hasta 1 kg por día entre sesiones.
+      <a href="https://www.kidney.org/kidney-topics/what-dry-weight" target="_blank" rel="noopener">National Kidney Foundation, "What Is Dry Weight?"</a></li>
+  </ul>
+
+  <h2 id="funcion-renal">Función renal y etapas</h2>
+  <ul>
+    <li>La tasa de filtración glomerular estimada se calcula con las ecuaciones CKD-EPI 2021, sin coeficiente racial.
+      <a href="https://pubmed.ncbi.nlm.nih.gov/34554658/" target="_blank" rel="noopener">Inker et al., 2021</a>
+      y <a href="https://www.kidney.org/ckd-epi-creatinine-equation-2021" target="_blank" rel="noopener">National Kidney Foundation</a>.
+      <span class="cita">Inker LA, et al. New Creatinine- and Cystatin C-Based Equations to Estimate GFR without Race. N Engl J Med. 2021;385:1737-1749.</span></li>
+    <li>Las etapas 3a, 3b, 4 y 5 siguen las categorías de la guía KDIGO.
+      <a href="https://pubmed.ncbi.nlm.nih.gov/38490803/" target="_blank" rel="noopener">KDIGO 2024</a>
+      <span class="cita">KDIGO CKD Work Group. KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease. Kidney Int. 2024;105(4S):S117-S314.</span></li>
+  </ul>
+
+  <h2 id="dialisis">Potasio en diálisis</h2>
+  <ul>
+    <li>En hemodiálisis, la hiperpotasemia es 2 a 2,4 veces más frecuente después del intervalo largo entre sesiones que después del corto.
+      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7833048/" target="_blank" rel="noopener">Bem et al., 2021</a>
+      <span class="cita">Bem D, Sugrue D, Wilding B, et al. The effect of hyperkalemia and long inter-dialytic interval on morbidity and mortality in patients receiving hemodialysis: a systematic review. Ren Fail. 2021.</span></li>
+    <li>En diálisis peritoneal, la hipopotasemia afecta a cerca de un tercio de los pacientes, por eso la app no fija ahí una meta automática de potasio.
+      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6935807/" target="_blank" rel="noopener">Hamad et al., 2019</a>
+      <span class="cita">Hamad A, Hussain ME, Elsanousi S, et al. Prevalence and Management of Hypokalemia in Peritoneal Dialysis Patients in Qatar. Int J Nephrol. 2019.</span></li>
+  </ul>
+
+  <h2 id="medicamentos">Medicamentos y diabetes</h2>
+  <ul>
+    <li>Los IECA, los ARA-II, los diuréticos ahorradores de potasio y los antagonistas del receptor mineralocorticoide son factores de riesgo de potasio alto en la sangre. La diabetes también lo es.
+      <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6892421/" target="_blank" rel="noopener">Hunter y Bailey, 2019</a>
+      <span class="cita">Hunter RW, Bailey MA. Hyperkalemia: pathophysiology, risk factors and consequences. Nephrol Dial Transplant. 2019. doi:10.1093/ndt/gfz206.</span></li>
+  </ul>
+
+  <h2 id="consejos">Consejos</h2>
+  <ul>
+    <li>Remojar y hervir verduras le quita parte del potasio, no todo, y conviene no usar el líquido de las conservas ni el jugo de la carne:
+      <a href="https://www.kidney.org/kidney-topics/potassium-your-ckd-diet" target="_blank" rel="noopener">National Kidney Foundation, potasio</a>
+      y <a href="https://www.kidney.org/sites/default/files/NutritionFlyers_SPAN_POTASSIUM.pdf" target="_blank" rel="noopener">folleto de potasio</a>.</li>
+    <li>Alimentos frescos, cocinar en casa, leer etiquetas y usar hierbas y especias en vez de sal:
+      <a href="https://www.kidney.org/kidney-topics/sodium-and-your-ckd-diet-how-to-spice-your-cooking" target="_blank" rel="noopener">National Kidney Foundation, sodio</a>.</li>
+    <li>Lácteos, frutos secos y bebidas cola oscuras son altos en fósforo:
+      <a href="https://www.kidney.org/kidney-topics/phosphorus-and-your-ckd-diet" target="_blank" rel="noopener">National Kidney Foundation, fósforo</a>.</li>
+  </ul>
+
+  <footer>KidneyChef — herramienta educativa de apoyo, no sustituye la atención de tu equipo de salud.</footer>
+</div>
+</body>
+</html>

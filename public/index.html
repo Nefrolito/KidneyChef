@@ -100,6 +100,7 @@
       <div class="consejo-texto">
         <span class="consejo-titulo">Consejo</span>
         <p id="consejo-cuerpo"></p>
+        <p id="consejo-fuente" class="consejo-fuente" hidden></p>
       </div>
     </section>
 
@@ -245,7 +246,7 @@
 
       <p class="summary-caption">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><path d="M12 8v5"/><circle cx="12" cy="16.2" r="0.4" fill="currentColor"/></svg>
-        Valores estimados. Son una guía, no un cálculo exacto.
+        <span>Valores estimados. Son una guía, no un cálculo exacto. <a href="fuentes.html#metas" target="_blank" rel="noopener">Fuentes de las metas</a></span>
       </p>
     </section>
 
@@ -331,16 +332,6 @@
     </section>
 
 
-    <div class="disclaimer" data-tab="hoy">
-      <svg class="disclaimer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><path d="M12 8v5"/><circle cx="12" cy="16.2" r="0.4" fill="currentColor"/></svg>
-      <p>
-        Esta app es una herramienta educativa de apoyo y usa valores nutricionales
-        de referencia general (por 100&nbsp;g). No sustituye la indicación de tu
-        nefrólogo(a) o nutricionista, quienes deben personalizar tus límites diarios
-        de potasio, fósforo y sodio. El reconocimiento por IA puede cometer errores:
-        verifica siempre el alimento identificado.
-      </p>
-    </div>
 
     <section class="card supermercado-card" data-tab="supermercado">
       <h2>Lista de supermercado</h2>
@@ -399,6 +390,20 @@
 
       <button id="super-limpiar-btn" class="btn btn-ghost" style="width:100%;">Limpiar selección</button>
     </section>
+    <!-- Visible en todas las pestañas, sin data-tab: Apple (guía 1.4.1) pidió
+         que las fuentes de la información médica sean fáciles de encontrar. -->
+    <div class="disclaimer">
+      <svg class="disclaimer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><path d="M12 8v5"/><circle cx="12" cy="16.2" r="0.4" fill="currentColor"/></svg>
+      <p>
+        Esta app es una herramienta educativa de apoyo. Los nutrientes de cada alimento
+        vienen de USDA FoodData Central, y los colores y metas de referencia, de guías
+        y material publicado de nefrología. No sustituye la indicación de tu
+        nefrólogo(a) o nutricionista, quienes deben personalizar tus límites diarios.
+        El reconocimiento por IA puede cometer errores: verifica siempre el alimento
+        identificado.
+        <a href="fuentes.html" target="_blank" rel="noopener">Fuentes y referencias</a>
+      </p>
+    </div>
   </main>
 
   <nav class="tab-bar" id="tab-bar" role="tablist" aria-label="Navegación principal">
@@ -446,6 +451,7 @@
       <p class="about-privacidad">
         <a href="terminos.html" target="_blank" rel="noopener">Términos y condiciones</a>
         · <a href="privacidad.html" target="_blank" rel="noopener">Política de privacidad</a>
+        · <a href="fuentes.html" target="_blank" rel="noopener">Fuentes y referencias</a>
       </p>
       <div class="modal-actions">
         <button id="about-close" class="btn btn-primary">Entendido</button>
@@ -590,6 +596,7 @@
             tienes las dos). Es una estimación: la confirmación diagnóstica la hace
             tu equipo tratante. Usa la edad calculada desde tu fecha de nacimiento en
             "Tu perfil", arriba.
+            <a href="fuentes.html#funcion-renal" target="_blank" rel="noopener">Ver fuentes</a>
           </p>
           <div class="clinical-field">
             <label for="egfr-sexo">Sexo biológico</label>
@@ -638,13 +645,13 @@
           <button type="button" class="btn btn-ghost" data-preset-dialisis="2,4,6">Mar · Jue · Sáb</button>
         </div>
         <div class="clinical-checks dialisis-dias" id="dialisis-dias"></div>
-        <small class="campo-ayuda">Sirve para recordarte el día antes. La víspera es cuando más se acumula el potasio, porque es el intervalo más largo sin dializar.</small>
+        <small class="campo-ayuda">Sirve para recordarte el día antes. El potasio se acumula entre sesiones, y la hiperpotasemia es más frecuente después del intervalo largo. <a href="fuentes.html#dialisis" target="_blank" rel="noopener">Ver fuente</a></small>
       </div>
 
       <div class="clinical-field" id="campo-diuresis" hidden>
         <label for="dato-diuresis">¿Cuánto orinas al día, aproximadamente?</label>
         <input type="number" id="dato-diuresis" min="0" max="4000" step="50" placeholder="Ej: 800">
-        <small class="campo-ayuda">En mililitros. De aquí sale tu límite de líquidos: lo que orinas más 500 ml. Si no lo sabes, pregúntale a tu equipo tratante.</small>
+        <small class="campo-ayuda">En mililitros. En hemodiálisis, tu límite de líquidos es lo que orinas en el día más 500 ml. Si no lo sabes, pregúntale a tu equipo tratante. <a href="fuentes.html#liquidos-peso" target="_blank" rel="noopener">Ver fuente</a></small>
       </div>
       <div class="clinical-checks">
         <label class="clinical-check"><input type="checkbox" id="dato-diabetes"> Diabetes</label>

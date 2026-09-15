@@ -589,8 +589,9 @@ def _build_prompt_receta(foods, presupuesto, densidad_maxima=None, situacion_cli
     bloque_densidad = (
         f"""
 
-Además, aunque no haya un presupuesto total fijado para estos nutrientes, el equipo \
-tratante recomienda en general no superar esta densidad en el plato final:
+Además, sobre esta densidad el plato final ya se considera alto en ese nutriente según \
+la tabla por 100 g del Servicio de Nefrología del Hospital del Mar (2017), que es la misma \
+que usa la app para colorear el plato. No la superes:
 {chr(10).join(lineas_densidad)}"""
         if lineas_densidad else ""
     )

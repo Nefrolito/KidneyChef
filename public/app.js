@@ -238,12 +238,15 @@ function nivelSuficiente(minimo) {
 // coincidir con la variable APP_KEY configurada en el servidor.
 const APP_KEY = "Xhw465sJYD8cL1lobmCuebpbJ2EmT6aD";
 
-// Umbrales de semáforo por PORCIÓN (mg), pensados como referencia educativa general.
-// Deben personalizarse con el equipo de nefrología/nutrición de cada paciente.
+// Semáforo por PORCIÓN (mg) si limites-clinicos.json no alcanzó a cargar.
+// Son las mismas cifras de LIMITES.porcion, cada una con fuente publicada:
+// potasio y fósforo según los folletos de la National Kidney Foundation, y
+// sodio según la FDA y la NKF. Hasta el 2026-09-14 eran 200/400, 100/200 y
+// 140/400 sin fuente; se alinearon tras el rechazo 1.4.1 de Apple.
 const UMBRALES = {
-  potasio_mg: { verde: 200, amarillo: 400 },
-  fosforo_mg: { verde: 100, amarillo: 200 },
-  sodio_mg: { verde: 140, amarillo: 400 },
+  potasio_mg: { verde: 100, amarillo: 200 },
+  fosforo_mg: { verde: 50, amarillo: 100 },
+  sodio_mg: { verde: 140, amarillo: 239 },
 };
 
 const NUTRIENTE_LABEL = {
@@ -591,7 +594,8 @@ function renderAvisoDialisis() {
     ? `<h2>Mañana te toca diálisis</h2>
        <p class="clinical-note">Hoy es el día en que llevas más tiempo sin dializar, así que
          es cuando más se te acumula el potasio. No aflojes la dieta pensando que la sesión
-         de mañana lo compensa: el riesgo está antes de dializar, no después.</p>`
+         de mañana lo compensa: el riesgo está antes de dializar, no después.</p>
+       <p class="fuente-dato">Fuente: ${enlaceFuente("bem_2021")}</p>`
     : `<h2>Hoy te toca diálisis</h2>
        <p class="clinical-note">Después de la sesión sigue cuidando el potasio y los
          líquidos: lo que comes hoy ya cuenta para el próximo intervalo.</p>`;
@@ -764,9 +768,10 @@ function etapaPorEgfr(egfr) {
 // a los umbrales fijos de UMBRALES, así que nunca queda sin semáforo.
 let LIMITES = null;
 
-// ¿El paciente tiene factores que aumentan el riesgo de hiperkalemia?
-// Diabetes y bloqueo del SRAA se tratan igual: ambos justifican clasificar
-// el potasio con los cortes estrictos.
+// ¿El paciente tiene factores de riesgo de hiperkalemia? La diabetes y los
+// fármacos que bloquean el SRAA lo son (Hunter y Bailey, 2019). Ya no cambian
+// ninguna cifra: la meta de 1500 mg y los cortes estrictos no tenían fuente
+// publicada y se quitaron el 2026-09-14. Solo se le avisa a la IA.
 function riesgoHiperkalemia() {
   const d = ensurePerfil().datosClinicos || {};
   return !!(d.diabetes || d.farmacosRetenedoresK);
@@ -784,11 +789,9 @@ function metaDiaria(nutriente) {
   if (propias && propias[nutriente] != null) return propias[nutriente];
 
   if (nutriente === "sodio_mg") return LIMITES.sodio.objetivo_mg_dia;
-  if (nutriente === "carbohidratos_g") {
-    return perfil.datosClinicos && perfil.datosClinicos.diabetes
-      ? LIMITES.carbohidratos.objetivo_g_dia_por_defecto
-      : null;
-  }
+  // Carbohidratos no tienen meta automática: la ADA dice que no hay una cifra
+  // única, así que solo cuenta la que fije el equipo tratante (arriba).
+  if (nutriente === "carbohidratos_g") return null;
   if (nutriente === "potasio_mg") return metaPorDefectoDesdeEtapa(LIMITES.potasio);
   if (nutriente === "fosforo_mg") return metaPorDefectoDesdeEtapa(LIMITES.fosforo);
   if (nutriente === "calorias_kcal") {
@@ -803,35 +806,18 @@ function metaDiaria(nutriente) {
 }
 
 // Meta automática de K/P desde ciertas etapas de ERC
-// (config.etapas_aplicables en limites-clinicos.json). No se activa en diálisis
-// peritoneal ni en 3a/3b porque no están en esa lista. Pedido de Camilo el
-// 2026-08-02; corregido el 2026-08-30 — ver _nota_meta_estricta.
+// (config.etapas_aplicables en limites-clinicos.json), salvo que el tratante
+// haya fijado una propia. Potasio 2000 mg y fósforo 1000 mg al día, con sus
+// fuentes en config.fuente. No se gradúa por etapa porque ninguna de esas
+// fuentes gradúa.
 //
-// El riesgo de hiperkalemia (diabetes o fármacos retenedores de K) ANTES
-// anulaba la meta, y eso dejaba sin ninguna referencia justo al paciente de
-// mayor riesgo. Ahora aprieta en vez de callar: si el nutriente declara un
-// objetivo estricto, ese paciente recibe el extremo bajo del mismo rango
-// KDOQI/NKF. Solo el potasio lo declara, así que el fósforo queda desacoplado
-// de un factor que no altera la fosfatemia.
+// Hasta el 2026-09-14 el riesgo de hiperkalemia (diabetes o fármacos) bajaba
+// la meta de potasio a 1500 mg. Esa cifra no tenía fuente publicada y se quitó:
+// ese caso queda para que lo individualice el tratante.
 function metaPorDefectoDesdeEtapa(config) {
   if (!config) return null;
   const etapa = situacionActual();
   if (!etapa || !config.etapas_aplicables.includes(etapa)) return null;
-
-  if (config.objetivo_mg_dia_por_defecto == null) return null;
-
-  // No hay meta graduada por etapa a propósito: KDOQI 2020 no fija cifras de
-  // K ni P por etapa, solo rangos generales (K 1500-2000, P 800-1000 mg/día).
-  // Graduar sería inventar una estructura que la guía no tiene. Ver
-  // _nota_no_graduar_por_etapa en limites-clinicos.json.
-
-  // El riesgo de hiperkalemia (diabetes o fármacos retenedores de K) aprieta
-  // la meta en vez de borrarla: antes la anulaba y dejaba sin referencia justo
-  // al paciente de mayor riesgo. Solo el potasio declara variante estricta, así
-  // que el fósforo queda desacoplado de un factor que no altera la fosfatemia.
-  if (config.objetivo_mg_dia_por_defecto_estricto != null && riesgoHiperkalemia()) {
-    return config.objetivo_mg_dia_por_defecto_estricto;
-  }
   return config.objetivo_mg_dia_por_defecto;
 }
 
@@ -856,6 +842,10 @@ function requiereDiuresis() {
 // restringir de más a alguien que sí orina también hace daño.
 function metaLiquidos() {
   if (!LIMITES || !requiereDiuresis()) return null;
+  // La fórmula publicada es para hemodiálisis. En peritoneal no hay una cifra
+  // con fuente: se registra lo que toma, sin meta, hasta que la fije el tratante.
+  const aplica = LIMITES.liquidos.situaciones_aplicables || [];
+  if (!aplica.includes(situacionActual())) return null;
   const raw = ensurePerfil().datosClinicos.diuresisMl;
   const esSupuesto = raw === null || raw === undefined || raw === "";
   const diuresis = esSupuesto ? LIMITES.liquidos.sin_dato.asumir_diuresis_ml : Number(raw);
@@ -894,28 +884,27 @@ function registrarPeso(kg) {
   localStorage.setItem(PESO_STORAGE_KEY, JSON.stringify(arr));
 }
 
-// Cuánto se tolera ganar entre sesiones: 1 kg entre semana, 2 kg en el
-// intervalo largo. Cuál aplica se deduce del calendario que declaró el
-// paciente — el hueco entre su última sesión y la siguiente. Con 3 días o más
-// es el intervalo largo (el clásico fin de semana de un esquema 3x/semana).
-// Cifras confirmadas por Camilo el 2026-08-30; ver _validado_clinicamente.
-function enIntervaloLargoDialisis() {
-  const dias = (ensurePerfil().datosClinicos.diasDialisis || []).slice().sort((a, b) => a - b);
-  if (dias.length < 2) return false;
-  const hoy = new Date().getDay();
-  // Días hacia atrás hasta la última sesión, y hacia adelante hasta la próxima.
-  let atras = 0;
-  while (atras < 7 && !dias.includes((hoy - atras + 7) % 7)) atras += 1;
-  let adelante = 0;
-  while (adelante < 7 && !dias.includes((hoy + adelante) % 7)) adelante += 1;
-  return atras + adelante >= 3;
+// Días entre el peso anterior y el de hoy, contados por fecha de calendario.
+function diasEntrePesos() {
+  const hoy = pesoDeHoy();
+  const anterior = pesoAnterior();
+  if (!hoy || !anterior) return null;
+  const inicio = new Date(anterior.fecha);
+  inicio.setHours(0, 0, 0, 0);
+  const fin = new Date(hoy.fecha);
+  fin.setHours(0, 0, 0, 0);
+  return Math.max(1, Math.round((fin - inicio) / 86400000));
 }
 
+// Cuánto se tolera ganar desde el registro anterior: 1 kg por cada día entre
+// ambos pesos, según la National Kidney Foundation ("no más de 1 kg por día
+// entre sesiones"). Hasta el 2026-09-14 eran 1 kg entre semana y 2 kg en el
+// intervalo largo, sin fuente publicada y más estricto que la NKF.
 function gananciaMaximaKg() {
   if (!LIMITES || !LIMITES.peso) return null;
-  return enIntervaloLargoDialisis()
-    ? LIMITES.peso.ganancia_maxima_kg_intervalo_largo
-    : LIMITES.peso.ganancia_maxima_kg_por_defecto;
+  const dias = diasEntrePesos();
+  if (dias == null) return null;
+  return Math.round(LIMITES.peso.ganancia_maxima_kg_por_dia * dias * 10) / 10;
 }
 
 // Ganancia de peso interdialítica (kg), o null si no hay un peso anterior
@@ -927,45 +916,34 @@ function gananciaPeso() {
   return Math.round((hoy.kg - anterior.kg) * 10) / 10;
 }
 
-// Umbral por porción derivado de la meta diaria: el día se reparte en varias
-// comidas y un alimento que usa hasta la mitad de ese presupuesto es verde.
-function umbralPorcion(metaDia) {
-  const r = LIMITES.regla_porcion;
-  const amarillo = metaDia / r.comidas_por_dia;
-  return { verde: amarillo * r.fraccion_verde, amarillo };
+// Nivel según cortes publicados { verde, amarillo }, inclusivos. Sin corte
+// amarillo (sodio por 100 g no tiene un "alto" publicado) nunca llega a rojo.
+function nivelSegunCortes(valor, t) {
+  const v = Math.round(valor);
+  if (v <= t.verde) return "verde";
+  if (t.amarillo == null || v <= t.amarillo) return "amarillo";
+  return "rojo";
 }
 
-// Clasifica un nutriente. Devuelve el nivel y en qué modo se evaluó, porque
-// el texto que se le muestra al paciente cambia según el caso.
-//   modo "meta"      -> la porción se comparó con su presupuesto real
-//   modo "contenido" -> se describe cuán alto es el alimento (mg/100 g)
-function clasificar(nutriente, valorPorcion, densidad100g) {
-  if (!LIMITES) {
-    const t = umbralesActivos()[nutriente];
-    if (!t) return { nivel: null, modo: "ninguno" };
-    const nivel = valorPorcion <= t.verde ? "verde" : valorPorcion <= t.amarillo ? "amarillo" : "rojo";
-    return { nivel, modo: "meta" };
+// Clasifica un nutriente por su CONTENIDO, con cortes publicados (ver las
+// fuentes en limites-clinicos.json). No afirma que el paciente se pasó de su
+// límite: eso lo mide "Así va tu día" contra la meta diaria.
+//   por porción (por defecto) -> mg de la porción contra los cortes de la
+//                                National Kidney Foundation y la FDA
+//   por100g = true            -> densidad del plato o ingrediente contra la
+//                                tabla por 100 g del Hospital del Mar
+// Hasta el 2026-09-14 había un modo "meta" que repartía la meta diaria en 4
+// comidas para sacar un umbral por porción. Esa regla no tenía fuente y se
+// quitó tras el rechazo 1.4.1 de Apple.
+function clasificar(nutriente, valorPorcion, densidad100g, por100g = false) {
+  if (por100g) {
+    const t = LIMITES && LIMITES.plato_por_100g && LIMITES.plato_por_100g[nutriente];
+    if (!t || densidad100g == null) return { nivel: null, modo: "ninguno" };
+    return { nivel: nivelSegunCortes(densidad100g, t), modo: "contenido" };
   }
-
-  const meta = metaDiaria(nutriente);
-  if (meta != null) {
-    const t = umbralPorcion(meta);
-    const nivel = valorPorcion <= t.verde ? "verde" : valorPorcion <= t.amarillo ? "amarillo" : "rojo";
-    return { nivel, modo: "meta" };
-  }
-
-  // Sin meta: se clasifica el contenido del alimento, no la porción.
-  const cfg = nutriente === "potasio_mg" ? LIMITES.potasio
-            : nutriente === "fosforo_mg" ? LIMITES.fosforo : null;
-  if (!cfg || densidad100g == null) return { nivel: null, modo: "ninguno" };
-
-  const c = (nutriente === "potasio_mg" && riesgoHiperkalemia() && cfg.clasificacion_contenido_estricta)
-    ? cfg.clasificacion_contenido_estricta
-    : cfg.clasificacion_contenido;
-
-  const nivel = densidad100g <= c.bajo_hasta ? "verde"
-              : densidad100g <= c.moderado_hasta ? "amarillo" : "rojo";
-  return { nivel, modo: "contenido" };
+  const t = (LIMITES && LIMITES.porcion && LIMITES.porcion[nutriente]) || umbralesActivos()[nutriente];
+  if (!t || valorPorcion == null) return { nivel: null, modo: "ninguno" };
+  return { nivel: nivelSegunCortes(valorPorcion, t), modo: "contenido" };
 }
 
 // El badge y "Acerca de" muestran el nivel de suscripción real (RevenueCat:
@@ -1351,14 +1329,16 @@ function copiarCodigoCliente() {
   );
 }
 
+// Cada consejo lleva la fuente que lo respalda (ids de LIMITES.fuentes), y la
+// tarjeta la muestra: Apple exige citas visibles para la información de salud.
 const TIPS_DEL_DIA = [
-  "Elegir alimentos frescos y cocinar en casa te ayuda a controlar el sodio y mejorar tu salud renal.",
-  "Remojar y hervir las verduras (doble cocción, descartando el agua) reduce su contenido de potasio.",
-  "Lee las etiquetas: el sodio se esconde en salsas, conservas, embutidos y panes procesados.",
-  "Lácteos, frutos secos y bebidas de cola son ricos en fósforo; modera sus porciones.",
-  "El agua de cocción de legumbres y verduras concentra potasio — evita reutilizarla en sopas o salsas.",
-  "Las especias y hierbas frescas son una buena forma de dar sabor sin recurrir a la sal.",
-  "Revisa siempre el alimento que identifica la app: la confirmación manual evita errores importantes.",
+  { texto: "Elegir alimentos frescos y cocinar en casa te ayuda a controlar el sodio.", fuente: "nkf_sodio_web" },
+  { texto: "Remojar y hervir las verduras, botando el agua, les quita parte del potasio, aunque no todo.", fuente: "nkf_potasio_web" },
+  { texto: "Lee las etiquetas: el sodio se esconde en salsas, conservas, embutidos y comidas procesadas.", fuente: "nkf_sodio_web" },
+  { texto: "Lácteos, frutos secos y bebidas cola oscuras son ricos en fósforo; modera sus porciones.", fuente: "nkf_fosforo_web" },
+  { texto: "No uses el líquido de frutas o verduras en conserva ni el jugo de la carne cocida: tienen potasio.", fuente: "nkf_potasio_folleto" },
+  { texto: "Cocina con hierbas y especias en vez de sal para dar sabor.", fuente: "nkf_sodio_web" },
+  { texto: "Revisa siempre el alimento que identifica la app: la confirmación manual evita errores importantes.", fuente: null },
 ];
 
 let FOODS = [];
@@ -1431,6 +1411,7 @@ const els = {
   planUpsellText: document.getElementById("plan-upsell-text"),
   consejoCard: document.getElementById("consejo-card"),
   consejoCuerpo: document.getElementById("consejo-cuerpo"),
+  consejoFuente: document.getElementById("consejo-fuente"),
   paywallOverlay: document.getElementById("paywall-overlay"),
   paywallPeriodoToggle: document.getElementById("paywall-periodo-toggle"),
   paywallNiveles: document.getElementById("paywall-niveles"),
@@ -1750,7 +1731,9 @@ function renderBanner() {
   const consejo = consejoDelDia();
   els.consejoCard.hidden = bloqueado || !consejo;
   if (els.consejoCard.hidden) return;
-  els.consejoCuerpo.textContent = consejo;
+  els.consejoCuerpo.textContent = consejo.texto;
+  els.consejoFuente.hidden = !consejo.fuente;
+  els.consejoFuente.innerHTML = consejo.fuente ? `Fuente: ${enlaceFuente(consejo.fuente)}` : "";
 }
 
 
@@ -2007,6 +1990,7 @@ function renderFoodResult(item, idx) {
         <button id="correct-${idx}">Corregir</button>
       </div>
       <p class="portion-note">Porción estimada: ${porcionG} g</p>
+      ${fuenteAlimentoHtml(match)}
       ${confidenceNote(item.confianza)}
       ${alternativesRow(item, idx)}
       <div class="semaforo-row">
@@ -2038,21 +2022,50 @@ function avisoAditivos(match) {
   return `<p class="aviso-aditivos ${alto ? "aditivos-alto" : ""}">${texto}</p>`;
 }
 
-// Cuando potasio o fósforo se muestran por contenido, hay que decirle al
-// paciente qué significa esa etiqueta: describe el alimento, no que se haya
-// pasado de un límite. Las guías no fijan una cifra universal para ellos.
-function notaSinMeta() {
-  const sinMeta = ["potasio_mg", "fosforo_mg"]
-    .filter((k) => metaDiaria(k) == null)
-    .map((k) => NUTRIENTE_LABEL[k].toLowerCase());
-  if (!sinMeta.length || !LIMITES) return "";
-  const lista = sinMeta.join(" y ");
-  return `<p class="nota-sin-meta">En ${lista} se indica cuánto aporta el alimento, no si superaste tu límite: tu objetivo lo define tu equipo tratante.</p>`;
+// Todos los semáforos describen el CONTENIDO, con cortes publicados, y hay que
+// decírselo al paciente: el color no dice si se pasó de su límite del día (eso
+// lo muestra "Así va tu día"). La nota enlaza a las fuentes.
+function notaSinMeta(por100g = false) {
+  if (!LIMITES) return "";
+  const texto = por100g
+    ? "El color indica cuánto potasio, fósforo y sodio tiene el plato por cada 100 g, según la tabla del Hospital del Mar y la FDA"
+    : "El color indica cuánto aporta esta porción, según la National Kidney Foundation y la FDA";
+  return `<p class="nota-sin-meta">${texto}. No dice si superaste tu límite del día. <a href="fuentes.html#semaforo" target="_blank" rel="noopener">Ver fuentes</a></p>`;
 }
 
-function badge(nutriente, valorPorcion, densidad100g) {
+// Enlace a una fuente de LIMITES.fuentes por su id. Si el archivo no cargó,
+// cae a la página de fuentes, que no depende de JavaScript.
+function enlaceFuente(id) {
+  const f = LIMITES && LIMITES.fuentes && LIMITES.fuentes[id];
+  if (!f) return `<a href="fuentes.html" target="_blank" rel="noopener">Ver fuentes</a>`;
+  return `<a href="${escapeHtml(f.url)}" target="_blank" rel="noopener">${escapeHtml(f.nombre_corto)}</a>`;
+}
+
+// Cita del dato de cada alimento. Los que vienen de una ficha USDA enlazan a
+// esa ficha exacta; las preparaciones se arman con ingredientes USDA.
+function fuenteAlimentoHtml(food) {
+  if (!food || !food.fuente) return "";
+  const fdcId = food.fuente.fdc_id;
+  if (fdcId) {
+    return `<p class="fuente-dato">Datos: <a href="https://fdc.nal.usda.gov/food-details/${encodeURIComponent(fdcId)}/nutrients" target="_blank" rel="noopener">USDA FoodData Central, ficha ${escapeHtml(String(fdcId))}</a></p>`;
+  }
+  return `<p class="fuente-dato">Datos: calculados con ingredientes de USDA FoodData Central. <a href="fuentes.html#alimentos" target="_blank" rel="noopener">Ver fuentes</a></p>`;
+}
+
+function badge(nutriente, valorPorcion, densidad100g, por100g = false) {
   const unidad = nutriente === "carbohidratos_g" ? "g" : "mg";
-  const { nivel, modo } = clasificar(nutriente, valorPorcion, densidad100g);
+  const { nivel, modo } = clasificar(nutriente, valorPorcion, densidad100g, por100g);
+  // Carbohidratos no tienen un corte publicado: se muestra la cifra sin color
+  // en vez de esconderla, porque al paciente con diabetes igual le sirve.
+  if (!nivel && nutriente === "carbohidratos_g" && valorPorcion != null) {
+    return `
+    <div class="semaforo-badge nivel-incompleto">
+      <span class="label">${NUTRIENTE_LABEL[nutriente]}</span>
+      <span class="badge-icon-circle">${NUTRIENTE_ICON[nutriente]}</span>
+      <span class="value">${valorPorcion} ${unidad}</span>
+      <span class="tag-pill">Sin meta</span>
+    </div>`;
+  }
   if (!nivel) return "";
   // En modo "contenido" el semáforo describe cuán alto es el alimento, no que
   // el paciente se haya pasado de un límite: la etiqueta lo dice explícito.
@@ -2441,7 +2454,7 @@ function prioridadClinica(food) {
   for (const nutriente of nutrientesVisibles()) {
     const densidad = food[nutriente];
     if (densidad == null) continue;
-    const { nivel } = clasificar(nutriente, Math.round(densidad), densidad);
+    const { nivel } = clasificar(nutriente, Math.round(densidad), densidad, true);
     score += peso[nivel] || 0;
   }
   return score;
@@ -2452,7 +2465,7 @@ function sellosDeAlimento(food) {
     .map((nutriente) => {
       const densidad = food[nutriente];
       if (densidad == null) return "";
-      const { nivel } = clasificar(nutriente, Math.round(densidad), densidad);
+      const { nivel } = clasificar(nutriente, Math.round(densidad), densidad, true);
       if (!nivel) return "";
       return `<span class="super-semaforo nivel-${nivel}">${escapeHtml(NUTRIENTE_LABEL[nutriente])} ${escapeHtml(nivelTagContenido(nivel))}</span>`;
     })
@@ -2868,6 +2881,8 @@ function resumenDelDiaTexto() {
   if (metaLiq) {
     const nota = metaLiq.esSupuesto ? " (estimado: no has registrado tu diuresis)" : "";
     lineas.push(`- Líquidos: ${Math.round(totalLiquidosHoy())} de ${Math.round(metaLiq.ml)} ml${nota}`);
+  } else if (requiereDiuresis()) {
+    lineas.push(`- Líquidos: ${Math.round(totalLiquidosHoy())} ml — sin meta fijada`);
   }
 
   lineas.push("");
@@ -2893,7 +2908,7 @@ async function analizarMiDia() {
         alimentos: alimentos.map((a) => ({ nombre: a.nombre, gramos: a.porcionG })),
         totales,
         metas,
-        liquidos_ml: metaLiquidos() ? Math.round(totalLiquidosHoy()) : null,
+        liquidos_ml: requiereDiuresis() ? Math.round(totalLiquidosHoy()) : null,
         meta_liquidos_ml: metaLiquidos() ? Math.round(metaLiquidos().ml) : null,
         situacion_clinica: situacionClinicaParaIA(),
         riesgo_hiperkalemia: riesgoHiperkalemia(),
@@ -3303,23 +3318,16 @@ function presupuestoRestanteHoy() {
   return out;
 }
 
-// Sin meta personal de potasio/fósforo no hay un total que no superar, pero
-// el semáforo del celular igual clasifica por CONTENIDO (mg/100g, ver
-// clasificar()) — sin mandarle este umbral a la IA, ella no tenía con qué
-// comparar para decidir si valía la pena escribir un consejo, aunque el
-// semáforo ya mostrara amarillo o rojo.
+// Techo de densidad del plato para la IA: sobre esta cifra por 100 g, el
+// potasio o el fósforo del plato ya es alto en la tabla del Hospital del Mar.
+// Se manda siempre, haya o no meta diaria, porque el semáforo del plato se
+// calcula con esa misma tabla.
 function densidadMaximaSinMeta() {
-  if (!LIMITES) return {};
-  const out = {};
-  if (metaDiaria("potasio_mg") == null) {
-    const cfg = (riesgoHiperkalemia() && LIMITES.potasio.clasificacion_contenido_estricta)
-      || LIMITES.potasio.clasificacion_contenido;
-    out.potasio_mg = cfg.moderado_hasta;
-  }
-  if (metaDiaria("fosforo_mg") == null) {
-    out.fosforo_mg = LIMITES.fosforo.clasificacion_contenido.moderado_hasta;
-  }
-  return out;
+  if (!LIMITES || !LIMITES.plato_por_100g) return {};
+  return {
+    potasio_mg: LIMITES.plato_por_100g.potasio_mg.amarillo,
+    fosforo_mg: LIMITES.plato_por_100g.fosforo_mg.amarillo,
+  };
 }
 
 // La receta generada tiene que usar la situación clínica declarada (etapa
@@ -3689,7 +3697,7 @@ function totalesRecetaExterna(porciones) {
 // se degrada a "sin confirmar"; el ámbar y el rojo se mantienen, porque los
 // ingredientes que faltan solo pueden subir el total, nunca bajarlo.
 function badgeRecetaExterna(nutriente, valorPorcion, densidad100g, hayFaltantes) {
-  const { nivel, modo } = clasificar(nutriente, valorPorcion, densidad100g);
+  const { nivel, modo } = clasificar(nutriente, valorPorcion, densidad100g, true);
   if (!nivel) return "";
   if (hayFaltantes && nivel === "verde") {
     return `
@@ -3700,33 +3708,21 @@ function badgeRecetaExterna(nutriente, valorPorcion, densidad100g, hayFaltantes)
         <span class="tag-pill">Sin confirmar</span>
       </div>`;
   }
-  return badge(nutriente, Math.round(valorPorcion), densidad100g);
+  return badge(nutriente, Math.round(valorPorcion), densidad100g, true);
 }
 
 // Cuántos gramos hay que sacarle al ingrediente que más aporta para que el
-// nutriente vuelva a verde. Se resuelve distinto según cómo se esté evaluando:
-// contra el presupuesto del paciente (modo "meta") o contra la densidad del
-// plato (modo "contenido"), donde sacar gramos también baja el peso total.
+// nutriente vuelva a verde, medido contra la densidad del plato (tabla por
+// 100 g), donde sacar gramos también baja el peso total.
 function gramosASacar(nutriente, modo, ctx, top) {
   const valorPor100 = top.food[nutriente] || 0;
   if (valorPor100 <= 0) return null;
 
-  if (modo === "meta") {
-    const meta = metaDiaria(nutriente);
-    if (meta == null || !LIMITES) return null;
-    const objetivo = umbralPorcion(meta).verde;
-    const excesoTotal = (ctx.porPorcion[nutriente] - objetivo) * ctx.porciones;
-    if (excesoTotal <= 0) return null;
-    return Math.ceil(excesoTotal / (valorPor100 / 100));
-  }
-
-  const cfg = nutriente === "potasio_mg" ? LIMITES && LIMITES.potasio
-            : nutriente === "fosforo_mg" ? LIMITES && LIMITES.fosforo : null;
-  if (!cfg) return null;
-  const c = (nutriente === "potasio_mg" && riesgoHiperkalemia() && cfg.clasificacion_contenido_estricta)
-    ? cfg.clasificacion_contenido_estricta
-    : cfg.clasificacion_contenido;
-  const objetivo = c.bajo_hasta;
+  // El modo "meta", que repartía la meta diaria en 4 comidas, no tenía fuente
+  // publicada y se quitó el 2026-09-14.
+  const t = LIMITES && LIMITES.plato_por_100g && LIMITES.plato_por_100g[nutriente];
+  if (!t) return null;
+  const objetivo = t.verde;
   if (valorPor100 <= objetivo) return null;
   const g = (100 * ctx.totales[nutriente] - objetivo * ctx.totalGramos) / (valorPor100 - objetivo);
   return g > 0 ? Math.ceil(g) : null;
@@ -3853,7 +3849,7 @@ function analizarRecetaExterna() {
   // gravedad, no con el que tenga el número más grande: 300 mg de potasio de
   // más pesan clínicamente mucho más que 300 mg de sodio de más.
   const enRojo = NUTRIENTES_ALARMA.filter(
-    (n) => clasificar(n, ctx.porPorcion[n], densidad(n)).nivel === "rojo"
+    (n) => clasificar(n, ctx.porPorcion[n], densidad(n), true).nivel === "rojo"
   );
   const alarma = enRojo.length
     ? `<div class="receta-ext-alarma">
@@ -3878,7 +3874,7 @@ function analizarRecetaExterna() {
 
   const bloquesSugerencias = NUTRIENTES_ALARMA
     .map((n) => {
-      const { nivel, modo } = clasificar(n, ctx.porPorcion[n], densidad(n));
+      const { nivel, modo } = clasificar(n, ctx.porPorcion[n], densidad(n), true);
       if (nivel !== "rojo" && nivel !== "amarillo") return "";
       const items = sugerenciasPara(n, modo, ctx);
       if (!items.length) return "";
@@ -3898,7 +3894,7 @@ function analizarRecetaExterna() {
       (${porciones} ${porciones === 1 ? "porción" : "porciones"} de ${Math.round(ctx.totalGramos)} g en total).
     </p>
     <div class="semaforo-row">${badges}</div>
-    ${notaSinMeta()}
+    ${notaSinMeta(true)}
     ${avisoFaltantes}
     ${bloquesSugerencias || `<p class="clinical-note">Esta receta te queda bien como está.</p>`}`;
   els.recetaExternaAnalisis.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -4043,7 +4039,7 @@ function renderRecetaIA(receta, { yaGuardada = false } = {}) {
   const densidad100g = (n) => (receta.total_gramos > 0 ? (totales[n] / receta.total_gramos) * 100 : 0);
   const valorPorcion = (n) => Math.round(totales[n] || 0);
   const semaforo = nutrientesVisibles()
-    .map((n) => badge(n, valorPorcion(n), densidad100g(n)))
+    .map((n) => badge(n, valorPorcion(n), densidad100g(n), true))
     .join("");
 
   // El consejo de la IA solo se muestra si el semáforo REAL (recalculado con
@@ -4051,7 +4047,7 @@ function renderRecetaIA(receta, { yaGuardada = false } = {}) {
   // alto en algo — evita mostrar una sugerencia de mejora cuando en realidad
   // todo ya está bien.
   const algoElevado = nutrientesVisibles().some(
-    (n) => ["amarillo", "rojo"].includes(clasificar(n, valorPorcion(n), densidad100g(n)).nivel)
+    (n) => ["amarillo", "rojo"].includes(clasificar(n, valorPorcion(n), densidad100g(n), true).nivel)
   );
   const consejoHtml = receta.consejo && algoElevado
     ? `<div class="receta-consejo"><span aria-hidden="true">💡</span><span><strong>Consejo:</strong> ${escapeHtml(receta.consejo)}</span></div>`
@@ -4069,7 +4065,7 @@ function renderRecetaIA(receta, { yaGuardada = false } = {}) {
       <ul class="refrigerador-receta-lista">${ingredientesHtml}</ul>
       <div class="semaforo-row">${semaforo}</div>
       ${porcentajeDelDiaHtml(receta)}
-      ${notaSinMeta()}
+      ${notaSinMeta(true)}
       ${consejoHtml}
       <ol class="refrigerador-receta-lista">${pasos}</ol>
       ${pasosRobotHtml(receta)}
@@ -4267,6 +4263,20 @@ function filaLiquidos(total, metaLiq) {
     </div>`;
 }
 
+function filaLiquidosSinMeta(total) {
+  return `
+    <div class="calc-fila calc-sin-meta">
+      <div class="calc-fila-info">
+        <div class="calc-fila-head">
+          <span class="calc-icon">${ICONO_LIQUIDO}</span>
+          <span class="calc-label">Líquidos</span>
+          <span class="calc-total">${Math.round(total)} ml</span>
+          <span class="tag-neutro">sin meta fijada</span>
+        </div>
+      </div>
+    </div>`;
+}
+
 function totalesNutrientesHoy() {
   const history = loadHistory().filter((h) => isToday(h.fecha));
   return history.reduce(
@@ -4300,9 +4310,12 @@ function renderCalculadora() {
     filas.push(filaCalculadora("calorias_kcal", totals.calorias_kcal, "kcal"));
   }
 
+  // En peritoneal se registra lo que toma aunque no haya meta automática.
   const metaLiq = metaLiquidos();
-  if (metaLiq) {
-    filas.push(filaLiquidos(totalLiquidosHoy(), metaLiq));
+  if (requiereDiuresis()) {
+    filas.push(metaLiq
+      ? filaLiquidos(totalLiquidosHoy(), metaLiq)
+      : filaLiquidosSinMeta(totalLiquidosHoy()));
     els.registroLiquidos.hidden = false;
   } else {
     els.registroLiquidos.hidden = true;
@@ -4313,7 +4326,8 @@ function renderCalculadora() {
 }
 
 // Vaso de peso: se llena según qué tan cerca está la ganancia interdialítica
-// del máximo recomendado (LIMITES.peso.ganancia_maxima_kg_por_defecto), mismo
+// del máximo recomendado (LIMITES.peso.ganancia_maxima_kg_por_dia por cada día
+// entre registros), mismo
 // código de color que los anillos (verde/ámbar/rojo). Sin un peso anterior
 // con qué comparar (primer registro) se muestra con un poco de contenido,
 // sin comparación todavía.
@@ -4348,7 +4362,8 @@ function renderPeso() {
   const excede = ganancia != null && maxGanancia != null && ganancia > maxGanancia;
   els.pesoAlerta.hidden = !excede;
   if (excede) {
-    els.pesoAlerta.textContent = `Ganaste ${ganancia} kg, más de lo recomendado (${maxGanancia} kg/día). Coméntaselo a tu equipo tratante.`;
+    const dias = diasEntrePesos();
+    els.pesoAlerta.textContent = `Ganaste ${ganancia} kg en ${dias} ${dias === 1 ? "día" : "días"}, más de lo recomendado: hasta ${LIMITES.peso.ganancia_maxima_kg_por_dia} kg por día entre sesiones. Coméntaselo a tu equipo tratante.`;
   }
 }
 
