@@ -18,6 +18,7 @@ import urllib.request
 import urllib.error
 import urllib.parse
 from collections import deque
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -67,6 +68,82 @@ RATE_LIMIT_GLOBAL_WINDOW = int(os.environ.get("RATE_LIMIT_GLOBAL_WINDOW", 86400)
 # quien descubra la URL del backend. Si queda vacía, no se exige (así el
 # desarrollo local funciona sin configurar nada).
 APP_KEY = os.environ.get("APP_KEY", "")
+
+# Fecha de término del link de prueba que se comparte fuera de la App Store
+# (AAAA-MM-DD, hora de Chile; el último día se sirve completo). Vacío = sin
+# vencimiento, que es como corre en local. Cuando vence, la app web deja de
+# abrirse y los endpoints de IA responden 410, pero siguen vivos el portal
+# del tratante y las páginas legales: la ficha de la App Store enlaza la de
+# privacidad, y romperla sería romper la ficha.
+DEMO_HASTA = os.environ.get("DEMO_HASTA", "").strip()
+
+DEMO_RUTAS_IA = {
+    "/api/analyze",
+    "/api/identificar-ingredientes",
+    "/api/generar-receta",
+    "/api/leer-receta",
+    "/api/analisis-dia",
+}
+
+APP_STORE_URL = "https://apps.apple.com/cl/app/kidneychef/id6800981992"
+
+
+def _hoy_en_chile():
+    try:
+        from zoneinfo import ZoneInfo
+        return datetime.now(ZoneInfo("America/Santiago")).date()
+    except Exception:
+        # Sin base de zonas horarias (contenedor pelado) se cae a UTC: puede
+        # adelantar el corte unas horas, nunca atrasarlo días.
+        return datetime.utcnow().date()
+
+
+def demo_vencida():
+    if not DEMO_HASTA:
+        return False
+    try:
+        fin = datetime.strptime(DEMO_HASTA, "%Y-%m-%d").date()
+    except ValueError:
+        # Una fecha mal escrita no puede dejar la app caída: se ignora.
+        print(f"DEMO_HASTA inválida ({DEMO_HASTA!r}), se ignora", flush=True)
+        return False
+    return _hoy_en_chile() > fin
+
+
+PAGINA_DEMO_TERMINADA = """<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La prueba de KidneyChef terminó</title>
+<style>
+  body {{ margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: #f4f8fa; color: #17262c; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }}
+  .caja {{ max-width: 420px; margin: 1.5rem; padding: 2rem 1.75rem; background: #fff; border: 1px solid #dfe7eb;
+    border-radius: 16px; line-height: 1.6; }}
+  h1 {{ color: #0b5a70; font-size: 1.35rem; margin: 0 0 0.9rem; }}
+  p {{ margin: 0 0 1rem; font-size: 0.95rem; }}
+  a {{ color: #0e7490; }}
+  .nota {{ color: #5b7280; font-size: 0.85rem; margin: 0; }}
+  @media (prefers-color-scheme: dark) {{
+    body {{ background: #0b1418; color: #e8f1f4; }}
+    .caja {{ background: #101c22; border-color: #223038; }}
+    h1 {{ color: #7fd3e6; }}
+    .nota {{ color: #93a5ae; }}
+  }}
+</style>
+</head>
+<body>
+  <div class="caja">
+    <h1>Esta versión de prueba terminó</h1>
+    <p>El enlace para probar KidneyChef en el navegador estuvo disponible hasta el {hasta}.</p>
+    <p>La app completa está en la App Store:
+      <a href="{tienda}">descargar KidneyChef</a>.</p>
+    <p class="nota">¿Dudas? Escríbenos desde la página de
+      <a href="/soporte.html">soporte</a>.</p>
+  </div>
+</body>
+</html>"""
 
 # Tope de tamaño del body. Las fotos llegan como data URL en base64; 8 MB da
 # holgura para una foto de celular y evita que alguien mande payloads enormes.
@@ -1820,6 +1897,13 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def _dispatch(self, method):
+        # Una pestaña que quedó abierta antes del vencimiento no puede seguir
+        # gastando llamadas de IA.
+        if demo_vencida() and self.path.split("?", 1)[0] in DEMO_RUTAS_IA:
+            self._send_json(410, {
+                "error": "La versión de prueba en el navegador terminó. La app completa está en la App Store."
+            })
+            return True
         """Busca en ROUTES una entrada que matchee método+path. Devuelve True
         si encontró una (el handler ya respondió, incluso si fue con un 500),
         False si ninguna matcheó (el llamador decide qué hacer — 404, o caer a
@@ -1862,10 +1946,26 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    def _servir_demo_terminada(self):
+        cuerpo = PAGINA_DEMO_TERMINADA.format(
+            hasta=DEMO_HASTA, tienda=APP_STORE_URL
+        ).encode("utf-8")
+        self.send_response(410)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(cuerpo)))
+        self._cors_headers()
+        self.end_headers()
+        self.wfile.write(cuerpo)
+
     def do_GET(self):
         if self._dispatch("GET"):
             return
         path = self.path.split("?", 1)[0]
+        # Solo se corta la entrada a la app web. Las páginas legales y el
+        # portal del tratante siguen sirviéndose.
+        if path in ("/", "/index.html") and demo_vencida():
+            self._servir_demo_terminada()
+            return
         # El portal del tratante es una segunda raíz estática, separada de
         # public/ (que es la app del paciente) — mismo estilo sin build ni
         # framework, solo otro directorio.
