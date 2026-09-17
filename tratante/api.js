@@ -63,10 +63,13 @@ function getMetasPaciente(pacienteId) {
   return apiTratante(`/api/pacientes/${pacienteId}/metas`);
 }
 
-function guardarMetasPaciente(pacienteId, potasioMg, fosforoMg) {
+// `metas` lleva los nombres que valida server.py (sodio_mg, potasio_mg,
+// fosforo_mg, carbohidratos_g, calorias_kcal, liquidos_ml). Un null borra
+// esa meta; lo que no se manda queda como está.
+function guardarMetasPaciente(pacienteId, metas) {
   return apiTratante(`/api/pacientes/${pacienteId}/metas`, {
     method: "PATCH",
-    body: JSON.stringify({ potasio_mg: potasioMg, fosforo_mg: fosforoMg }),
+    body: JSON.stringify(metas),
   });
 }
 

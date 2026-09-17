@@ -763,6 +763,18 @@ function etapaPorEgfr(egfr) {
   return { key: "5", etiqueta: "ERC etapa 5 (sin diálisis)", selloCorto: "ERC etapa 5" };
 }
 
+// Metas que puede fijar el equipo tratante, con el nombre y la unidad que ve
+// el paciente. Es el espejo de METAS_TRATANTE en server.py: si se agrega una
+// allá, va también acá. Todas priman sobre los valores de referencia.
+const METAS_TRATANTE = {
+  sodio_mg: { etiqueta: "Sodio", unidad: "mg" },
+  potasio_mg: { etiqueta: "Potasio", unidad: "mg" },
+  fosforo_mg: { etiqueta: "Fósforo", unidad: "mg" },
+  carbohidratos_g: { etiqueta: "Carbohidratos", unidad: "g" },
+  calorias_kcal: { etiqueta: "Calorías", unidad: "kcal" },
+  liquidos_ml: { etiqueta: "Líquidos", unidad: "ml" },
+};
+
 // --- Modelo clínico (KDIGO/KDOQI) ---------------------------------------
 // Cargado desde limites-clinicos.json. Mientras no esté cargado, la app cae
 // a los umbrales fijos de UMBRALES, así que nunca queda sin semáforo.
@@ -775,6 +787,15 @@ let LIMITES = null;
 function riesgoHiperkalemia() {
   const d = ensurePerfil().datosClinicos || {};
   return !!(d.diabetes || d.farmacosRetenedoresK);
+}
+
+// Meta fijada por el equipo tratante para ese nombre, o null. Solo cuenta en
+// el Plan Clínico, que es donde existe el vínculo con el tratante.
+function metaPropia(nombre) {
+  const perfil = ensurePerfil();
+  if (!PLANS[perfil.planId].features.umbralesPersonalizados) return null;
+  const propias = perfil.metasDiarias || {};
+  return propias[nombre] != null ? propias[nombre] : null;
 }
 
 // Meta diaria de un nutriente, o null si no corresponde fijar una.
@@ -841,7 +862,12 @@ function requiereDiuresis() {
 // supuesto más restrictivo — pero se marca como provisional en la UI, porque
 // restringir de más a alguien que sí orina también hace daño.
 function metaLiquidos() {
-  if (!LIMITES || !requiereDiuresis()) return null;
+  if (!LIMITES) return null;
+  // La meta que fija el tratante prima, y vale aunque el paciente no esté en
+  // diálisis: es una indicación suya, no un valor de referencia de la app.
+  const propia = metaPropia("liquidos_ml");
+  if (propia != null) return { ml: propia, esSupuesto: false };
+  if (!requiereDiuresis()) return null;
   // La fórmula publicada es para hemodiálisis. En peritoneal no hay una cifra
   // con fuente: se registra lo que toma, sin meta, hasta que la fije el tratante.
   const aplica = LIMITES.liquidos.situaciones_aplicables || [];
@@ -1307,10 +1333,12 @@ async function refrescarMetasSincronizadas() {
     guardarPerfil(perfil);
 
     const metas = perfil.metasDiarias || {};
-    const hayMetas = metas.potasio_mg != null || metas.fosforo_mg != null;
-    els.metasSincronizadas.hidden = !hayMetas;
-    els.metaPotasioValor.textContent = metas.potasio_mg != null ? `${metas.potasio_mg} mg/día` : "sin fijar";
-    els.metaFosforoValor.textContent = metas.fosforo_mg != null ? `${metas.fosforo_mg} mg/día` : "sin fijar";
+    const fijadas = Object.entries(METAS_TRATANTE)
+      .filter(([nombre]) => metas[nombre] != null)
+      .map(([nombre, { etiqueta, unidad }]) =>
+        `<p class="metas-sincronizadas-fila">${etiqueta}: <strong>${Math.round(metas[nombre])} ${unidad}/día</strong></p>`);
+    els.metasSincronizadas.hidden = fijadas.length === 0;
+    els.metasSincronizadasLista.innerHTML = fijadas.join("");
 
     renderCalculadora();
     if (!els.results.hidden) renderResults();
@@ -1444,8 +1472,7 @@ const els = {
   vinculosPendientes: document.getElementById("vinculos-pendientes"),
   vinculosActivos: document.getElementById("vinculos-activos"),
   metasSincronizadas: document.getElementById("metas-sincronizadas"),
-  metaPotasioValor: document.getElementById("meta-potasio-valor"),
-  metaFosforoValor: document.getElementById("meta-fosforo-valor"),
+  metasSincronizadasLista: document.getElementById("metas-sincronizadas-lista"),
   refrigeradorChecklist: document.getElementById("refrigerador-checklist"),
   refrigeradorBuscador: document.getElementById("refrigerador-buscador"),
   refrigeradorSinResultados: document.getElementById("refrigerador-sin-resultados"),
@@ -2007,7 +2034,7 @@ function renderFoodResult(item, idx) {
 function nutrientesVisibles() {
   const base = ["potasio_mg", "fosforo_mg", "sodio_mg"];
   const d = ensurePerfil().datosClinicos || {};
-  if (d.diabetes) base.push("carbohidratos_g");
+  if (d.diabetes || metaDiaria("carbohidratos_g") != null) base.push("carbohidratos_g");
   return base;
 }
 
@@ -2055,15 +2082,17 @@ function fuenteAlimentoHtml(food) {
 function badge(nutriente, valorPorcion, densidad100g, por100g = false) {
   const unidad = nutriente === "carbohidratos_g" ? "g" : "mg";
   const { nivel, modo } = clasificar(nutriente, valorPorcion, densidad100g, por100g);
-  // Carbohidratos no tienen un corte publicado: se muestra la cifra sin color
-  // en vez de esconderla, porque al paciente con diabetes igual le sirve.
+  // Carbohidratos no tienen un corte por porción publicado: se muestra la
+  // cifra sin color en vez de esconderla, porque al paciente con diabetes
+  // igual le sirve, y su meta diaria (si el tratante la fijó) sí se ve en
+  // "Así va tu día".
   if (!nivel && nutriente === "carbohidratos_g" && valorPorcion != null) {
     return `
     <div class="semaforo-badge nivel-incompleto">
       <span class="label">${NUTRIENTE_LABEL[nutriente]}</span>
       <span class="badge-icon-circle">${NUTRIENTE_ICON[nutriente]}</span>
       <span class="value">${valorPorcion} ${unidad}</span>
-      <span class="tag-pill">Sin meta</span>
+      <span class="tag-pill">Sin semáforo</span>
     </div>`;
   }
   if (!nivel) return "";
@@ -4303,16 +4332,16 @@ function renderCalculadora() {
   if (nutrientesVisibles().includes("carbohidratos_g")) {
     filas.push(filaCalculadora("carbohidratos_g", totals.carbohidratos_g, "g"));
   }
-  // Calorías: solo en diálisis, porque su meta depende del peso corporal que
-  // ahí se registra (ver metaDiaria/LIMITES.calorias) — no tiene sentido
-  // mostrarla sin esa meta.
-  if (requiereDiuresis()) {
+  // Calorías: en diálisis, porque su meta sale del peso que ahí se registra
+  // (ver metaDiaria/LIMITES.calorias), o cuando el tratante fijó una meta
+  // propia. Sin meta no tiene sentido mostrarlas.
+  if (requiereDiuresis() || metaPropia("calorias_kcal") != null) {
     filas.push(filaCalculadora("calorias_kcal", totals.calorias_kcal, "kcal"));
   }
 
   // En peritoneal se registra lo que toma aunque no haya meta automática.
   const metaLiq = metaLiquidos();
-  if (requiereDiuresis()) {
+  if (requiereDiuresis() || metaLiq) {
     filas.push(metaLiq
       ? filaLiquidos(totalLiquidosHoy(), metaLiq)
       : filaLiquidosSinMeta(totalLiquidosHoy()));

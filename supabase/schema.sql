@@ -10,8 +10,12 @@ create table pacientes (
   id uuid primary key default gen_random_uuid(),
   codigo_cliente text unique not null,
   device_secret_hash text not null,
+  metas_sodio_mg numeric,
   metas_potasio_mg numeric,
   metas_fosforo_mg numeric,
+  metas_carbohidratos_g numeric,
+  metas_calorias_kcal numeric,
+  metas_liquidos_ml numeric,
   metas_actualizado_por uuid,
   metas_actualizado_at timestamptz,
   created_at timestamptz not null default now()

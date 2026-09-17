@@ -1400,10 +1400,7 @@ def handle_get_paciente_me(handler):
         return
     handler._send_json(200, {
         "codigo_cliente": paciente["codigo_cliente"],
-        "metasDiarias": {
-            "potasio_mg": paciente.get("metas_potasio_mg"),
-            "fosforo_mg": paciente.get("metas_fosforo_mg"),
-        },
+        "metasDiarias": _metas_de(paciente),
     })
 
 
@@ -1618,6 +1615,48 @@ def handle_actualizar_vinculo_tratante(handler, id):
     handler._send_json(200, {"vinculo": actualizado})
 
 
+# Metas diarias que puede fijar el tratante, con su columna en Supabase y un
+# máximo de cordura (no es un límite clínico: solo ataja un dedazo del tipo
+# 20000 mg de potasio). Hasta el 2026-09-17 solo estaban potasio y fósforo;
+# las demás se agregaron cuando la app del paciente dejó de fijar por su
+# cuenta las metas que no tenían fuente publicada (rechazo 1.4.1 de Apple).
+METAS_TRATANTE = {
+    "sodio_mg": ("metas_sodio_mg", 10000),
+    "potasio_mg": ("metas_potasio_mg", 10000),
+    "fosforo_mg": ("metas_fosforo_mg", 5000),
+    "carbohidratos_g": ("metas_carbohidratos_g", 800),
+    "calorias_kcal": ("metas_calorias_kcal", 6000),
+    "liquidos_ml": ("metas_liquidos_ml", 5000),
+}
+
+
+def _metas_de(paciente):
+    """Las metas del paciente con los nombres que usa la app, no los de la
+    base. Una meta sin fijar vale None."""
+    return {nombre: paciente.get(col) for nombre, (col, _) in METAS_TRATANTE.items()}
+
+
+def _validar_metas(body):
+    """Devuelve (columnas, error). Solo se tocan las metas que vengan en el
+    body: lo que no viene se deja como está, y un null explícito la borra."""
+    columnas = {}
+    for nombre, (col, maximo) in METAS_TRATANTE.items():
+        if nombre not in body:
+            continue
+        valor = body[nombre]
+        if valor is None or valor == "":
+            columnas[col] = None
+            continue
+        if isinstance(valor, bool) or not isinstance(valor, (int, float)):
+            return None, f"{nombre} debe ser un número o null"
+        if valor <= 0 or valor > maximo:
+            return None, f"{nombre} debe estar entre 1 y {maximo}"
+        columnas[col] = valor
+    if not columnas:
+        return None, "No se envió ninguna meta"
+    return columnas, None
+
+
 def handle_get_metas_paciente(handler, id):
     """GET /api/pacientes/{id}/metas — solo si el tratante tiene un vínculo
     activo con este paciente."""
@@ -1633,8 +1672,7 @@ def handle_get_metas_paciente(handler, id):
         handler._send_json(404, {"error": "Paciente no encontrado"})
         return
     handler._send_json(200, {
-        "potasio_mg": paciente.get("metas_potasio_mg"),
-        "fosforo_mg": paciente.get("metas_fosforo_mg"),
+        **_metas_de(paciente),
         "actualizado_por": paciente.get("metas_actualizado_por"),
         "actualizado_at": paciente.get("metas_actualizado_at"),
     })
@@ -1653,10 +1691,12 @@ def handle_patch_metas_paciente(handler, id):
     body = _leer_body_json(handler)
     if body is None:
         return
-    actualizado = supabase_client.update_metas_paciente(
-        id, body.get("potasio_mg"), body.get("fosforo_mg"), user["id"]
-    )
-    handler._send_json(200, {"metas": actualizado})
+    columnas, error = _validar_metas(body)
+    if error:
+        handler._send_json(400, {"error": error})
+        return
+    actualizado = supabase_client.update_metas_paciente(id, columnas, user["id"])
+    handler._send_json(200, {"metas": _metas_de(actualizado or {})})
 
 
 def handle_upsert_consumo(handler, fecha):

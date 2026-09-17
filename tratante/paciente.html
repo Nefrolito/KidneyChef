@@ -26,13 +26,33 @@
       <h2>Metas diarias</h2>
       <p class="hint-msg" id="metas-actualizado"></p>
       <form id="form-metas">
+        <p class="hint-msg">
+          Lo que fijes acá reemplaza los valores de referencia que usa la app del paciente.
+          Deja un campo vacío para no fijar esa meta.
+        </p>
+        <div class="campo">
+          <label for="meta-sodio">Sodio (mg/día)</label>
+          <input type="number" id="meta-sodio" min="1" max="10000" step="50" placeholder="Sin fijar">
+        </div>
         <div class="campo">
           <label for="meta-potasio">Potasio (mg/día)</label>
-          <input type="number" id="meta-potasio" min="0" step="50" placeholder="Sin fijar">
+          <input type="number" id="meta-potasio" min="1" max="10000" step="50" placeholder="Sin fijar">
         </div>
         <div class="campo">
           <label for="meta-fosforo">Fósforo (mg/día)</label>
-          <input type="number" id="meta-fosforo" min="0" step="50" placeholder="Sin fijar">
+          <input type="number" id="meta-fosforo" min="1" max="5000" step="50" placeholder="Sin fijar">
+        </div>
+        <div class="campo">
+          <label for="meta-carbohidratos">Carbohidratos (g/día)</label>
+          <input type="number" id="meta-carbohidratos" min="1" max="800" step="5" placeholder="Sin fijar">
+        </div>
+        <div class="campo">
+          <label for="meta-calorias">Calorías (kcal/día)</label>
+          <input type="number" id="meta-calorias" min="1" max="6000" step="50" placeholder="Sin fijar">
+        </div>
+        <div class="campo">
+          <label for="meta-liquidos">Líquidos (ml/día)</label>
+          <input type="number" id="meta-liquidos" min="1" max="5000" step="50" placeholder="Sin fijar">
         </div>
         <button type="submit" class="btn btn-primary" id="metas-btn">Guardar metas</button>
         <p class="error-msg" id="metas-error"></p>
@@ -68,8 +88,12 @@
       metasCard: document.getElementById("metas-card"),
       metasActualizado: document.getElementById("metas-actualizado"),
       formMetas: document.getElementById("form-metas"),
+      metaSodio: document.getElementById("meta-sodio"),
       metaPotasio: document.getElementById("meta-potasio"),
       metaFosforo: document.getElementById("meta-fosforo"),
+      metaCarbohidratos: document.getElementById("meta-carbohidratos"),
+      metaCalorias: document.getElementById("meta-calorias"),
+      metaLiquidos: document.getElementById("meta-liquidos"),
       metasBtn: document.getElementById("metas-btn"),
       metasError: document.getElementById("metas-error"),
       metasHint: document.getElementById("metas-hint"),
@@ -79,6 +103,17 @@
       consumoHint: document.getElementById("consumo-hint"),
       chartPotasio: document.getElementById("chart-potasio"),
       chartFosforo: document.getElementById("chart-fosforo"),
+    };
+
+    // Nombre de la meta en la API -> input del formulario. Agregar una meta
+    // nueva es sumar una fila acá y su campo en el HTML de arriba.
+    const CAMPOS_META = {
+      sodio_mg: () => els.metaSodio,
+      potasio_mg: () => els.metaPotasio,
+      fosforo_mg: () => els.metaFosforo,
+      carbohidratos_g: () => els.metaCarbohidratos,
+      calorias_kcal: () => els.metaCalorias,
+      liquidos_ml: () => els.metaLiquidos,
     };
 
     const pacienteId = new URLSearchParams(location.search).get("id");
@@ -111,8 +146,9 @@
         els.pacienteCodigo.textContent = `Código ${vinculoActual.codigo_cliente}`;
 
         const metas = await getMetasPaciente(pacienteId);
-        els.metaPotasio.value = metas.potasio_mg ?? "";
-        els.metaFosforo.value = metas.fosforo_mg ?? "";
+        for (const [nombre, campo] of Object.entries(CAMPOS_META)) {
+          campo().value = metas[nombre] ?? "";
+        }
         els.metasActualizado.textContent = metas.actualizado_at
           ? `Último ajuste: ${formatFecha(metas.actualizado_at)}`
           : "Todavía no se ha fijado ninguna meta.";
@@ -165,9 +201,12 @@
       els.metasHint.textContent = "";
       els.metasBtn.disabled = true;
       try {
-        const potasio = els.metaPotasio.value === "" ? null : Number(els.metaPotasio.value);
-        const fosforo = els.metaFosforo.value === "" ? null : Number(els.metaFosforo.value);
-        await guardarMetasPaciente(pacienteId, potasio, fosforo);
+        const metas = {};
+        for (const [nombre, campo] of Object.entries(CAMPOS_META)) {
+          const valor = campo().value;
+          metas[nombre] = valor === "" ? null : Number(valor);
+        }
+        await guardarMetasPaciente(pacienteId, metas);
         els.metasHint.textContent = "Metas guardadas.";
       } catch (err) {
         els.metasError.textContent = err.message;

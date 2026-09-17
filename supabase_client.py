@@ -114,16 +114,16 @@ def insert_paciente(codigo_cliente, device_secret_hash):
     return rows[0]
 
 
-def update_metas_paciente(paciente_id, potasio_mg, fosforo_mg, actualizado_por):
+def update_metas_paciente(paciente_id, columnas, actualizado_por):
+    """`columnas` ya viene validado por server.py: nombres de columna
+    metas_* con su valor (numero o None para borrar la meta)."""
+    body = dict(columnas)
+    body["metas_actualizado_por"] = actualizado_por
+    body["metas_actualizado_at"] = _now_iso()
     rows = _postgrest_request(
         "PATCH", "pacientes",
         params={"id": f"eq.{paciente_id}"},
-        body={
-            "metas_potasio_mg": potasio_mg,
-            "metas_fosforo_mg": fosforo_mg,
-            "metas_actualizado_por": actualizado_por,
-            "metas_actualizado_at": _now_iso(),
-        },
+        body=body,
     )
     return rows[0] if rows else None
 
