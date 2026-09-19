@@ -240,3 +240,91 @@ def get_consumos_rango(paciente_id, desde, hasta):
         ("order", "fecha.asc"),
     ]
     return _postgrest_request("GET", "consumos_diarios", params=params) or []
+
+
+# --- fotos_paciente --------------------------------------------------------
+
+def get_foto_paciente(paciente_id):
+    rows = _postgrest_request(
+        "GET", "fotos_paciente",
+        params={"paciente_id": f"eq.{paciente_id}", "select": "*", "limit": "1"},
+    )
+    return rows[0] if rows else None
+
+
+def upsert_foto_paciente(paciente_id, imagen_base64, mime):
+    """El consentimiento se registra junto con la imagen: no existe una fila
+    de foto sin su marca de consentimiento (ver handle_put_foto en
+    server.py). Subir una foto nueva renueva esa marca."""
+    ahora = _now_iso()
+    rows = _postgrest_request(
+        "POST", "fotos_paciente",
+        body={
+            "paciente_id": paciente_id,
+            "imagen_base64": imagen_base64,
+            "mime": mime,
+            "consentimiento_at": ahora,
+            "actualizado_at": ahora,
+        },
+        prefer="resolution=merge-duplicates,return=representation",
+    )
+    return rows[0] if rows else None
+
+
+def delete_foto_paciente(paciente_id):
+    _postgrest_request(
+        "DELETE", "fotos_paciente",
+        params={"paciente_id": f"eq.{paciente_id}"},
+        prefer="return=minimal",
+    )
+
+
+# --- indicaciones_examenes -------------------------------------------------
+
+def insert_indicacion(paciente_id, tratante_id, examenes, otros, nota, fecha_sugerida):
+    rows = _postgrest_request(
+        "POST", "indicaciones_examenes",
+        body={
+            "paciente_id": paciente_id,
+            "tratante_id": tratante_id,
+            "examenes": examenes,
+            "otros": otros,
+            "nota": nota,
+            "fecha_sugerida": fecha_sugerida,
+            "estado": "vigente",
+        },
+    )
+    return rows[0]
+
+
+def get_indicaciones_por_paciente(paciente_id, tratante_id=None):
+    """Todas las indicaciones del paciente, o solo las de un tratante. El
+    portal filtra por tratante: cada profesional ve lo que él indicó, no lo
+    que indicó el otro (el alias ya sigue ese mismo criterio). La app del
+    paciente las ve todas, que para eso son suyas."""
+    params = {
+        "paciente_id": f"eq.{paciente_id}",
+        "select": "*",
+        "order": "creada_at.desc",
+    }
+    if tratante_id:
+        params["tratante_id"] = f"eq.{tratante_id}"
+    return _postgrest_request("GET", "indicaciones_examenes", params=params) or []
+
+
+def get_indicacion_por_id(indicacion_id):
+    rows = _postgrest_request(
+        "GET", "indicaciones_examenes",
+        params={"id": f"eq.{indicacion_id}", "select": "*", "limit": "1"},
+    )
+    return rows[0] if rows else None
+
+
+def update_indicacion(indicacion_id, cambios):
+    """`cambios` ya viene validado por server.py (estado, vista_at, hecha_at)."""
+    rows = _postgrest_request(
+        "PATCH", "indicaciones_examenes",
+        params={"id": f"eq.{indicacion_id}"},
+        body=cambios,
+    )
+    return rows[0] if rows else None

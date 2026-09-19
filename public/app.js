@@ -1261,6 +1261,7 @@ async function activarPlanClinico() {
 
 function tipoTratanteLabel(tipo) {
   if (tipo === "nefrologo") return "Tu nefrólogo(a)";
+  if (tipo === "nutriologo") return "Tu nutriólogo(a)";
   if (tipo === "nutricionista") return "Tu nutricionista";
   return "Tu equipo tratante";
 }
@@ -1275,6 +1276,9 @@ async function refrescarVinculos() {
   if (!perfil.vinculacion.codigoCliente) {
     els.vinculosPendientes.innerHTML = "";
     els.vinculosActivos.innerHTML = "";
+    hayVinculoActivo = false;
+    renderFotoPaciente();
+    if (els.indicacionesBloque) els.indicacionesBloque.hidden = true;
     return;
   }
   try {
@@ -1284,6 +1288,9 @@ async function refrescarVinculos() {
     if (!res.ok) return; // credenciales inválidas o sin conexión: no rompe la app local
     const data = await res.json();
     const vinculos = data.vinculos || [];
+    // La foto solo se ofrece con un vínculo activo: el backend la rechaza
+    // sin él, y no tiene sentido pedirla si nadie va a verla.
+    hayVinculoActivo = vinculos.some((v) => v.estado === "activo");
 
     els.vinculosPendientes.innerHTML = vinculos
       .filter((v) => v.estado === "pendiente")
@@ -1315,6 +1322,8 @@ async function refrescarVinculos() {
       .join("");
 
     wireVinculoBotones();
+    await refrescarFotoPaciente();
+    await refrescarIndicaciones();
   } catch {
     // sin conexión: se reintenta en el próximo refresco
   }
@@ -1386,6 +1395,239 @@ function copiarCodigoCliente() {
     () => setStatus("Código copiado."),
     () => setStatus("No se pudo copiar el código.", true)
   );
+}
+
+// --- Foto para el equipo tratante ---------------------------------------
+// El portal del tratante muestra a sus pacientes como códigos de ocho
+// caracteres. La foto es para que reconozca a quién está mirando; la sube el
+// paciente, con una casilla de consentimiento explícita, y la puede quitar
+// cuando quiera (eso borra la fila en el servidor, no la marca como borrada).
+//
+// El backend solo la acepta si ya hay un vínculo activo, así que este bloque
+// aparece recién ahí: una foto de la cara es un dato sensible y no tiene por
+// qué viajar al servidor mientras no haya un tratante que la vea.
+const FOTO_LADO_MAX = 512;
+const FOTO_CALIDAD = 0.82;
+const ICONO_FOTO_VACIA = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="3.4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>`;
+
+let fotoPacienteActual = null;
+let hayVinculoActivo = false;
+
+function estadoFoto(mensaje, esError = false) {
+  if (!els.fotoPacienteStatus) return;
+  els.fotoPacienteStatus.textContent = mensaje || "";
+  els.fotoPacienteStatus.classList.toggle("error", Boolean(esError));
+}
+
+// Recorte cuadrado centrado y reescalado a 512 px: el avatar del portal es
+// redondo y chico, y así lo que se guarda son decenas de KB en vez de los
+// varios MB que entrega la cámara de un teléfono.
+async function comprimirFotoPaciente(file) {
+  const dataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
+    reader.readAsDataURL(file);
+  });
+  const img = await new Promise((resolve, reject) => {
+    const imagen = new Image();
+    imagen.onload = () => resolve(imagen);
+    imagen.onerror = () => reject(new Error("El archivo no parece ser una imagen"));
+    imagen.src = dataUrl;
+  });
+  const lado = Math.min(img.naturalWidth, img.naturalHeight);
+  const destino = Math.min(lado, FOTO_LADO_MAX);
+  const canvas = document.createElement("canvas");
+  canvas.width = destino;
+  canvas.height = destino;
+  canvas.getContext("2d").drawImage(
+    img,
+    (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado,
+    0, 0, destino, destino
+  );
+  return canvas.toDataURL("image/jpeg", FOTO_CALIDAD);
+}
+
+function renderFotoPaciente() {
+  if (!els.fotoPacienteBloque) return;
+  els.fotoPacienteBloque.hidden = !hayVinculoActivo;
+  els.fotoPacienteVista.innerHTML = fotoPacienteActual
+    ? `<img src="${fotoPacienteActual}" alt="">`
+    : ICONO_FOTO_VACIA;
+  els.fotoPacienteBorrar.hidden = !fotoPacienteActual;
+  els.fotoPacienteElegir.textContent = fotoPacienteActual ? "Cambiar foto" : "Elegir foto";
+  els.fotoPacienteElegir.disabled = !els.fotoConsentimiento.checked;
+}
+
+async function refrescarFotoPaciente() {
+  const perfil = ensurePerfil();
+  if (!perfil.vinculacion.codigoCliente || !hayVinculoActivo) {
+    // Sin vínculo activo el servidor ya borró la foto
+    // (_borrar_foto_si_quedo_sin_vinculos), así que tampoco se conserva acá.
+    fotoPacienteActual = null;
+    renderFotoPaciente();
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/api/pacientes/me/foto`, {
+      headers: authHeadersPaciente(),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    fotoPacienteActual = data.foto || null;
+    // Que exista una foto guardada significa que en su momento marcó la
+    // casilla: se refleja para no pedirle el permiso dos veces.
+    if (fotoPacienteActual) els.fotoConsentimiento.checked = true;
+    renderFotoPaciente();
+  } catch {
+    // sin conexión: se reintenta en el próximo refresco
+  }
+}
+
+async function subirFotoPaciente(file) {
+  if (!file) return;
+  if (!els.fotoConsentimiento.checked) {
+    estadoFoto("Marca la autorización antes de subir la foto.", true);
+    return;
+  }
+  estadoFoto("Preparando la foto…");
+  try {
+    const imagen = await comprimirFotoPaciente(file);
+    const res = await fetch(`${API_BASE}/api/pacientes/me/foto`, {
+      method: "PUT",
+      headers: { ...authHeadersPaciente(), "Content-Type": "application/json" },
+      body: JSON.stringify({ imagen, consentimiento: true }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "No se pudo guardar la foto");
+    fotoPacienteActual = data.foto || imagen;
+    renderFotoPaciente();
+    estadoFoto("Foto guardada. Tu equipo tratante ya puede verla.");
+  } catch (err) {
+    estadoFoto(err.message, true);
+  }
+}
+
+async function borrarFotoPaciente() {
+  try {
+    const res = await fetch(`${API_BASE}/api/pacientes/me/foto`, {
+      method: "DELETE",
+      headers: authHeadersPaciente(),
+    });
+    if (!res.ok) throw new Error("No se pudo quitar la foto");
+    fotoPacienteActual = null;
+    renderFotoPaciente();
+    estadoFoto("Foto retirada.");
+  } catch (err) {
+    estadoFoto(err.message, true);
+  }
+}
+
+// Desmarcar la casilla es retirar el permiso, así que también borra la foto:
+// dejarla guardada "sin autorización" sería mentirle al paciente.
+async function cambiarConsentimientoFoto() {
+  if (!els.fotoConsentimiento.checked && fotoPacienteActual) {
+    if (!confirm("Si retiras la autorización se borra la foto que subiste. ¿Continuar?")) {
+      els.fotoConsentimiento.checked = true;
+      return;
+    }
+    await borrarFotoPaciente();
+  }
+  renderFotoPaciente();
+}
+
+// --- Exámenes de control indicados por el tratante ----------------------
+// NO es una orden médica: no lleva firma electrónica ni identifica al
+// establecimiento, y ningún laboratorio la recibe como documento. Es el
+// recado que hoy llega por WhatsApp, puesto donde no se pierde. El paciente
+// solo acusa recibo ("ya me los hice"); acá no se registran resultados, que
+// sería ficha clínica y está deliberadamente fuera de alcance.
+
+// Una fecha suelta (AAAA-MM-DD) la interpreta el navegador como UTC y se
+// puede correr un día hacia atrás en Chile: se arma al mediodía local.
+function formatFechaSola(iso) {
+  if (!iso) return "";
+  return new Date(`${iso}T12:00:00`).toLocaleDateString("es-CL", {
+    day: "numeric", month: "long", year: "numeric",
+  });
+}
+
+function renderIndicacion(ind) {
+  const items = (ind.examenes || []).map((e) => `<li>${escapeHtml(e.etiqueta)}</li>`);
+  if (ind.otros) items.push(`<li>${escapeHtml(ind.otros)}</li>`);
+  const cancelada = ind.estado === "cancelada";
+  const clases = ["indicacion-item"];
+  if (cancelada) clases.push("indicacion-item-cancelada");
+  else if (ind.hecha_at) clases.push("indicacion-item-hecha");
+  return `
+    <div class="${clases.join(" ")}">
+      <div class="indicacion-item-cabecera">
+        <strong>${escapeHtml(ind.tratante_nombre || "Tu equipo tratante")}</strong>
+        <small>${escapeHtml(tipoTratanteLabel(ind.tratante_tipo))} · ${escapeHtml(formatFecha(ind.creada_at))}</small>
+      </div>
+      ${cancelada ? `<small>Tu equipo tratante canceló esta indicación.</small>` : ""}
+      <ul>${items.join("")}</ul>
+      ${ind.fecha_sugerida && !cancelada
+        ? `<p class="indicacion-item-plazo">Para antes del ${escapeHtml(formatFechaSola(ind.fecha_sugerida))}</p>`
+        : ""}
+      ${ind.nota ? `<p class="indicacion-item-nota">${escapeHtml(ind.nota)}</p>` : ""}
+      ${cancelada ? "" : `
+        <div class="indicacion-item-acciones">
+          ${ind.hecha_at
+            ? `<button class="btn btn-ghost" data-indicacion-deshacer="${ind.id}">Todavía no me los hago</button>`
+            : `<button class="btn btn-primary" data-indicacion-hecha="${ind.id}">Ya me los hice</button>`}
+        </div>`}
+    </div>`;
+}
+
+async function refrescarIndicaciones() {
+  const perfil = ensurePerfil();
+  if (!els.indicacionesBloque) return;
+  if (!perfil.vinculacion.codigoCliente) {
+    els.indicacionesBloque.hidden = true;
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/api/pacientes/me/indicaciones`, {
+      headers: authHeadersPaciente(),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const indicaciones = data.indicaciones || [];
+    els.indicacionesBloque.hidden = indicaciones.length === 0;
+    els.indicacionesLista.innerHTML = indicaciones.map(renderIndicacion).join("");
+
+    els.indicacionesLista.querySelectorAll("[data-indicacion-hecha]").forEach((btn) => {
+      btn.addEventListener("click", () =>
+        actualizarIndicacion(btn.dataset.indicacionHecha, { hecha: true }));
+    });
+    els.indicacionesLista.querySelectorAll("[data-indicacion-deshacer]").forEach((btn) => {
+      btn.addEventListener("click", () =>
+        actualizarIndicacion(btn.dataset.indicacionDeshacer, { hecha: false }));
+    });
+
+    // Acuse de recibo: se marcan como vistas las que el paciente acaba de
+    // ver en pantalla, para que el tratante sepa si le llegó el recado.
+    indicaciones
+      .filter((ind) => !ind.vista_at && ind.estado !== "cancelada")
+      .forEach((ind) => actualizarIndicacion(ind.id, { vista: true }, false));
+  } catch {
+    // sin conexión: se reintenta en el próximo refresco
+  }
+}
+
+async function actualizarIndicacion(id, cambios, refrescar = true) {
+  try {
+    const res = await fetch(`${API_BASE}/api/pacientes/me/indicaciones/${id}`, {
+      method: "PATCH",
+      headers: { ...authHeadersPaciente(), "Content-Type": "application/json" },
+      body: JSON.stringify(cambios),
+    });
+    if (!res.ok) return;
+    if (refrescar) await refrescarIndicaciones();
+  } catch {
+    // sin conexión: el estado local no cambia y se reintenta después
+  }
 }
 
 // Cada consejo lleva la fuente que lo respalda (ids de LIMITES.fuentes), y la
@@ -1506,6 +1748,15 @@ const els = {
   vinculosActivos: document.getElementById("vinculos-activos"),
   metasSincronizadas: document.getElementById("metas-sincronizadas"),
   metasSincronizadasLista: document.getElementById("metas-sincronizadas-lista"),
+  fotoPacienteBloque: document.getElementById("foto-paciente-bloque"),
+  fotoPacienteVista: document.getElementById("foto-paciente-vista"),
+  fotoPacienteElegir: document.getElementById("foto-paciente-elegir"),
+  fotoPacienteBorrar: document.getElementById("foto-paciente-borrar"),
+  fotoPacienteInput: document.getElementById("foto-paciente-input"),
+  fotoConsentimiento: document.getElementById("foto-consentimiento"),
+  fotoPacienteStatus: document.getElementById("foto-paciente-status"),
+  indicacionesBloque: document.getElementById("indicaciones-bloque"),
+  indicacionesLista: document.getElementById("indicaciones-lista"),
   refrigeradorChecklist: document.getElementById("refrigerador-checklist"),
   refrigeradorBuscador: document.getElementById("refrigerador-buscador"),
   refrigeradorSinResultados: document.getElementById("refrigerador-sin-resultados"),
@@ -1637,6 +1888,13 @@ async function init() {
   refrescarVinculos();
   refrescarMetasSincronizadas();
   setInterval(refrescarVinculos, VINCULOS_POLL_MS);
+  els.fotoConsentimiento.addEventListener("change", cambiarConsentimientoFoto);
+  els.fotoPacienteElegir.addEventListener("click", () => els.fotoPacienteInput.click());
+  els.fotoPacienteInput.addEventListener("change", (e) => {
+    subirFotoPaciente(e.target.files[0]);
+    e.target.value = ""; // permite volver a elegir el mismo archivo
+  });
+  els.fotoPacienteBorrar.addEventListener("click", borrarFotoPaciente);
 
   els.cameraInput.addEventListener("change", (e) => handleFileSelected(e.target.files[0]));
   els.analyzeBtn.addEventListener("click", analyzeImage);

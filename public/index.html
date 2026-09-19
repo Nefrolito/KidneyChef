@@ -315,6 +315,41 @@
       <div id="vinculos-pendientes" class="vinculos-lista"></div>
       <div id="vinculos-activos" class="vinculos-lista"></div>
 
+      <!-- Foto: la sube el paciente y la ve su equipo tratante vinculado, para
+           reconocerlo en una lista de códigos. Solo aparece cuando ya hay un
+           vínculo activo, y el consentimiento es una casilla explícita. -->
+      <div id="foto-paciente-bloque" class="clinical-field" hidden>
+        <label>Tu foto</label>
+        <p class="clinical-note">
+          Ayuda a que tu nefrólogo(a) o nutricionista te reconozca en su portal, donde
+          apareces solo con un código. Es opcional y puedes quitarla cuando quieras.
+        </p>
+        <div class="foto-paciente-fila">
+          <span id="foto-paciente-vista" class="foto-paciente-vista" aria-hidden="true"></span>
+          <div class="foto-paciente-acciones">
+            <button type="button" id="foto-paciente-elegir" class="btn btn-ghost" disabled>Elegir foto</button>
+            <button type="button" id="foto-paciente-borrar" class="btn btn-ghost" hidden>Quitar foto</button>
+          </div>
+        </div>
+        <label class="clinical-check clinical-check-ancho">
+          <input type="checkbox" id="foto-consentimiento">
+          <span>Autorizo que el equipo tratante que yo acepté pueda ver esta foto.</span>
+        </label>
+        <input type="file" id="foto-paciente-input" accept="image/*" hidden>
+        <p class="status" id="foto-paciente-status" role="status" aria-live="polite"></p>
+      </div>
+
+      <!-- Exámenes de control que indicó el tratante. NO es una orden médica:
+           el rótulo tiene que estar a la vista, no solo en el código. -->
+      <div id="indicaciones-bloque" class="clinical-field" hidden>
+        <label>Exámenes que te indicaron</label>
+        <div id="indicaciones-lista"></div>
+        <small class="campo-ayuda">
+          Esto no es una orden de laboratorio: es un recado de tu equipo tratante para que no
+          se te olvide. La orden formal te la entregan ellos como siempre.
+        </small>
+      </div>
+
       <div id="metas-sincronizadas" class="clinical-field" hidden>
         <label>Metas fijadas por tu equipo tratante</label>
         <div id="metas-sincronizadas-lista"></div>

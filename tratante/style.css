@@ -1,6 +1,9 @@
-/* Mismos tokens de color que public/style.css (paleta de marca de
-   KidneyChef), para que el portal se sienta parte de la misma app aunque
-   viva en un directorio aparte y sin build. */
+/* Portal del equipo tratante.
+   Mismos tokens de color y tipografías que public/style.css (paleta de marca
+   de KidneyChef) para que se sienta parte de la misma app, pero con una
+   estructura propia: acá no hay pestañas de celular, hay una barra lateral y
+   una lista de pacientes, que es como se trabaja en un computador de
+   consulta. Sin build ni dependencias, igual que el resto del proyecto. */
 :root {
   --brand: #0e7490;
   --brand-dark: #0b5a70;
@@ -11,11 +14,18 @@
   --bg: #f4f8fa;
   --surface: #ffffff;
   --surface-alt: #f0f5f7;
+  --surface-hover: #e9f1f4;
+  --sidebar-bg: #0c2b35;
+  --sidebar-text: #cfe4ea;
+  --sidebar-text-fuerte: #ffffff;
+  --sidebar-activo: rgba(255, 255, 255, 0.12);
+  --sidebar-borde: rgba(255, 255, 255, 0.10);
   --text: #10222c;
   --muted: #5b7280;
   --border: #dfe7eb;
   --shadow-sm: 0 1px 2px rgba(16, 34, 44, 0.06);
   --shadow-md: 0 8px 24px rgba(16, 34, 44, 0.08);
+  --shadow-lg: 0 24px 60px rgba(16, 34, 44, 0.18);
 
   --verde: #16a34a;
   --verde-bg: #eafbf1;
@@ -26,6 +36,10 @@
   --rojo: #dc2626;
   --rojo-bg: #fdecec;
   --rojo-border: #f4c6c6;
+
+  --radio: 14px;
+  --radio-sm: 10px;
+  --sidebar-ancho: 252px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -33,6 +47,9 @@
     --bg: #0b1418;
     --surface: #121d23;
     --surface-alt: #16232a;
+    --surface-hover: #1c2b33;
+    --sidebar-bg: #08191f;
+    --sidebar-borde: rgba(255, 255, 255, 0.07);
     --text: #e8f1f4;
     --muted: #93a5ae;
     --border: #223038;
@@ -40,6 +57,7 @@
     --brand-100: #123a40;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
     --verde-bg: #10281a;
     --verde-border: #1e4a2c;
     --amarillo-bg: #2e2409;
@@ -61,95 +79,550 @@ body {
 
 h1, h2, h3 {
   font-family: "Plus Jakarta Sans", "Inter", sans-serif;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  margin: 0;
 }
 
-.topbar {
-  padding: 1.5rem 1rem 1.25rem;
-  background: linear-gradient(180deg, var(--brand-50) 0%, var(--bg) 100%);
-  border-bottom: 1px solid var(--border);
+a { color: var(--brand); }
+
+/* --- Estructura general -------------------------------------------------- */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-ancho) minmax(0, 1fr);
+  min-height: 100vh;
 }
-.topbar-row {
-  max-width: 760px;
-  margin: 0 auto;
+
+.sidebar {
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem 1rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0 0.4rem;
+  color: var(--sidebar-text-fuerte);
+  text-decoration: none;
+}
+.sidebar-brand-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(140deg, var(--brand-light), var(--brand));
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.sidebar-brand-logo svg { width: 19px; height: 19px; }
+.sidebar-brand strong {
+  font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+  font-size: 1.02rem;
+  display: block;
+  line-height: 1.15;
+}
+.sidebar-brand small {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sidebar-text);
+  opacity: 0.75;
+}
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 0.15rem; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--radio-sm);
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-size: 0.89rem;
+  font-weight: 600;
+  border: none;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+.nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.85; }
+.nav-item:hover { background: rgba(255, 255, 255, 0.07); color: var(--sidebar-text-fuerte); }
+.nav-item[aria-current="page"], .nav-item.activo {
+  background: var(--sidebar-activo);
+  color: var(--sidebar-text-fuerte);
+}
+.nav-badge {
+  margin-left: auto;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: var(--brand-light);
+  color: #06232a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+.nav-badge[hidden] { display: none; }
+
+.sidebar-pie { margin-top: auto; border-top: 1px solid var(--sidebar-borde); padding-top: 1rem; }
+
+.perfil-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.4rem 0.75rem;
+}
+.perfil-chip-texto { min-width: 0; }
+.perfil-chip-texto strong {
+  display: block;
+  font-size: 0.86rem;
+  color: var(--sidebar-text-fuerte);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.perfil-chip-texto small { font-size: 0.74rem; opacity: 0.8; }
+
+.contenido { min-width: 0; padding: 2rem 2rem 4rem; }
+.contenido-ancho { max-width: 980px; margin: 0 auto; }
+
+.pagina-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.pagina-header h1 { font-size: 1.5rem; }
+.pagina-header .subtitulo { margin: 0.3rem 0 0; color: var(--muted); font-size: 0.87rem; }
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+}
+.volver:hover { color: var(--brand); }
+
+/* --- Paneles ------------------------------------------------------------- */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radio);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+.panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
 }
-.topbar h1 { margin: 0; font-size: 1.3rem; }
-.topbar .subtitulo { margin: 0.15rem 0 0; font-size: 0.82rem; color: var(--muted); }
+.panel-header h2 { font-size: 1rem; }
+.panel-header p { margin: 0.2rem 0 0; font-size: 0.8rem; color: var(--muted); }
+.panel-body { padding: 1.25rem; }
+.panel-body > :first-child { margin-top: 0; }
 
-main {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 1.25rem 1rem 3rem;
+.grid-dos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem 1.25rem;
 }
 
-.card {
-  background: var(--surface);
+/* --- Lista de pacientes -------------------------------------------------- */
+
+.lista { display: flex; flex-direction: column; }
+.lista-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+}
+.lista-fila:last-child { border-bottom: none; }
+.lista-fila:hover { background: var(--surface-alt); }
+.lista-fila-texto { min-width: 0; flex: 1; }
+.lista-fila-texto strong { display: block; font-size: 0.95rem; }
+.lista-fila-texto small { color: var(--muted); font-size: 0.78rem; }
+.lista-fila-acciones { display: flex; gap: 0.4rem; flex-shrink: 0; }
+
+.codigo {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.06em;
+}
+
+/* --- Avatar / foto del paciente ------------------------------------------ */
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--brand-100);
+  color: var(--brand-dark);
+  font-weight: 800;
+  font-size: 0.92rem;
+  font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+  overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: var(--shadow-sm);
-  padding: 1.25rem;
-  margin-bottom: 1.25rem;
 }
-.card h2 { margin: 0 0 0.9rem; font-size: 1.05rem; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.avatar-sm { width: 32px; height: 32px; font-size: 0.76rem; }
+.avatar-lg { width: 76px; height: 76px; font-size: 1.5rem; }
+/* En la barra lateral el avatar va sobre fondo oscuro. */
+.sidebar .avatar { background: rgba(255, 255, 255, 0.14); color: var(--sidebar-text-fuerte); border-color: transparent; }
 
-.campo { margin-bottom: 0.9rem; }
-.campo label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; }
-.campo input, .campo select {
+.paciente-portada {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.paciente-portada-texto h1 { font-size: 1.45rem; }
+
+/* --- Badges -------------------------------------------------------------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.badge-activo { background: var(--verde-bg); border-color: var(--verde-border); color: var(--verde); }
+.badge-pendiente { background: var(--amarillo-bg); border-color: var(--amarillo-border); color: var(--amarillo); }
+.badge-cancelada { background: var(--rojo-bg); border-color: var(--rojo-border); color: var(--rojo); }
+
+/* --- Formularios --------------------------------------------------------- */
+
+.campo { margin-bottom: 1rem; }
+.campo:last-child { margin-bottom: 0; }
+.campo label, .campo-titulo {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.campo input[type="text"],
+.campo input[type="email"],
+.campo input[type="password"],
+.campo input[type="number"],
+.campo input[type="date"],
+.campo textarea,
+.campo select {
   width: 100%;
-  padding: 0.65rem 0.75rem;
-  border-radius: 10px;
+  padding: 0.62rem 0.75rem;
+  border-radius: var(--radio-sm);
   border: 1px solid var(--border);
   background: var(--surface-alt);
   color: var(--text);
   font-size: 0.92rem;
   font-family: inherit;
 }
-.campo-ayuda { display: block; margin-top: 0.35rem; font-size: 0.76rem; color: var(--muted); }
+.campo textarea { resize: vertical; min-height: 78px; }
+.campo input:focus, .campo textarea:focus, .campo select:focus {
+  outline: 2px solid var(--brand-light);
+  outline-offset: 1px;
+  border-color: var(--brand);
+}
+.campo-ayuda { display: block; margin-top: 0.35rem; font-size: 0.75rem; color: var(--muted); }
+
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.15rem 1rem;
+}
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: var(--radio-sm);
+  font-size: 0.87rem;
+  cursor: pointer;
+}
+.check:hover { background: var(--surface-alt); }
+.check input { margin: 0.15rem 0 0; accent-color: var(--brand); flex-shrink: 0; }
+
+.acciones-form {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* --- Botones ------------------------------------------------------------- */
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  padding: 0.7rem 1.1rem;
-  border-radius: 10px;
-  border: none;
-  font-size: 0.9rem;
+  padding: 0.65rem 1.05rem;
+  border-radius: var(--radio-sm);
+  border: 1px solid transparent;
+  font-size: 0.88rem;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
 }
-.btn-primary { background: var(--brand); color: white; }
+.btn svg { width: 16px; height: 16px; }
+.btn-primary { background: var(--brand); color: #fff; }
 .btn-primary:hover { background: var(--brand-dark); }
-.btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
-.btn-ghost:hover { background: var(--surface-alt); }
+.btn-ghost { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn-ghost:hover { background: var(--surface-hover); }
+.btn-peligro { background: transparent; color: var(--rojo); border-color: var(--rojo-border); }
+.btn-peligro:hover { background: var(--rojo-bg); }
+.btn-sm { padding: 0.42rem 0.75rem; font-size: 0.79rem; }
 .btn-full { width: 100%; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.error-msg { color: var(--rojo); font-size: 0.85rem; margin: 0.6rem 0 0; min-height: 1.1em; }
-.hint-msg { color: var(--muted); font-size: 0.85rem; margin: 0.6rem 0 0; }
+/* --- Mensajes ------------------------------------------------------------ */
 
-.paciente-item, .vinculo-item {
+.error-msg { color: var(--rojo); font-size: 0.84rem; margin: 0.6rem 0 0; }
+.hint-msg { color: var(--muted); font-size: 0.84rem; margin: 0.6rem 0 0; }
+.error-msg:empty, .hint-msg:empty { display: none; }
+
+.aviso {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radio-sm);
+  font-size: 0.83rem;
+  line-height: 1.45;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--muted);
+}
+.aviso strong { color: var(--text); }
+.aviso-legal { background: var(--amarillo-bg); border-color: var(--amarillo-border); color: var(--amarillo); }
+.aviso-legal strong { color: inherit; }
+.aviso svg { width: 17px; height: 17px; flex-shrink: 0; margin-top: 0.1rem; }
+
+.vacio {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+.vacio svg { width: 30px; height: 30px; opacity: 0.4; margin-bottom: 0.5rem; }
+.vacio strong { display: block; color: var(--text); font-size: 0.92rem; margin-bottom: 0.2rem; }
+.lista-vacia { color: var(--muted); font-size: 0.85rem; }
+
+.cargando {
+  height: 64px;
+  border-radius: var(--radio-sm);
+  background: linear-gradient(90deg, var(--surface-alt) 25%, var(--surface-hover) 37%, var(--surface-alt) 63%);
+  background-size: 400% 100%;
+  animation: brillo 1.4s ease infinite;
+  margin: 0.4rem 1.25rem;
+}
+@keyframes brillo { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+@media (prefers-reduced-motion: reduce) { .cargando { animation: none; } }
+
+/* --- Pestañas del detalle ------------------------------------------------ */
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  /* La tira se desplaza si no cabe (móvil); la barra de scroll no aporta
+     nada porque la pestaña cortada ya avisa que hay más. */
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 0.6rem 0.9rem;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--text); }
+.tab[aria-selected="true"] { color: var(--brand); border-bottom-color: var(--brand); }
+
+/* --- Diálogo (vincular paciente) ----------------------------------------- */
+
+dialog {
+  border: 1px solid var(--border);
+  border-radius: var(--radio);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0;
+  width: min(440px, calc(100vw - 2rem));
+  box-shadow: var(--shadow-lg);
+}
+dialog::backdrop { background: rgba(8, 25, 31, 0.55); }
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.dialog-header h2 { font-size: 1rem; }
+.dialog-body { padding: 1.25rem; }
+.cerrar-dialog {
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 0.1rem 0.3rem;
+  border-radius: 6px;
+}
+.cerrar-dialog:hover { background: var(--surface-alt); color: var(--text); }
+
+/* --- Indicaciones de exámenes -------------------------------------------- */
+
+.indicacion {
+  border: 1px solid var(--border);
+  border-radius: var(--radio-sm);
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.75rem;
+  background: var(--surface-alt);
+}
+.indicacion:last-child { margin-bottom: 0; }
+.indicacion-cabecera {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  padding: 0.75rem 0.9rem;
-  border-radius: 10px;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
-.paciente-item-texto, .vinculo-item-texto { display: flex; flex-direction: column; gap: 0.15rem; }
-.paciente-item-texto small, .vinculo-item-texto small { color: var(--muted); font-size: 0.76rem; }
-.paciente-item-acciones, .vinculo-item-acciones { display: flex; gap: 0.4rem; flex-shrink: 0; }
-.paciente-item-acciones .btn, .vinculo-item-acciones .btn { padding: 0.45rem 0.8rem; font-size: 0.8rem; }
-.paciente-item a { color: var(--brand); text-decoration: none; font-weight: 700; }
-.paciente-item a:hover { text-decoration: underline; }
+.indicacion-fecha { font-size: 0.76rem; color: var(--muted); }
+.indicacion ul { margin: 0.4rem 0; padding-left: 1.1rem; font-size: 0.87rem; }
+.indicacion ul li { margin-bottom: 0.15rem; }
+.indicacion-nota {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-left: 2px solid var(--border);
+  padding-left: 0.6rem;
+}
+.indicacion-cancelada { opacity: 0.6; }
+.indicacion-cancelada ul { text-decoration: line-through; }
 
-.lista-vacia { color: var(--muted); font-size: 0.85rem; }
+/* --- Gráficos ------------------------------------------------------------ */
 
-.top-actions { display: flex; gap: 0.6rem; align-items: center; }
+.grafico-titulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin: 0 0 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.grafico + .grafico-titulo { margin-top: 1.4rem; }
+
+/* --- Login --------------------------------------------------------------- */
+
+.login-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.login-marca {
+  background: linear-gradient(160deg, var(--brand-dark) 0%, #0c2b35 100%);
+  color: #fff;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+.login-marca h1 { font-size: 2rem; max-width: 22ch; }
+.login-marca p { color: rgba(255, 255, 255, 0.78); font-size: 0.95rem; max-width: 40ch; line-height: 1.6; }
+.login-marca .sidebar-brand { margin-bottom: 1.5rem; }
+.login-panel {
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.5rem;
+  background: var(--bg);
+}
+.login-caja { width: min(380px, 100%); }
+.login-caja h2 { font-size: 1.35rem; margin-bottom: 0.3rem; }
+.login-caja > p { color: var(--muted); font-size: 0.87rem; margin: 0 0 1.5rem; }
+.login-pie { margin-top: 1.25rem; font-size: 0.85rem; color: var(--muted); text-align: center; }
+.login-pie a { font-weight: 700; text-decoration: none; }
+.login-pie a:hover { text-decoration: underline; }
+
+/* --- Responsivo ---------------------------------------------------------- */
+
+/* En pantallas angostas el badge y los botones estrujaban el nombre del
+   paciente hasta dejarlo en una palabra por línea: pasan a una segunda fila. */
+@media (max-width: 560px) {
+  .lista-fila { flex-wrap: wrap; row-gap: 0.55rem; }
+  .lista-fila-texto { flex: 1 1 0; min-width: 9rem; }
+  .lista-fila > .badge, .lista-fila-acciones { margin-left: auto; }
+}
+
+@media (max-width: 900px) {
+  .app-shell { grid-template-columns: minmax(0, 1fr); }
+  .sidebar {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+  .sidebar-brand small { display: none; }
+  .sidebar-nav { flex-direction: row; gap: 0.25rem; }
+  .nav-item { padding: 0.45rem 0.65rem; font-size: 0.83rem; }
+  .nav-item span.nav-texto { display: none; }
+  .sidebar-pie { margin-top: 0; margin-left: auto; border-top: none; padding-top: 0; display: flex; align-items: center; gap: 0.5rem; }
+  .perfil-chip { padding: 0; }
+  .perfil-chip-texto { display: none; }
+  .contenido { padding: 1.25rem 1rem 3rem; }
+  .login-shell { grid-template-columns: minmax(0, 1fr); }
+  .login-marca { padding: 2rem 1.5rem; }
+  .login-marca h1 { font-size: 1.5rem; }
+  .login-marca p { display: none; }
+}

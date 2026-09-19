@@ -34,8 +34,11 @@ Para el portal del equipo tratante (`/tratante/`, ver más abajo) hace falta ade
 un proyecto de [Supabase](https://supabase.com/dashboard) (Postgres + Auth):
 
 1. Crear el proyecto en supabase.com/dashboard.
-2. Correr `supabase/schema.sql` en su SQL Editor (crea las 4 tablas y deja RLS
+2. Correr `supabase/schema.sql` en su SQL Editor (crea las 6 tablas y deja RLS
    encendido sin políticas permisivas — el acceso real lo controla `server.py`).
+   En un proyecto que ya existía, correr en cambio las migraciones sueltas de
+   `supabase/` (son idempotentes), y hacerlo **antes** de desplegar el
+   `server.py` que las usa.
 3. Copiar de **Project Settings → API**: `Project URL`, la key `service_role` y
    la key `anon`, y completar `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` y
    `SUPABASE_ANON_KEY` en `.env` (ver comentarios en `.env.example`).
@@ -111,7 +114,7 @@ mientras despierta.
 ## Equipo tratante (portal en `/tratante/`)
 
 Además de la app del paciente (`public/`), el repo incluye un portal web
-separado para el nefrólogo(a)/nutricionista, servido por el mismo `server.py`
+separado para el equipo tratante, servido por el mismo `server.py`
 en `/tratante/` (sin build ni framework, igual que `public/`).
 
 - El paciente activa "Plan Clínico" en su celular y recibe un **código de
@@ -121,9 +124,25 @@ en `/tratante/` (sin build ni framework, igual que `public/`).
 - El vínculo queda `pendiente` hasta que **el propio paciente lo acepta desde
   su celular** — es un paso de confirmación obligatorio (no solo de UX):
   sin él, el tratante nunca llega a ver datos clínicos del paciente.
-- Una vez aceptado, el tratante puede ajustar las metas de potasio/fósforo y
-  ver un gráfico del consumo diario del paciente (solo se sincroniza consumo
-  al servidor si existe al menos un vínculo activo).
+- Una vez aceptado, el tratante puede ajustar las seis metas diarias y ver un
+  gráfico del consumo diario del paciente (solo se sincroniza consumo al
+  servidor si existe al menos un vínculo activo).
+- El paciente puede subir una **foto** suya, marcando una casilla de
+  consentimiento, para que su tratante lo reconozca en una lista de códigos.
+  Vale la misma regla que el consumo: el backend solo la acepta si ya hay un
+  vínculo activo, y el paciente puede quitarla cuando quiera (se borra la fila).
+- Hay tres tipos de tratante: **nefrólogo(a)** y **nutriólogo(a)** son médicos;
+  **nutricionista** no lo es (en Chile es profesión de colaboración médica).
+  Los tres ven el consumo y ajustan las metas diarias; **solo los médicos
+  pueden indicar exámenes** — `TIPOS_MEDICOS` en `server.py` es la regla, y el
+  portal además esconde esa pestaña a quien no corresponde.
+- El médico tratante puede enviarle una **indicación de exámenes de control**, que el
+  paciente ve en su app y marca como hecha. **No es una orden médica**: no
+  identifica establecimiento ni lleva firma electrónica, y ningún laboratorio
+  la recibe como documento — el rótulo está a la vista en las dos puntas. El
+  catálogo de exámenes vive en `EXAMENES_CATALOGO` (`server.py`), con la guía
+  KDIGO 2024 citada en el portal; qué pedir lo decide el tratante, y siempre
+  puede escribirlo en el campo libre.
 
 Requiere el proyecto de Supabase de la sección "Configuración" de más arriba.
 Localmente, con `server.py` corriendo, el portal está en

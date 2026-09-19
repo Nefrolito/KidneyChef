@@ -24,7 +24,9 @@ create table pacientes (
 create table perfiles_tratante (
   id uuid primary key references auth.users (id) on delete cascade,
   nombre text not null,
-  tipo text not null check (tipo in ('nefrologo', 'nutricionista')),
+  -- 'nutriologo' es el MÉDICO nutriólogo, distinto del 'nutricionista'
+  -- (profesión de colaboración médica). Solo los médicos indican exámenes.
+  tipo text not null check (tipo in ('nefrologo', 'nutriologo', 'nutricionista')),
   created_at timestamptz not null default now()
 );
 
@@ -74,3 +76,43 @@ grant select, insert, update, delete on pacientes to service_role;
 grant select, insert, update, delete on perfiles_tratante to service_role;
 grant select, insert, update, delete on vinculos to service_role;
 grant select, insert, update, delete on consumos_diarios to service_role;
+
+
+-- --- Foto del paciente e indicaciones de exámenes (2026-09-19) -----------
+-- Para un proyecto que ya existía, lo mismo está en
+-- `migracion-2026-09-19-foto-indicaciones.sql` (con `if not exists`).
+
+-- En tabla aparte y no como columna de `pacientes` porque esa fila se lee
+-- entera (`select=*`) en cada request autenticado del paciente.
+create table fotos_paciente (
+  paciente_id uuid primary key references pacientes (id) on delete cascade,
+  imagen_base64 text not null,
+  mime text not null,
+  consentimiento_at timestamptz not null,
+  actualizado_at timestamptz not null default now()
+);
+
+-- Indicación de exámenes de control: un recado del tratante a su paciente,
+-- NO una orden médica (sin establecimiento ni firma electrónica).
+create table indicaciones_examenes (
+  id uuid primary key default gen_random_uuid(),
+  paciente_id uuid not null references pacientes (id) on delete cascade,
+  tratante_id uuid not null references auth.users (id) on delete cascade,
+  examenes jsonb not null default '[]'::jsonb,
+  otros text,
+  nota text,
+  fecha_sugerida date,
+  estado text not null default 'vigente' check (estado in ('vigente', 'cancelada')),
+  creada_at timestamptz not null default now(),
+  vista_at timestamptz,
+  hecha_at timestamptz
+);
+
+create index indicaciones_paciente_idx on indicaciones_examenes (paciente_id, creada_at desc);
+create index indicaciones_tratante_idx on indicaciones_examenes (tratante_id, creada_at desc);
+
+alter table fotos_paciente enable row level security;
+alter table indicaciones_examenes enable row level security;
+
+grant select, insert, update, delete on fotos_paciente to service_role;
+grant select, insert, update, delete on indicaciones_examenes to service_role;

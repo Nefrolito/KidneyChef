@@ -1541,12 +1541,52 @@ def handle_actualizar_vinculo_paciente(handler, id):
         })
         return
     actualizado = supabase_client.update_vinculo_estado(id, nuevo_estado)
+    if nuevo_estado in ("revocado", "rechazado"):
+        _borrar_foto_si_quedo_sin_vinculos(paciente["id"])
     handler._send_json(200, {"vinculo": actualizado})
+
+
+def _borrar_foto_si_quedo_sin_vinculos(paciente_id):
+    """Cerrado el último vínculo activo, la foto del paciente se borra sola.
+
+    No es solo higiene: la app del paciente esconde el bloque de la foto
+    cuando no hay vínculo activo, así que dejarla guardada lo dejaría sin
+    ninguna forma de retirarla. Y ya no puede verla nadie — el GET del
+    tratante exige vínculo activo — o sea que no le sirve a nadie."""
+    if supabase_client.find_vinculo_activo(paciente_id):
+        return
+    supabase_client.delete_foto_paciente(paciente_id)
 
 
 # --- Tratante: perfil y flujo de vínculo ----------------------------------
 
-TIPOS_TRATANTE_VALIDOS = {"nefrologo", "nutricionista"}
+TIPOS_TRATANTE_VALIDOS = {"nefrologo", "nutriologo", "nutricionista"}
+
+# Quiénes son MÉDICOS. El nutriólogo lo es (es una especialidad médica); el
+# nutricionista no — en Chile es una profesión de colaboración médica, y el
+# Código Sanitario reserva los actos diagnósticos al médico cirujano. Por eso
+# indicar exámenes queda solo para los de esta lista: no es una preferencia de
+# producto, es quién puede hacerlo. Decisión de Camilo, 2026-09-19.
+#
+# Lo que sí puede hacer un nutricionista es todo el resto del portal: ver el
+# consumo y ajustar las metas diarias, que es su terreno.
+TIPOS_MEDICOS = {"nefrologo", "nutriologo"}
+
+
+def _exige_medico(handler, user):
+    """True si el tratante autenticado es médico. Si no lo es, ya respondió
+    403 y el llamador tiene que cortar ahí.
+
+    El chequeo va SIEMPRE acá, no solo escondiendo la pestaña en el portal:
+    esconder un formulario no impide que alguien llame el endpoint a mano."""
+    perfil = supabase_client.get_perfil_tratante(user["id"])
+    if not perfil or perfil.get("tipo") not in TIPOS_MEDICOS:
+        handler._send_json(403, {
+            "error": "Solo un médico puede indicar exámenes. Como nutricionista puedes "
+                     "ajustar las metas diarias y ver el consumo del paciente."
+        })
+        return False
+    return True
 
 
 def handle_crear_perfil_tratante(handler):
@@ -1689,6 +1729,7 @@ def handle_actualizar_vinculo_tratante(handler, id):
         handler._send_json(409, {"error": "El tratante solo puede revocar un vínculo activo"})
         return
     actualizado = supabase_client.update_vinculo_estado(id, nuevo_estado)
+    _borrar_foto_si_quedo_sin_vinculos(vinculo["paciente_id"])
     handler._send_json(200, {"vinculo": actualizado})
 
 
@@ -1832,6 +1873,367 @@ def handle_get_consumo_paciente(handler, id):
     handler._send_json(200, {"consumos": consumos})
 
 
+# --- Foto del paciente ----------------------------------------------------
+# La sube el PACIENTE desde su app marcando una casilla de consentimiento, y
+# la ve el tratante con vínculo activo. Existe para que el profesional
+# reconozca a quién está mirando en una lista de códigos de 8 caracteres.
+#
+# Misma regla de privacidad que el consumo (ver handle_upsert_consumo): solo
+# se acepta si ya hay un vínculo activo. Una foto de la cara es un dato
+# personal sensible y no tiene por qué vivir en el servidor mientras no haya
+# una relación clínica real detrás. Borrarla borra la fila, no la marca como
+# borrada.
+FOTO_MIMES_VALIDOS = {"image/jpeg", "image/png", "image/webp"}
+# ~340.000 caracteres de base64 ≈ 255 KB de imagen: de sobra para la
+# miniatura de 512 px que manda la app, y un tope explícito de lo que puede
+# quedar guardado en la base.
+FOTO_MAX_BASE64 = int(os.environ.get("FOTO_MAX_BASE64", 340_000))
+
+FOTO_DATA_URL_RE = re.compile(r"^data:(image/[a-z+]+);base64,(.+)$", re.DOTALL)
+
+
+def _parsear_foto(data_url):
+    """Valida el data URL que manda la app. Devuelve (base64, mime, error):
+    con error distinto de None, los otros dos vienen vacíos."""
+    if not isinstance(data_url, str) or not data_url:
+        return None, None, "Falta la imagen"
+    match = FOTO_DATA_URL_RE.match(data_url.strip())
+    if not match:
+        return None, None, "La imagen debe venir como data URL base64"
+    mime, datos = match.group(1), match.group(2).strip()
+    if mime not in FOTO_MIMES_VALIDOS:
+        return None, None, "Formato de imagen no aceptado (usa JPEG, PNG o WebP)"
+    if len(datos) > FOTO_MAX_BASE64:
+        return None, None, "La imagen es demasiado grande"
+    try:
+        # validate=True para no aceptar basura que base64 ignoraría en
+        # silencio: si no decodifica, no se guarda.
+        base64.b64decode(datos, validate=True)
+    except (ValueError, TypeError):
+        # binascii.Error, que es lo que levanta b64decode, hereda de ValueError.
+        return None, None, "La imagen no es base64 válido"
+    return datos, mime, None
+
+
+def _foto_data_url(fila):
+    if not fila:
+        return None
+    return f"data:{fila['mime']};base64,{fila['imagen_base64']}"
+
+
+def handle_put_foto_paciente(handler):
+    """PUT /api/pacientes/me/foto — el paciente sube o reemplaza su foto.
+
+    `consentimiento: true` es obligatorio y se guarda con fecha: es el
+    permiso explícito para que su equipo tratante vea su cara. Sin vínculo
+    activo no se guarda nada (no hay a quién mostrársela)."""
+    paciente = require_device_secret(handler)
+    if not paciente:
+        handler._send_json(401, {"error": "Credenciales de dispositivo inválidas"})
+        return
+    if not supabase_client.find_vinculo_activo(paciente["id"]):
+        handler._send_json(403, {
+            "error": "No hay un vínculo activo con ningún tratante; la foto no se guarda."
+        })
+        return
+    body = _leer_body_json(handler)
+    if body is None:
+        return
+    if body.get("consentimiento") is not True:
+        handler._send_json(400, {
+            "error": "Falta el consentimiento explícito para compartir la foto"
+        })
+        return
+    datos, mime, error = _parsear_foto(body.get("imagen"))
+    if error:
+        handler._send_json(400, {"error": error})
+        return
+    fila = supabase_client.upsert_foto_paciente(paciente["id"], datos, mime)
+    handler._send_json(200, {
+        "foto": _foto_data_url(fila),
+        "actualizado_at": (fila or {}).get("actualizado_at"),
+    })
+
+
+def handle_get_foto_me(handler):
+    """GET /api/pacientes/me/foto — la foto propia, para que la app muestre
+    lo que el tratante está viendo."""
+    paciente = require_device_secret(handler)
+    if not paciente:
+        handler._send_json(401, {"error": "Credenciales de dispositivo inválidas"})
+        return
+    fila = supabase_client.get_foto_paciente(paciente["id"])
+    handler._send_json(200, {
+        "foto": _foto_data_url(fila),
+        "actualizado_at": (fila or {}).get("actualizado_at"),
+        "consentimiento_at": (fila or {}).get("consentimiento_at"),
+    })
+
+
+def handle_delete_foto_me(handler):
+    """DELETE /api/pacientes/me/foto — retirar la foto. El paciente puede
+    hacerlo cuando quiera, sin pedirle permiso a nadie."""
+    paciente = require_device_secret(handler)
+    if not paciente:
+        handler._send_json(401, {"error": "Credenciales de dispositivo inválidas"})
+        return
+    supabase_client.delete_foto_paciente(paciente["id"])
+    handler._send_json(200, {"ok": True})
+
+
+def handle_get_foto_paciente(handler, id):
+    """GET /api/pacientes/{id}/foto — solo con vínculo activo."""
+    user = require_tratante_auth(handler)
+    if not user:
+        handler._send_json(401, {"error": "Token inválido o expirado"})
+        return
+    if not supabase_client.find_vinculo_activo(id, user["id"]):
+        handler._send_json(403, {"error": "No tienes un vínculo activo con este paciente"})
+        return
+    fila = supabase_client.get_foto_paciente(id)
+    handler._send_json(200, {
+        "foto": _foto_data_url(fila),
+        "actualizado_at": (fila or {}).get("actualizado_at"),
+    })
+
+
+# --- Indicación de exámenes de control -------------------------------------
+# NO es una orden médica ni una receta: no identifica establecimiento, no
+# lleva firma electrónica y ningún laboratorio la va a aceptar como documento.
+# Es el recado que hoy el tratante manda por WhatsApp — "en el próximo control
+# tráeme potasio y fósforo" — puesto donde el paciente no lo pierde. Ese
+# encuadre tiene que quedar visible en las dos puntas (portal y app), no solo
+# en este comentario.
+#
+# El catálogo son NOMBRES de exámenes de seguimiento habitual en ERC, no
+# umbrales ni indicaciones: KidneyChef no decide qué pedir, solo ahorra
+# tipeo. Quien elige es el tratante, y siempre puede escribir en el campo
+# libre. La lista sigue los exámenes que KDIGO 2024 nombra para el
+# seguimiento de ERC; la cita se muestra en el portal.
+EXAMENES_FUENTE = {
+    "cita": (
+        "Kidney Disease: Improving Global Outcomes (KDIGO) CKD Work Group. "
+        "KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management "
+        "of Chronic Kidney Disease. Kidney Int. 2024;105(4S):S117-S314."
+    ),
+    "url": "https://kdigo.org/guidelines/ckd-evaluation-and-management/",
+}
+
+EXAMENES_CATALOGO = [
+    {"id": "creatinina_vfg", "etiqueta": "Creatinina sérica y VFG estimada"},
+    {"id": "rac_orina", "etiqueta": "Razón albúmina/creatinina en orina (RAC)"},
+    {"id": "potasio_serico", "etiqueta": "Potasio sérico"},
+    {"id": "sodio_serico", "etiqueta": "Sodio sérico"},
+    {"id": "fosforo_serico", "etiqueta": "Fósforo sérico"},
+    {"id": "calcio_serico", "etiqueta": "Calcio sérico"},
+    {"id": "pth", "etiqueta": "Hormona paratiroidea (PTH)"},
+    {"id": "vitamina_d", "etiqueta": "Vitamina D (25-OH)"},
+    {"id": "bicarbonato", "etiqueta": "Bicarbonato sérico"},
+    {"id": "urea_bun", "etiqueta": "Nitrógeno ureico (BUN)"},
+    {"id": "albumina_serica", "etiqueta": "Albúmina sérica"},
+    {"id": "hemograma", "etiqueta": "Hemograma (hemoglobina)"},
+    {"id": "ferritina_tsat", "etiqueta": "Ferritina y saturación de transferrina"},
+    {"id": "hba1c", "etiqueta": "Hemoglobina glicosilada (HbA1c)"},
+    {"id": "perfil_lipidico", "etiqueta": "Perfil lipídico"},
+    {"id": "kt_v", "etiqueta": "Kt/V (adecuación de diálisis)"},
+]
+
+EXAMENES_POR_ID = {e["id"]: e for e in EXAMENES_CATALOGO}
+
+INDICACION_NOTA_MAX = 500
+INDICACION_OTROS_MAX = 300
+FECHA_ISO_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def handle_get_catalogo_examenes(handler):
+    """GET /api/examenes/catalogo — el catálogo vive solo acá para no tener
+    tres copias (backend, portal, app). El portal lo pide para dibujar las
+    casillas; la app del paciente no lo necesita, porque cada indicación
+    viaja con las etiquetas ya resueltas."""
+    user = require_tratante_auth(handler)
+    if not user:
+        handler._send_json(401, {"error": "Token inválido o expirado"})
+        return
+    if not _exige_medico(handler, user):
+        return
+    handler._send_json(200, {"examenes": EXAMENES_CATALOGO, "fuente": EXAMENES_FUENTE})
+
+
+def _validar_indicacion(body):
+    """Devuelve (campos, error) para insert_indicacion."""
+    ids = body.get("examenes") or []
+    if not isinstance(ids, list):
+        return None, "El campo examenes debe ser una lista"
+    seleccionados = []
+    vistos = set()
+    for examen_id in ids:
+        if examen_id in vistos:
+            continue
+        if examen_id not in EXAMENES_POR_ID:
+            return None, f"Examen desconocido: {examen_id}"
+        vistos.add(examen_id)
+        # Se guarda una copia de la etiqueta, no solo el id: la indicación
+        # tiene que leerse igual dentro de un año aunque el catálogo cambie.
+        seleccionados.append(dict(EXAMENES_POR_ID[examen_id]))
+
+    otros = (body.get("otros") or "").strip()
+    if len(otros) > INDICACION_OTROS_MAX:
+        return None, f"El campo libre no puede pasar de {INDICACION_OTROS_MAX} caracteres"
+    if not seleccionados and not otros:
+        return None, "Marca al menos un examen o escribe cuál pedir"
+
+    nota = (body.get("nota") or "").strip()
+    if len(nota) > INDICACION_NOTA_MAX:
+        return None, f"La nota no puede pasar de {INDICACION_NOTA_MAX} caracteres"
+
+    fecha = (body.get("fecha_sugerida") or "").strip()
+    if fecha and not FECHA_ISO_RE.match(fecha):
+        return None, "La fecha sugerida debe ir como AAAA-MM-DD"
+
+    return {
+        "examenes": seleccionados,
+        "otros": otros or None,
+        "nota": nota or None,
+        "fecha_sugerida": fecha or None,
+    }, None
+
+
+def _indicacion_publica(fila, tratante=None):
+    """La forma en que se devuelve una indicación. `tratante` suma la
+    identidad profesional de quien la escribió — la app del paciente la
+    muestra, igual que ya hace con los vínculos."""
+    salida = {
+        "id": fila["id"],
+        "examenes": fila.get("examenes") or [],
+        "otros": fila.get("otros"),
+        "nota": fila.get("nota"),
+        "fecha_sugerida": fila.get("fecha_sugerida"),
+        "estado": fila.get("estado"),
+        "creada_at": fila.get("creada_at"),
+        "vista_at": fila.get("vista_at"),
+        "hecha_at": fila.get("hecha_at"),
+    }
+    if tratante is not None:
+        salida["tratante_nombre"] = tratante.get("nombre")
+        salida["tratante_tipo"] = tratante.get("tipo")
+    return salida
+
+
+def handle_crear_indicacion(handler, id):
+    """POST /api/pacientes/{id}/indicaciones — solo con vínculo activo y solo
+    si quien la manda es médico (ver TIPOS_MEDICOS)."""
+    user = require_tratante_auth(handler)
+    if not user:
+        handler._send_json(401, {"error": "Token inválido o expirado"})
+        return
+    if not _exige_medico(handler, user):
+        return
+    if not supabase_client.find_vinculo_activo(id, user["id"]):
+        handler._send_json(403, {"error": "No tienes un vínculo activo con este paciente"})
+        return
+    body = _leer_body_json(handler)
+    if body is None:
+        return
+    campos, error = _validar_indicacion(body)
+    if error:
+        handler._send_json(400, {"error": error})
+        return
+    fila = supabase_client.insert_indicacion(
+        id, user["id"], campos["examenes"], campos["otros"],
+        campos["nota"], campos["fecha_sugerida"],
+    )
+    handler._send_json(201, {"indicacion": _indicacion_publica(fila)})
+
+
+def handle_get_indicaciones_tratante(handler, id):
+    """GET /api/pacientes/{id}/indicaciones — las que escribió ESTE tratante.
+    No ve las del otro profesional del equipo, mismo criterio que el alias."""
+    user = require_tratante_auth(handler)
+    if not user:
+        handler._send_json(401, {"error": "Token inválido o expirado"})
+        return
+    if not supabase_client.find_vinculo_activo(id, user["id"]):
+        handler._send_json(403, {"error": "No tienes un vínculo activo con este paciente"})
+        return
+    filas = supabase_client.get_indicaciones_por_paciente(id, user["id"])
+    handler._send_json(200, {"indicaciones": [_indicacion_publica(f) for f in filas]})
+
+
+def handle_cancelar_indicacion(handler, id):
+    """PATCH /api/indicaciones/{id} — el tratante retira una indicación que ya
+    no corresponde. Solo el autor puede cancelarla, y solo a 'cancelada': no
+    se edita el contenido de una indicación ya enviada, se cancela y se
+    escribe otra, para que lo que el paciente leyó no cambie a sus espaldas."""
+    user = require_tratante_auth(handler)
+    if not user:
+        handler._send_json(401, {"error": "Token inválido o expirado"})
+        return
+    fila = supabase_client.get_indicacion_por_id(id)
+    if not fila or fila["tratante_id"] != user["id"]:
+        handler._send_json(404, {"error": "Indicación no encontrada"})
+        return
+    body = _leer_body_json(handler)
+    if body is None:
+        return
+    if body.get("estado") != "cancelada":
+        handler._send_json(400, {"error": "Una indicación enviada solo puede cancelarse"})
+        return
+    actualizada = supabase_client.update_indicacion(id, {"estado": "cancelada"})
+    handler._send_json(200, {"indicacion": _indicacion_publica(actualizada or fila)})
+
+
+def handle_get_indicaciones_paciente(handler):
+    """GET /api/pacientes/me/indicaciones — todas las que le escribieron, de
+    cualquiera de sus tratantes."""
+    paciente = require_device_secret(handler)
+    if not paciente:
+        handler._send_json(401, {"error": "Credenciales de dispositivo inválidas"})
+        return
+    filas = supabase_client.get_indicaciones_por_paciente(paciente["id"])
+    perfiles_cache = {}
+    salida = []
+    for fila in filas:
+        tratante_id = fila["tratante_id"]
+        if tratante_id not in perfiles_cache:
+            perfiles_cache[tratante_id] = supabase_client.get_perfil_tratante(tratante_id) or {}
+        salida.append(_indicacion_publica(fila, perfiles_cache[tratante_id]))
+    handler._send_json(200, {"indicaciones": salida})
+
+
+def handle_actualizar_indicacion_paciente(handler, id):
+    """PATCH /api/pacientes/me/indicaciones/{id} — el paciente marca que la
+    vio y que ya se hizo los exámenes. Es acuse de recibo, nada más: no
+    registra resultados (eso sería ficha clínica, deliberadamente fuera de
+    alcance por ahora). 'hecha: false' deshace la marca por si se equivocó."""
+    paciente = require_device_secret(handler)
+    if not paciente:
+        handler._send_json(401, {"error": "Credenciales de dispositivo inválidas"})
+        return
+    fila = supabase_client.get_indicacion_por_id(id)
+    if not fila or fila["paciente_id"] != paciente["id"]:
+        handler._send_json(404, {"error": "Indicación no encontrada"})
+        return
+    body = _leer_body_json(handler)
+    if body is None:
+        return
+    cambios = {}
+    if body.get("vista") is True and not fila.get("vista_at"):
+        cambios["vista_at"] = supabase_client._now_iso()
+    if "hecha" in body:
+        if body["hecha"] is True:
+            cambios["hecha_at"] = supabase_client._now_iso()
+        elif body["hecha"] is False:
+            cambios["hecha_at"] = None
+        else:
+            handler._send_json(400, {"error": "El campo hecha debe ser true o false"})
+            return
+    if not cambios:
+        handler._send_json(200, {"indicacion": _indicacion_publica(fila)})
+        return
+    actualizada = supabase_client.update_indicacion(id, cambios)
+    handler._send_json(200, {"indicacion": _indicacion_publica(actualizada or fila)})
+
+
 # Router mínimo: cada ruta es (método HTTP, regex del path, función que recibe
 # el Handler y los grupos nombrados del regex como kwargs). Las fases
 # siguientes (metas, consumo) solo agregan tuplas acá — no tocan
@@ -1856,6 +2258,19 @@ ROUTES = [
     ("PATCH", re.compile(r"^/api/pacientes/(?P<id>[^/]+)/metas$"), handle_patch_metas_paciente),
     ("PUT", re.compile(r"^/api/pacientes/me/consumo/(?P<fecha>[^/]+)$"), handle_upsert_consumo),
     ("GET", re.compile(r"^/api/pacientes/(?P<id>[^/]+)/consumo$"), handle_get_consumo_paciente),
+    # Foto del paciente. Las rutas "me" van ANTES que las de {id}: "me"
+    # también calza con [^/]+ y el router se queda con la primera que matchea.
+    ("PUT", re.compile(r"^/api/pacientes/me/foto$"), handle_put_foto_paciente),
+    ("GET", re.compile(r"^/api/pacientes/me/foto$"), handle_get_foto_me),
+    ("DELETE", re.compile(r"^/api/pacientes/me/foto$"), handle_delete_foto_me),
+    ("GET", re.compile(r"^/api/pacientes/(?P<id>[^/]+)/foto$"), handle_get_foto_paciente),
+    # Indicación de exámenes de control (no es orden médica, ver arriba).
+    ("GET", re.compile(r"^/api/examenes/catalogo$"), handle_get_catalogo_examenes),
+    ("GET", re.compile(r"^/api/pacientes/me/indicaciones$"), handle_get_indicaciones_paciente),
+    ("PATCH", re.compile(r"^/api/pacientes/me/indicaciones/(?P<id>[^/]+)$"), handle_actualizar_indicacion_paciente),
+    ("POST", re.compile(r"^/api/pacientes/(?P<id>[^/]+)/indicaciones$"), handle_crear_indicacion),
+    ("GET", re.compile(r"^/api/pacientes/(?P<id>[^/]+)/indicaciones$"), handle_get_indicaciones_tratante),
+    ("PATCH", re.compile(r"^/api/indicaciones/(?P<id>[^/]+)$"), handle_cancelar_indicacion),
 ]
 
 

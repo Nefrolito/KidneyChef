@@ -3,112 +3,165 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KidneyChef — Portal del tratante</title>
+<title>KidneyChef — Pacientes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-row">
-      <div>
-        <h1>KidneyChef</h1>
-        <p class="subtitulo" id="perfil-subtitulo">Portal del equipo tratante</p>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="contenido">
+      <div class="contenido-ancho">
+        <p class="error-msg" id="carga-error"></p>
+
+        <!-- Primera vez: la cuenta existe en Supabase Auth pero todavía no
+             tiene nombre ni especialidad. -->
+        <section class="panel" id="completar-perfil-panel" hidden>
+          <div class="panel-header">
+            <div>
+              <h2>Completa tu perfil</h2>
+              <p>Un solo paso, antes de vincular pacientes.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <form id="form-perfil">
+              <div class="grid-dos">
+                <div class="campo">
+                  <label for="perfil-nombre">Tu nombre</label>
+                  <input type="text" id="perfil-nombre" required placeholder="Ej: Dra. Ana Rojas">
+                  <small class="campo-ayuda">Es lo que verá el paciente cuando le llegue tu solicitud.</small>
+                </div>
+                <div class="campo">
+                  <label for="perfil-tipo">Tipo de profesional</label>
+                  <select id="perfil-tipo" required>
+                    <option value="">Selecciona</option>
+                    <option value="nefrologo">Nefrólogo(a) — médico</option>
+                    <option value="nutriologo">Nutriólogo(a) — médico</option>
+                    <option value="nutricionista">Nutricionista</option>
+                  </select>
+                  <small class="campo-ayuda">Indicar exámenes de control queda solo para
+                    los médicos. Las metas diarias y el consumo los ve y ajusta cualquiera
+                    de los tres.</small>
+                </div>
+              </div>
+              <div class="acciones-form">
+                <button type="submit" class="btn btn-primary">Guardar perfil</button>
+              </div>
+              <p class="error-msg" id="perfil-error"></p>
+            </form>
+          </div>
+        </section>
+
+        <div id="dashboard" hidden>
+          <header class="pagina-header">
+            <div>
+              <h1>Pacientes</h1>
+              <p class="subtitulo" id="resumen-pacientes"></p>
+            </div>
+            <button class="btn btn-primary" id="abrir-vincular"></button>
+          </header>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div><h2>Con vínculo activo</h2></div>
+            </div>
+            <div id="lista-activos"><div class="cargando"></div></div>
+          </section>
+
+          <section class="panel" id="solicitudes">
+            <div class="panel-header">
+              <div>
+                <h2>Solicitudes pendientes</h2>
+                <p>Esperando que el paciente las acepte desde su celular.</p>
+              </div>
+            </div>
+            <div id="lista-pendientes"></div>
+          </section>
+        </div>
       </div>
-      <div class="top-actions">
-        <button class="btn btn-ghost" id="cerrar-sesion-btn">Cerrar sesión</button>
-      </div>
+    </main>
+  </div>
+
+  <dialog id="dialog-vincular">
+    <div class="dialog-header">
+      <h2>Vincular un paciente</h2>
+      <button class="cerrar-dialog" id="cerrar-vincular" aria-label="Cerrar">&times;</button>
     </div>
-  </header>
-
-  <main>
-    <section class="card" id="completar-perfil-card" hidden>
-      <h2>Completa tu perfil</h2>
-      <p class="hint-msg">Un solo paso, antes de vincular pacientes.</p>
-      <form id="form-perfil">
-        <div class="campo">
-          <label for="perfil-nombre">Tu nombre</label>
-          <input type="text" id="perfil-nombre" required>
-        </div>
-        <div class="campo">
-          <label for="perfil-tipo">Tipo de profesional</label>
-          <select id="perfil-tipo" required>
-            <option value="">Selecciona</option>
-            <option value="nefrologo">Nefrólogo(a)</option>
-            <option value="nutricionista">Nutricionista</option>
-          </select>
-        </div>
-        <button type="submit" class="btn btn-primary btn-full">Guardar</button>
-        <p class="error-msg" id="perfil-error"></p>
-      </form>
-    </section>
-
-    <section class="card" id="dashboard-card" hidden>
-      <h2>Vincular un paciente nuevo</h2>
+    <div class="dialog-body">
       <form id="form-vincular">
         <div class="campo">
           <label for="vincular-codigo">Código de cliente</label>
-          <input type="text" id="vincular-codigo" required placeholder="Ej: LS9AHULR" style="text-transform:uppercase">
-          <small class="campo-ayuda">El código que te comparte tu paciente desde su celular.</small>
+          <input type="text" id="vincular-codigo" required placeholder="Ej: LS9AHULR"
+                 style="text-transform:uppercase" autocomplete="off" maxlength="8">
+          <small class="campo-ayuda">
+            El código que te comparte tu paciente desde su celular. En la consulta también
+            puedes escanear su código QR con la cámara del teléfono.
+          </small>
         </div>
         <div class="campo">
-          <label for="vincular-alias">Tu propia nota (solo la ves tú)</label>
-          <input type="text" id="vincular-alias" placeholder="Ej: Juan P. — control lunes">
+          <label for="vincular-alias">Tu propia nota</label>
+          <input type="text" id="vincular-alias" placeholder="Ej: Juan P. — control lunes" autocomplete="off">
+          <small class="campo-ayuda">Solo la ves tú. El paciente no comparte su nombre con la app.</small>
         </div>
-        <button type="submit" class="btn btn-primary" id="vincular-btn">Enviar solicitud</button>
+        <p class="aviso" id="aviso-vincular"></p>
+        <div class="acciones-form">
+          <button type="submit" class="btn btn-primary" id="vincular-btn">Enviar solicitud</button>
+          <button type="button" class="btn btn-ghost" id="cancelar-vincular">Cancelar</button>
+        </div>
         <p class="error-msg" id="vincular-error"></p>
-        <p class="hint-msg" id="vincular-hint"></p>
       </form>
-    </section>
-
-    <section class="card" id="pendientes-card" hidden>
-      <h2>Solicitudes pendientes</h2>
-      <p class="hint-msg">Esperando que el paciente las acepte desde su celular.</p>
-      <div id="lista-pendientes"></div>
-    </section>
-
-    <section class="card" id="activos-card" hidden>
-      <h2>Tus pacientes</h2>
-      <div id="lista-activos"></div>
-    </section>
-  </main>
+    </div>
+  </dialog>
 
   <script src="config.js"></script>
   <script src="auth.js"></script>
   <script src="api.js"></script>
+  <script src="shell.js"></script>
   <script>
     const els = {
-      perfilSubtitulo: document.getElementById("perfil-subtitulo"),
-      completarPerfilCard: document.getElementById("completar-perfil-card"),
+      cargaError: document.getElementById("carga-error"),
+      completarPerfilPanel: document.getElementById("completar-perfil-panel"),
       formPerfil: document.getElementById("form-perfil"),
       perfilNombre: document.getElementById("perfil-nombre"),
       perfilTipo: document.getElementById("perfil-tipo"),
       perfilError: document.getElementById("perfil-error"),
-      dashboardCard: document.getElementById("dashboard-card"),
+      dashboard: document.getElementById("dashboard"),
+      resumenPacientes: document.getElementById("resumen-pacientes"),
+      abrirVincular: document.getElementById("abrir-vincular"),
+      dialogVincular: document.getElementById("dialog-vincular"),
+      cerrarVincular: document.getElementById("cerrar-vincular"),
+      cancelarVincular: document.getElementById("cancelar-vincular"),
+      avisoVincular: document.getElementById("aviso-vincular"),
       formVincular: document.getElementById("form-vincular"),
       vincularCodigo: document.getElementById("vincular-codigo"),
       vincularAlias: document.getElementById("vincular-alias"),
       vincularBtn: document.getElementById("vincular-btn"),
       vincularError: document.getElementById("vincular-error"),
-      vincularHint: document.getElementById("vincular-hint"),
-      pendientesCard: document.getElementById("pendientes-card"),
       listaPendientes: document.getElementById("lista-pendientes"),
-      activosCard: document.getElementById("activos-card"),
       listaActivos: document.getElementById("lista-activos"),
-      cerrarSesionBtn: document.getElementById("cerrar-sesion-btn"),
     };
 
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, (c) => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-      }[c]));
-    }
+    els.abrirVincular.innerHTML = `${ICONOS.mas}Vincular paciente`;
+    els.avisoVincular.innerHTML = `${ICONOS.aviso}<span>El paciente recibe la solicitud en su celular y decide si la acepta.
+      Hasta entonces no ves ningún dato suyo.</span>`;
 
     // Si el tratante llegó escaneando el QR del paciente, el código viaja en
-    // la URL: se rellena solo y el foco queda en su nota.
+    // la URL: el diálogo se abre solo con el código puesto.
     const codigoEscaneado = new URLSearchParams(location.search).get("codigo");
-    if (codigoEscaneado && els.vincularCodigo) {
-      els.vincularCodigo.value = codigoEscaneado.trim().toUpperCase();
-      if (els.vincularAlias) els.vincularAlias.focus();
+
+    function abrirDialogoVincular(codigo = "") {
+      els.vincularError.textContent = "";
+      if (codigo) els.vincularCodigo.value = codigo.trim().toUpperCase().slice(0, 8);
+      els.dialogVincular.showModal();
+      (codigo ? els.vincularAlias : els.vincularCodigo).focus();
     }
+
+    els.abrirVincular.addEventListener("click", () => abrirDialogoVincular());
+    els.cerrarVincular.addEventListener("click", () => els.dialogVincular.close());
+    els.cancelarVincular.addEventListener("click", () => els.dialogVincular.close());
 
     async function init() {
       if (!tokenActual()) {
@@ -116,17 +169,22 @@
         location.href = "login.html" + location.search;
         return;
       }
+      let perfil = null;
       try {
-        const perfil = await getPerfilPropio();
-        els.perfilSubtitulo.textContent = `${perfil.nombre} — ${perfil.tipo === "nefrologo" ? "Nefrólogo(a)" : "Nutricionista"}`;
-        els.dashboardCard.hidden = false;
-        els.pendientesCard.hidden = false;
-        els.activosCard.hidden = false;
-        await refrescarVinculos();
+        perfil = await getPerfilPropio();
       } catch (err) {
-        // 404 = falta completar perfil; cualquier otro error también cae acá
-        // porque sin perfil no tiene sentido mostrar el resto del dashboard.
-        els.completarPerfilCard.hidden = false;
+        // 404 = falta completar el perfil. Cualquier otro error también cae
+        // acá: sin perfil no tiene sentido mostrar el resto del dashboard.
+        renderSidebar({ activo: "pacientes" });
+        els.completarPerfilPanel.hidden = false;
+        return;
+      }
+      renderSidebar({ activo: "pacientes", perfil });
+      els.dashboard.hidden = false;
+      await refrescarVinculos();
+      if (codigoEscaneado) abrirDialogoVincular(codigoEscaneado);
+      if (location.hash === "#solicitudes") {
+        document.getElementById("solicitudes").scrollIntoView({ behavior: "smooth" });
       }
     }
 
@@ -135,7 +193,7 @@
       els.perfilError.textContent = "";
       try {
         await guardarPerfilPropio(els.perfilNombre.value.trim(), els.perfilTipo.value);
-        els.completarPerfilCard.hidden = true;
+        els.completarPerfilPanel.hidden = true;
         await init();
       } catch (err) {
         els.perfilError.textContent = err.message;
@@ -145,14 +203,14 @@
     els.formVincular.addEventListener("submit", async (e) => {
       e.preventDefault();
       els.vincularError.textContent = "";
-      els.vincularHint.textContent = "";
       els.vincularBtn.disabled = true;
       try {
         await crearVinculo(els.vincularCodigo.value.trim().toUpperCase(), els.vincularAlias.value.trim());
         els.vincularCodigo.value = "";
         els.vincularAlias.value = "";
-        els.vincularHint.textContent = "Solicitud enviada. Queda pendiente hasta que el paciente la acepte.";
+        els.dialogVincular.close();
         await refrescarVinculos();
+        document.getElementById("solicitudes").scrollIntoView({ behavior: "smooth" });
       } catch (err) {
         els.vincularError.textContent = err.message;
       } finally {
@@ -160,57 +218,95 @@
       }
     });
 
+    function filaPendiente(v) {
+      const nombre = v.alias || v.codigo_cliente;
+      return `
+        <div class="lista-fila">
+          ${avatarHtml(null, nombre)}
+          <div class="lista-fila-texto">
+            <strong>${escapeHtml(nombre)}</strong>
+            <small>Código <span class="codigo">${escapeHtml(v.codigo_cliente)}</span> · enviada el ${escapeHtml(formatFecha(v.creado_at))}</small>
+          </div>
+          <span class="badge badge-pendiente">Pendiente</span>
+          <div class="lista-fila-acciones">
+            <button class="btn btn-ghost btn-sm" data-cancelar="${escapeHtml(v.id)}">Cancelar</button>
+          </div>
+        </div>`;
+    }
+
+    function filaActivo(v) {
+      const nombre = v.alias || v.codigo_cliente;
+      return `
+        <div class="lista-fila" data-paciente="${escapeHtml(v.paciente_id)}">
+          <span data-avatar="${escapeHtml(v.paciente_id)}">${avatarHtml(null, nombre)}</span>
+          <div class="lista-fila-texto">
+            <strong>${escapeHtml(nombre)}</strong>
+            <small>Código <span class="codigo">${escapeHtml(v.codigo_cliente)}</span> · vinculado desde el ${escapeHtml(formatFecha(v.confirmado_at || v.creado_at))}</small>
+          </div>
+          <div class="lista-fila-acciones">
+            <a class="btn btn-ghost btn-sm" href="paciente.html?id=${encodeURIComponent(v.paciente_id)}">Abrir ficha</a>
+          </div>
+        </div>`;
+    }
+
     async function refrescarVinculos() {
-      const data = await listarVinculos();
-      const vinculos = data.vinculos || [];
+      let vinculos = [];
+      try {
+        const data = await listarVinculos();
+        vinculos = data.vinculos || [];
+      } catch (err) {
+        els.cargaError.textContent = err.message;
+        els.listaActivos.innerHTML = "";
+        return;
+      }
 
       const pendientes = vinculos.filter((v) => v.estado === "pendiente");
       els.listaPendientes.innerHTML = pendientes.length
-        ? pendientes.map((v) => `
-          <div class="vinculo-item">
-            <div class="vinculo-item-texto">
-              <strong>${escapeHtml(v.alias || v.codigo_cliente)}</strong>
-              <small>Código ${escapeHtml(v.codigo_cliente)} — esperando aceptación</small>
-            </div>
-            <div class="vinculo-item-acciones">
-              <button class="btn btn-ghost" data-cancelar="${v.id}">Cancelar</button>
-            </div>
-          </div>`).join("")
-        : `<p class="lista-vacia">No tienes solicitudes pendientes.</p>`;
+        ? `<div class="lista">${pendientes.map(filaPendiente).join("")}</div>`
+        : estadoVacio("Sin solicitudes pendientes", "Las que envíes aparecerán acá hasta que el paciente responda.");
 
       const activos = vinculos.filter((v) => v.estado === "activo");
       els.listaActivos.innerHTML = activos.length
-        ? activos.map((v) => `
-          <div class="paciente-item">
-            <div class="paciente-item-texto">
-              <a href="paciente.html?id=${encodeURIComponent(v.paciente_id)}">${escapeHtml(v.alias || v.codigo_cliente)}</a>
-              <small>Código ${escapeHtml(v.codigo_cliente)}</small>
-            </div>
-            <div class="paciente-item-acciones">
-              <button class="btn btn-ghost" data-revocar="${v.id}">Revocar</button>
-            </div>
-          </div>`).join("")
-        : `<p class="lista-vacia">Todavía no tienes pacientes vinculados.</p>`;
+        ? `<div class="lista">${activos.map(filaActivo).join("")}</div>`
+        : estadoVacio("Todavía no tienes pacientes", "Vincula uno con su código de cliente para empezar a seguirlo.");
+
+      els.resumenPacientes.textContent = activos.length === 1
+        ? "1 paciente con vínculo activo"
+        : `${activos.length} pacientes con vínculo activo`;
+      actualizarBadgePendientes(pendientes.length);
 
       els.listaPendientes.querySelectorAll("[data-cancelar]").forEach((btn) => {
         btn.addEventListener("click", async () => {
-          await cancelarVinculo(btn.dataset.cancelar);
-          refrescarVinculos();
+          btn.disabled = true;
+          try {
+            await cancelarVinculo(btn.dataset.cancelar);
+            await refrescarVinculos();
+          } catch (err) {
+            els.cargaError.textContent = err.message;
+            btn.disabled = false;
+          }
         });
       });
-      els.listaActivos.querySelectorAll("[data-revocar]").forEach((btn) => {
-        btn.addEventListener("click", async () => {
-          if (!confirm("¿Revocar el vínculo con este paciente?")) return;
-          await revocarVinculo(btn.dataset.revocar);
-          refrescarVinculos();
-        });
-      });
+
+      cargarFotos(activos);
     }
 
-    els.cerrarSesionBtn.addEventListener("click", () => {
-      cerrarSesion();
-      location.href = "login.html";
-    });
+    // Las fotos se piden después de dibujar la lista, una por paciente: son
+    // pocos pacientes por tratante y así la lista aparece de inmediato en vez
+    // de esperar a la última imagen. Si alguna falla, queda el avatar con
+    // iniciales que ya está dibujado.
+    function cargarFotos(activos) {
+      activos.forEach(async (v) => {
+        try {
+          const { foto } = await getFotoPaciente(v.paciente_id);
+          if (!foto) return;
+          const hueco = els.listaActivos.querySelector(`[data-avatar="${v.paciente_id}"]`);
+          if (hueco) hueco.innerHTML = avatarHtml(foto, v.alias || v.codigo_cliente);
+        } catch {
+          // sin foto o sin red: se queda el avatar de iniciales
+        }
+      });
+    }
 
     init();
   </script>

@@ -76,3 +76,33 @@ function guardarMetasPaciente(pacienteId, metas) {
 function getConsumoPaciente(pacienteId, desde, hasta) {
   return apiTratante(`/api/pacientes/${pacienteId}/consumo?desde=${desde}&hasta=${hasta}`);
 }
+
+function getFotoPaciente(pacienteId) {
+  return apiTratante(`/api/pacientes/${pacienteId}/foto`);
+}
+
+// El catálogo de exámenes vive en server.py (EXAMENES_CATALOGO) y se pide
+// acá en vez de duplicarlo en el portal: una sola lista que mantener.
+function getCatalogoExamenes() {
+  return apiTratante("/api/examenes/catalogo");
+}
+
+function listarIndicaciones(pacienteId) {
+  return apiTratante(`/api/pacientes/${pacienteId}/indicaciones`);
+}
+
+function crearIndicacion(pacienteId, { examenes, otros, nota, fecha_sugerida }) {
+  return apiTratante(`/api/pacientes/${pacienteId}/indicaciones`, {
+    method: "POST",
+    body: JSON.stringify({ examenes, otros, nota, fecha_sugerida }),
+  });
+}
+
+// Una indicación enviada no se edita, solo se cancela: lo que el paciente
+// ya leyó no puede cambiar a sus espaldas.
+function cancelarIndicacion(indicacionId) {
+  return apiTratante(`/api/indicaciones/${indicacionId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ estado: "cancelada" }),
+  });
+}

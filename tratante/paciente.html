@@ -3,95 +3,202 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KidneyChef — Paciente</title>
+<title>KidneyChef — Ficha del paciente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-row">
-      <div>
-        <h1 id="paciente-titulo">Paciente</h1>
-        <p class="subtitulo" id="paciente-codigo"></p>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="contenido">
+      <div class="contenido-ancho">
+        <p class="error-msg" id="carga-error"></p>
+
+        <div id="ficha" hidden>
+          <a class="volver" href="index.html" id="volver"></a>
+
+          <header class="pagina-header">
+            <div class="paciente-portada">
+              <span id="paciente-avatar"></span>
+              <div class="paciente-portada-texto">
+                <h1 id="paciente-titulo">Paciente</h1>
+                <p class="subtitulo" id="paciente-codigo"></p>
+              </div>
+            </div>
+          </header>
+
+          <div class="tabs" role="tablist">
+            <button class="tab" role="tab" data-panel="panel-metas" aria-selected="true">Metas diarias</button>
+            <button class="tab" role="tab" data-panel="panel-consumo" aria-selected="false">Consumo</button>
+            <button class="tab" role="tab" data-panel="panel-examenes" aria-selected="false" id="tab-examenes" hidden>Exámenes de control</button>
+            <button class="tab" role="tab" data-panel="panel-vinculo" aria-selected="false">Vínculo</button>
+          </div>
+
+          <!-- Metas ------------------------------------------------------ -->
+          <div id="panel-metas" role="tabpanel">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Metas diarias</h2>
+                  <p id="metas-actualizado"></p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <p class="aviso" id="aviso-metas"></p>
+                <form id="form-metas">
+                  <div class="grid-dos" id="grid-metas">
+                    <div class="campo">
+                      <label for="meta-sodio">Sodio (mg/día)</label>
+                      <input type="number" id="meta-sodio" min="500" max="4000" step="100" placeholder="Sin fijar">
+                      <small class="campo-ayuda">Entre 500 y 4000, en múltiplos de 100</small>
+                    </div>
+                    <div class="campo">
+                      <label for="meta-potasio">Potasio (mg/día)</label>
+                      <input type="number" id="meta-potasio" min="800" max="4000" step="100" placeholder="Sin fijar">
+                      <small class="campo-ayuda">Entre 800 y 4000, en múltiplos de 100</small>
+                    </div>
+                    <div class="campo">
+                      <label for="meta-fosforo">Fósforo (mg/día)</label>
+                      <input type="number" id="meta-fosforo" min="400" max="2000" step="100" placeholder="Sin fijar">
+                      <small class="campo-ayuda">Entre 400 y 2000, en múltiplos de 100</small>
+                    </div>
+                    <div class="campo">
+                      <label for="meta-carbohidratos">Carbohidratos (g/día)</label>
+                      <input type="number" id="meta-carbohidratos" min="50" max="400" step="5" placeholder="Sin fijar">
+                      <small class="campo-ayuda">Entre 50 y 400, en múltiplos de 5</small>
+                    </div>
+                    <div class="campo">
+                      <label for="meta-calorias">Calorías (kcal/día)</label>
+                      <input type="number" id="meta-calorias" min="800" max="4000" step="50" placeholder="Sin fijar">
+                      <small class="campo-ayuda">Entre 800 y 4000, en múltiplos de 50</small>
+                    </div>
+                    <div class="campo">
+                      <label for="meta-liquidos">Líquidos (ml/día)</label>
+                      <input type="number" id="meta-liquidos" min="300" max="3000" step="100" placeholder="Sin fijar">
+                      <small class="campo-ayuda">Entre 300 y 3000, en múltiplos de 100</small>
+                    </div>
+                  </div>
+                  <div class="acciones-form">
+                    <button type="submit" class="btn btn-primary" id="metas-btn">Guardar metas</button>
+                    <span class="hint-msg" id="metas-hint" style="margin:0"></span>
+                  </div>
+                  <p class="error-msg" id="metas-error"></p>
+                </form>
+              </div>
+            </section>
+          </div>
+
+          <!-- Consumo ---------------------------------------------------- -->
+          <div id="panel-consumo" role="tabpanel" hidden>
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Consumo registrado</h2>
+                  <p>Últimos 30 días, según lo que el paciente registró en su app.</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <p class="hint-msg" id="consumo-hint"></p>
+                <p class="grafico-titulo">Potasio</p>
+                <div class="grafico" id="chart-potasio"></div>
+                <p class="grafico-titulo">Fósforo</p>
+                <div class="grafico" id="chart-fosforo"></div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Exámenes de control ---------------------------------------- -->
+          <div id="panel-examenes" role="tabpanel" hidden>
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Indicar exámenes de control</h2>
+                  <p>El paciente los ve en su app como una indicación tuya.</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <p class="aviso aviso-legal" id="aviso-examenes"></p>
+                <form id="form-examenes">
+                  <div class="campo">
+                    <span class="campo-titulo">Exámenes</span>
+                    <div class="check-grid" id="catalogo-examenes"></div>
+                    <small class="campo-ayuda" id="fuente-examenes"></small>
+                  </div>
+                  <div class="campo">
+                    <label for="examenes-otros">Otros exámenes</label>
+                    <input type="text" id="examenes-otros" maxlength="300"
+                           placeholder="Lo que no esté en la lista de arriba">
+                  </div>
+                  <div class="grid-dos">
+                    <div class="campo">
+                      <label for="examenes-fecha">Para antes de (opcional)</label>
+                      <input type="date" id="examenes-fecha">
+                    </div>
+                  </div>
+                  <div class="campo">
+                    <label for="examenes-nota">Nota para el paciente (opcional)</label>
+                    <textarea id="examenes-nota" maxlength="500"
+                              placeholder="Ej: Tráelos al control del 20 de octubre. En ayunas."></textarea>
+                  </div>
+                  <div class="acciones-form">
+                    <button type="submit" class="btn btn-primary" id="examenes-btn">Enviar indicación</button>
+                    <span class="hint-msg" id="examenes-hint" style="margin:0"></span>
+                  </div>
+                  <p class="error-msg" id="examenes-error"></p>
+                </form>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Indicaciones que le enviaste</h2>
+                  <p>Solo las tuyas, no las de otros profesionales del equipo.</p>
+                </div>
+              </div>
+              <div class="panel-body" id="lista-indicaciones"></div>
+            </section>
+          </div>
+
+          <!-- Vínculo ---------------------------------------------------- -->
+          <div id="panel-vinculo" role="tabpanel" hidden>
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Vínculo con este paciente</h2>
+                  <p id="vinculo-desde"></p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <p class="aviso" id="aviso-vinculo"></p>
+                <div class="acciones-form">
+                  <button class="btn btn-peligro" id="revocar-btn">Revocar vínculo</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
-      <div class="top-actions">
-        <a class="btn btn-ghost" href="index.html">Volver</a>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <p class="error-msg" id="carga-error"></p>
-
-    <section class="card" id="metas-card" hidden>
-      <h2>Metas diarias</h2>
-      <p class="hint-msg" id="metas-actualizado"></p>
-      <form id="form-metas">
-        <p class="hint-msg">
-          Lo que fijes acá reemplaza los valores de referencia que usa la app del paciente.
-          Deja un campo vacío para no fijar esa meta.
-        </p>
-        <div class="campo">
-          <label for="meta-sodio">Sodio (mg/día)</label>
-          <input type="number" id="meta-sodio" min="500" max="4000" step="100" placeholder="Sin fijar">
-          <small class="hint-msg">Entre 500 y 4000 mg/día, en múltiplos de 100</small>
-        </div>
-        <div class="campo">
-          <label for="meta-potasio">Potasio (mg/día)</label>
-          <input type="number" id="meta-potasio" min="800" max="4000" step="100" placeholder="Sin fijar">
-          <small class="hint-msg">Entre 800 y 4000 mg/día, en múltiplos de 100</small>
-        </div>
-        <div class="campo">
-          <label for="meta-fosforo">Fósforo (mg/día)</label>
-          <input type="number" id="meta-fosforo" min="400" max="2000" step="100" placeholder="Sin fijar">
-          <small class="hint-msg">Entre 400 y 2000 mg/día, en múltiplos de 100</small>
-        </div>
-        <div class="campo">
-          <label for="meta-carbohidratos">Carbohidratos (g/día)</label>
-          <input type="number" id="meta-carbohidratos" min="50" max="400" step="5" placeholder="Sin fijar">
-          <small class="hint-msg">Entre 50 y 400 g/día, en múltiplos de 5</small>
-        </div>
-        <div class="campo">
-          <label for="meta-calorias">Calorías (kcal/día)</label>
-          <input type="number" id="meta-calorias" min="800" max="4000" step="50" placeholder="Sin fijar">
-          <small class="hint-msg">Entre 800 y 4000 kcal/día, en múltiplos de 50</small>
-        </div>
-        <div class="campo">
-          <label for="meta-liquidos">Líquidos (ml/día)</label>
-          <input type="number" id="meta-liquidos" min="300" max="3000" step="100" placeholder="Sin fijar">
-          <small class="hint-msg">Entre 300 y 3000 ml/día, en múltiplos de 100</small>
-        </div>
-        <button type="submit" class="btn btn-primary" id="metas-btn">Guardar metas</button>
-        <p class="error-msg" id="metas-error"></p>
-        <p class="hint-msg" id="metas-hint"></p>
-      </form>
-    </section>
-
-    <section class="card" id="consumo-card" hidden>
-      <h2>Consumo — últimos 30 días</h2>
-      <p class="hint-msg" id="consumo-hint"></p>
-      <h3 style="font-size:0.9rem;margin:0.8rem 0 0.4rem;">Potasio</h3>
-      <div id="chart-potasio"></div>
-      <h3 style="font-size:0.9rem;margin:1.1rem 0 0.4rem;">Fósforo</h3>
-      <div id="chart-fosforo"></div>
-    </section>
-
-    <section class="card" id="vinculo-card" hidden>
-      <h2>Vínculo</h2>
-      <p class="hint-msg">Termina el seguimiento de este paciente de tu lado.</p>
-      <button class="btn btn-ghost" id="revocar-btn">Revocar vínculo</button>
-    </section>
-  </main>
+    </main>
+  </div>
 
   <script src="config.js"></script>
   <script src="auth.js"></script>
   <script src="api.js"></script>
+  <script src="shell.js"></script>
   <script src="chart.js"></script>
   <script>
     const els = {
+      cargaError: document.getElementById("carga-error"),
+      ficha: document.getElementById("ficha"),
+      volver: document.getElementById("volver"),
+      pacienteAvatar: document.getElementById("paciente-avatar"),
       pacienteTitulo: document.getElementById("paciente-titulo"),
       pacienteCodigo: document.getElementById("paciente-codigo"),
-      cargaError: document.getElementById("carga-error"),
-      metasCard: document.getElementById("metas-card"),
+      avisoMetas: document.getElementById("aviso-metas"),
       metasActualizado: document.getElementById("metas-actualizado"),
       formMetas: document.getElementById("form-metas"),
       metaSodio: document.getElementById("meta-sodio"),
@@ -103,13 +210,36 @@
       metasBtn: document.getElementById("metas-btn"),
       metasError: document.getElementById("metas-error"),
       metasHint: document.getElementById("metas-hint"),
-      vinculoCard: document.getElementById("vinculo-card"),
-      revocarBtn: document.getElementById("revocar-btn"),
-      consumoCard: document.getElementById("consumo-card"),
       consumoHint: document.getElementById("consumo-hint"),
       chartPotasio: document.getElementById("chart-potasio"),
       chartFosforo: document.getElementById("chart-fosforo"),
+      avisoExamenes: document.getElementById("aviso-examenes"),
+      catalogoExamenes: document.getElementById("catalogo-examenes"),
+      fuenteExamenes: document.getElementById("fuente-examenes"),
+      formExamenes: document.getElementById("form-examenes"),
+      examenesOtros: document.getElementById("examenes-otros"),
+      examenesFecha: document.getElementById("examenes-fecha"),
+      examenesNota: document.getElementById("examenes-nota"),
+      examenesBtn: document.getElementById("examenes-btn"),
+      examenesError: document.getElementById("examenes-error"),
+      examenesHint: document.getElementById("examenes-hint"),
+      listaIndicaciones: document.getElementById("lista-indicaciones"),
+      vinculoDesde: document.getElementById("vinculo-desde"),
+      avisoVinculo: document.getElementById("aviso-vinculo"),
+      revocarBtn: document.getElementById("revocar-btn"),
     };
+
+    els.volver.innerHTML = `${ICONOS.atras} Pacientes`;
+    els.avisoMetas.innerHTML = `${ICONOS.aviso}<span>Lo que fijes acá reemplaza los valores de referencia
+      que usa la app del paciente. Deja un campo vacío para no fijar esa meta.</span>`;
+    els.avisoVinculo.innerHTML = `${ICONOS.aviso}<span>Al revocar dejas de ver los datos de este paciente y
+      de poder ajustarle las metas. Él también puede revocarlo desde su celular cuando quiera.</span>`;
+    // El encuadre legal va visible para el tratante, no solo en un comentario
+    // del código: lo que manda no es una orden de laboratorio.
+    els.avisoExamenes.innerHTML = `${ICONOS.aviso}<span><strong>Esto no es una orden médica.</strong>
+      Es una indicación que el paciente lee en su app, sin firma electrónica ni datos del
+      establecimiento: ningún laboratorio la va a recibir como documento. La orden formal
+      sigue emitiéndose como siempre.</span>`;
 
     // Nombre de la meta en la API -> input del formulario. Agregar una meta
     // nueva es sumar una fila acá y su campo en el HTML de arriba.
@@ -127,11 +257,18 @@
 
     const pacienteId = new URLSearchParams(location.search).get("id");
     let vinculoActual = null;
+    let puedeIndicarExamenes = false;
 
-    function formatFecha(iso) {
-      if (!iso) return "";
-      return new Date(iso).toLocaleString("es-CL", { dateStyle: "medium", timeStyle: "short" });
-    }
+    // --- Pestañas ---------------------------------------------------------
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((t) => {
+          const activo = t === tab;
+          t.setAttribute("aria-selected", String(activo));
+          document.getElementById(t.dataset.panel).hidden = !activo;
+        });
+      });
+    });
 
     async function init() {
       if (!tokenActual()) {
@@ -142,32 +279,65 @@
         location.href = "index.html";
         return;
       }
+      let perfil = null;
+      try {
+        perfil = await getPerfilPropio();
+      } catch {
+        // Sin perfil no se puede operar; index.html lo pide.
+        location.href = "index.html";
+        return;
+      }
+      renderSidebar({ perfil });
+      // Solo los médicos indican exámenes (ver TIPOS_MEDICOS en server.py).
+      // Esconder la pestaña es cortesía, no seguridad: el backend rechaza el
+      // POST igual venga de donde venga.
+      puedeIndicarExamenes = esMedico(perfil);
+      document.getElementById("tab-examenes").hidden = !puedeIndicarExamenes;
+
       try {
         const data = await listarVinculos();
-        vinculoActual = (data.vinculos || []).find(
-          (v) => v.paciente_id === pacienteId && v.estado === "activo"
-        );
+        const vinculos = data.vinculos || [];
+        actualizarBadgePendientes(vinculos.filter((v) => v.estado === "pendiente").length);
+        vinculoActual = vinculos.find((v) => v.paciente_id === pacienteId && v.estado === "activo");
         if (!vinculoActual) {
           els.cargaError.textContent = "No tienes un vínculo activo con este paciente.";
           return;
         }
-        els.pacienteTitulo.textContent = vinculoActual.alias || vinculoActual.codigo_cliente;
-        els.pacienteCodigo.textContent = `Código ${vinculoActual.codigo_cliente}`;
+        const nombre = vinculoActual.alias || vinculoActual.codigo_cliente;
+        els.ficha.hidden = false;
+        els.pacienteTitulo.textContent = nombre;
+        els.pacienteCodigo.innerHTML = `Código <span class="codigo">${escapeHtml(vinculoActual.codigo_cliente)}</span>`;
+        els.pacienteAvatar.innerHTML = avatarHtml(null, nombre, "avatar-lg");
+        els.vinculoDesde.textContent = `Activo desde el ${formatFecha(vinculoActual.confirmado_at || vinculoActual.creado_at)}.`;
+
+        cargarFoto(nombre);
 
         const metas = await getMetasPaciente(pacienteId);
-        for (const [nombre, cfg] of Object.entries(CAMPOS_META)) {
-          cfg.campo().value = metas[nombre] ?? "";
+        for (const [clave, cfg] of Object.entries(CAMPOS_META)) {
+          cfg.campo().value = metas[clave] ?? "";
         }
         els.metasActualizado.textContent = metas.actualizado_at
-          ? `Último ajuste: ${formatFecha(metas.actualizado_at)}`
+          ? `Último ajuste: ${formatFechaHora(metas.actualizado_at)}`
           : "Todavía no se ha fijado ninguna meta.";
 
-        els.metasCard.hidden = false;
-        els.vinculoCard.hidden = false;
-
         await cargarConsumo(metas.potasio_mg, metas.fosforo_mg);
+        if (puedeIndicarExamenes) {
+          await cargarCatalogoExamenes();
+          await refrescarIndicaciones();
+        }
       } catch (err) {
         els.cargaError.textContent = err.message;
+      }
+    }
+
+    // La foto la sube el paciente desde su app, con consentimiento explícito.
+    // Si no hay, queda el avatar con iniciales del alias.
+    async function cargarFoto(nombre) {
+      try {
+        const { foto } = await getFotoPaciente(pacienteId);
+        if (foto) els.pacienteAvatar.innerHTML = avatarHtml(foto, nombre, "avatar-lg");
+      } catch {
+        // sin foto o sin red
       }
     }
 
@@ -182,7 +352,6 @@
       try {
         const data = await getConsumoPaciente(pacienteId, fechaISO(hace30), fechaISO(hoy));
         const consumos = data.consumos || [];
-        els.consumoCard.hidden = false;
         if (!consumos.length) {
           els.consumoHint.textContent = "Todavía no hay registros de consumo sincronizados.";
         }
@@ -190,16 +359,13 @@
           puntos: consumos.map((c) => ({ fecha: c.fecha, valor: c.potasio_mg || 0 })),
           metaValue: metaPotasio,
           unidad: "mg",
-          color: "#0e7490",
         });
         renderLineChart(els.chartFosforo, {
           puntos: consumos.map((c) => ({ fecha: c.fecha, valor: c.fosforo_mg || 0 })),
           metaValue: metaFosforo,
           unidad: "mg",
-          color: "#0e7490",
         });
       } catch (err) {
-        els.consumoCard.hidden = false;
         els.consumoHint.textContent = err.message;
       }
     }
@@ -211,10 +377,10 @@
       els.metasBtn.disabled = true;
       try {
         const metas = {};
-        for (const [nombre, cfg] of Object.entries(CAMPOS_META)) {
+        for (const [clave, cfg] of Object.entries(CAMPOS_META)) {
           const crudo = cfg.campo().value.trim();
           if (crudo === "") {
-            metas[nombre] = null;
+            metas[clave] = null;
             continue;
           }
           const valor = Number(crudo);
@@ -228,16 +394,108 @@
               `La meta para ${cfg.nombre} se fija en múltiplos de ${cfg.paso} ${cfg.unidad}.`
             );
           }
-          metas[nombre] = valor;
+          metas[clave] = valor;
         }
         await guardarMetasPaciente(pacienteId, metas);
         els.metasHint.textContent = "Metas guardadas.";
+        els.metasActualizado.textContent = `Último ajuste: ${formatFechaHora(new Date().toISOString())}`;
       } catch (err) {
         els.metasError.textContent = err.message;
       } finally {
         els.metasBtn.disabled = false;
       }
     });
+
+    // --- Exámenes de control ---------------------------------------------
+
+    async function cargarCatalogoExamenes() {
+      try {
+        const { examenes, fuente } = await getCatalogoExamenes();
+        els.catalogoExamenes.innerHTML = examenes.map((e) => `
+          <label class="check">
+            <input type="checkbox" value="${escapeHtml(e.id)}" name="examen">
+            <span>${escapeHtml(e.etiqueta)}</span>
+          </label>`).join("");
+        els.fuenteExamenes.innerHTML = `Lista basada en los exámenes de seguimiento que nombra
+          ${escapeHtml(fuente.cita)} <a href="${escapeHtml(fuente.url)}" target="_blank" rel="noopener">Ver guía</a>.
+          Qué pedir lo decides tú.`;
+      } catch (err) {
+        els.catalogoExamenes.innerHTML = `<p class="lista-vacia">No se pudo cargar la lista de exámenes: ${escapeHtml(err.message)}</p>`;
+      }
+    }
+
+    els.formExamenes.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      els.examenesError.textContent = "";
+      els.examenesHint.textContent = "";
+      els.examenesBtn.disabled = true;
+      try {
+        const examenes = [...els.catalogoExamenes.querySelectorAll("input:checked")].map((i) => i.value);
+        await crearIndicacion(pacienteId, {
+          examenes,
+          otros: els.examenesOtros.value.trim(),
+          nota: els.examenesNota.value.trim(),
+          fecha_sugerida: els.examenesFecha.value || null,
+        });
+        els.formExamenes.reset();
+        els.examenesHint.textContent = "Indicación enviada. El paciente ya la ve en su app.";
+        await refrescarIndicaciones();
+      } catch (err) {
+        els.examenesError.textContent = err.message;
+      } finally {
+        els.examenesBtn.disabled = false;
+      }
+    });
+
+    function estadoIndicacion(ind) {
+      if (ind.estado === "cancelada") return `<span class="badge badge-cancelada">Cancelada</span>`;
+      if (ind.hecha_at) return `<span class="badge badge-activo">El paciente la marcó como hecha</span>`;
+      if (ind.vista_at) return `<span class="badge">Vista</span>`;
+      return `<span class="badge badge-pendiente">Sin abrir</span>`;
+    }
+
+    function renderIndicacion(ind) {
+      const items = (ind.examenes || []).map((e) => `<li>${escapeHtml(e.etiqueta)}</li>`);
+      if (ind.otros) items.push(`<li>${escapeHtml(ind.otros)}</li>`);
+      const plazo = ind.fecha_sugerida ? ` · para antes del ${escapeHtml(formatFecha(ind.fecha_sugerida))}` : "";
+      return `
+        <article class="indicacion ${ind.estado === "cancelada" ? "indicacion-cancelada" : ""}">
+          <div class="indicacion-cabecera">
+            <span class="indicacion-fecha">${escapeHtml(formatFecha(ind.creada_at))}${plazo}</span>
+            ${estadoIndicacion(ind)}
+          </div>
+          <ul>${items.join("")}</ul>
+          ${ind.nota ? `<p class="indicacion-nota">${escapeHtml(ind.nota)}</p>` : ""}
+          ${ind.estado === "cancelada" ? "" : `
+            <div class="acciones-form">
+              <button class="btn btn-ghost btn-sm" data-cancelar-indicacion="${escapeHtml(ind.id)}">Cancelar indicación</button>
+            </div>`}
+        </article>`;
+    }
+
+    async function refrescarIndicaciones() {
+      try {
+        const { indicaciones } = await listarIndicaciones(pacienteId);
+        els.listaIndicaciones.innerHTML = indicaciones.length
+          ? indicaciones.map(renderIndicacion).join("")
+          : estadoVacio("Sin indicaciones", "Lo que le indiques aparecerá acá, con el estado en que lo dejó el paciente.");
+        els.listaIndicaciones.querySelectorAll("[data-cancelar-indicacion]").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            if (!confirm("¿Cancelar esta indicación? El paciente la verá tachada.")) return;
+            btn.disabled = true;
+            try {
+              await cancelarIndicacion(btn.dataset.cancelarIndicacion);
+              await refrescarIndicaciones();
+            } catch (err) {
+              els.examenesError.textContent = err.message;
+              btn.disabled = false;
+            }
+          });
+        });
+      } catch (err) {
+        els.listaIndicaciones.innerHTML = `<p class="lista-vacia">${escapeHtml(err.message)}</p>`;
+      }
+    }
 
     els.revocarBtn.addEventListener("click", async () => {
       if (!vinculoActual) return;
