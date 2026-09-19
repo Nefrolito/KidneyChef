@@ -1198,6 +1198,37 @@ function renderVinculacion() {
   const codigo = perfil.vinculacion && perfil.vinculacion.codigoCliente;
   els.codigoClienteBloque.hidden = !codigo;
   els.codigoClienteValor.textContent = codigo || "—";
+  renderQrVinculo(codigo);
+}
+
+// El QR lleva la URL del portal con el código adentro: en la consulta, el
+// tratante lo escanea con la cámara de su teléfono y el formulario de vínculo
+// se abre con el código puesto, sin dictar ocho caracteres. No salta ningún
+// paso de permiso: el vínculo nace pendiente y el paciente lo acepta desde
+// esta misma pantalla (Ley 20.584).
+//
+// Se dibuja con la copia local de qrcode-generator (public/vendor/qrcode.js)
+// porque la app tiene que funcionar sin conexión.
+const PORTAL_TRATANTE_URL = "https://kidneychef-api.onrender.com/tratante/";
+
+function renderQrVinculo(codigo) {
+  if (!els.qrVinculo) return;
+  if (!codigo || typeof qrcode !== "function") {
+    els.qrVinculo.hidden = true;
+    els.qrVinculoImagen.innerHTML = "";
+    return;
+  }
+  try {
+    const qr = qrcode(0, "M");
+    qr.addData(`${PORTAL_TRATANTE_URL}?codigo=${encodeURIComponent(codigo)}`);
+    qr.make();
+    els.qrVinculoImagen.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+    els.qrVinculo.hidden = false;
+  } catch (e) {
+    // Sin QR el código escrito sigue sirviendo: no vale la pena romper la vista.
+    console.warn("No se pudo dibujar el QR de vínculo", e);
+    els.qrVinculo.hidden = true;
+  }
 }
 
 async function activarPlanClinico() {
@@ -1468,6 +1499,8 @@ const els = {
   activarPlanClinico: document.getElementById("activar-plan-clinico"),
   codigoClienteBloque: document.getElementById("codigo-cliente-bloque"),
   codigoClienteValor: document.getElementById("codigo-cliente-valor"),
+  qrVinculo: document.getElementById("qr-vinculo"),
+  qrVinculoImagen: document.getElementById("qr-vinculo-imagen"),
   copiarCodigoBtn: document.getElementById("copiar-codigo-btn"),
   vinculosPendientes: document.getElementById("vinculos-pendientes"),
   vinculosActivos: document.getElementById("vinculos-activos"),

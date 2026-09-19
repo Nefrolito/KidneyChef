@@ -55,7 +55,7 @@
     // Si ya hay una sesión guardada, no tiene sentido mostrar el login de
     // nuevo — pero no se valida el token acá (eso lo hace index.html contra
     // el backend); si expiró, api.js redirige de vuelta para acá solo.
-    if (tokenActual()) location.href = "index.html";
+    if (tokenActual()) location.href = "index.html" + location.search;
 
     toggleModo.addEventListener("click", (e) => {
       e.preventDefault();
@@ -78,7 +78,7 @@
         if (modoCrearCuenta) {
           const resultado = await registrarse(emailInput.value, passwordInput.value);
           if (resultado.confirmado) {
-            location.href = "index.html";
+            location.href = "index.html" + location.search;
           } else {
             hintMsg.textContent = "Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.";
             modoCrearCuenta = false;
@@ -88,7 +88,7 @@
           }
         } else {
           await iniciarSesion(emailInput.value, passwordInput.value);
-          location.href = "index.html";
+          location.href = "index.html" + location.search;
         }
       } catch (err) {
         errorMsg.textContent = err.message;

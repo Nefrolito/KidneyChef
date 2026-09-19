@@ -102,9 +102,18 @@
       }[c]));
     }
 
+    // Si el tratante llegó escaneando el QR del paciente, el código viaja en
+    // la URL: se rellena solo y el foco queda en su nota.
+    const codigoEscaneado = new URLSearchParams(location.search).get("codigo");
+    if (codigoEscaneado && els.vincularCodigo) {
+      els.vincularCodigo.value = codigoEscaneado.trim().toUpperCase();
+      if (els.vincularAlias) els.vincularAlias.focus();
+    }
+
     async function init() {
       if (!tokenActual()) {
-        location.href = "login.html";
+        // Se conserva el código del QR para no perderlo al pasar por el login.
+        location.href = "login.html" + location.search;
         return;
       }
       try {

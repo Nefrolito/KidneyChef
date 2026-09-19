@@ -1988,3 +1988,15 @@ h1, h2, h3 {
 .campo-ayuda a,
 .clinical-note a { color: var(--brand); font-weight: 600; }
 .calculadora-card .summary-caption span { min-width: 0; }
+
+/* QR para vincular al tratante en consulta. Fondo blanco siempre: un QR
+   sobre fondo oscuro no se lee bien con la cámara. */
+.qr-vinculo { margin-top: 0.9rem; }
+.qr-vinculo-imagen {
+  width: 188px;
+  padding: 0.7rem;
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+.qr-vinculo-imagen svg { display: block; width: 100%; height: auto; }

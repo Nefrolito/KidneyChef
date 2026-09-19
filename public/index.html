@@ -304,6 +304,12 @@
           <button type="button" id="copiar-codigo-btn" class="btn btn-ghost">Copiar</button>
         </div>
         <small class="campo-ayuda">Compártelo con tu equipo tratante para que se vincule contigo.</small>
+        <div id="qr-vinculo" class="qr-vinculo" hidden>
+          <div id="qr-vinculo-imagen" class="qr-vinculo-imagen"></div>
+          <small class="campo-ayuda">En la consulta, tu nefrólogo(a) o nutricionista puede escanear
+            este código con la cámara de su teléfono en vez de escribir el tuyo. Igual tendrás que
+            aceptar la solicitud acá.</small>
+        </div>
       </div>
 
       <div id="vinculos-pendientes" class="vinculos-lista"></div>
@@ -668,6 +674,7 @@
     </div>
   </div>
 
+  <script src="vendor/qrcode.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
