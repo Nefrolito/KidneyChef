@@ -1692,43 +1692,52 @@ def handle_actualizar_vinculo_tratante(handler, id):
     handler._send_json(200, {"vinculo": actualizado})
 
 
-# Metas diarias que puede fijar el tratante, con su columna en Supabase y un
-# máximo de cordura (no es un límite clínico: solo ataja un dedazo del tipo
-# 20000 mg de potasio). Hasta el 2026-09-17 solo estaban potasio y fósforo;
-# las demás se agregaron cuando la app del paciente dejó de fijar por su
-# cuenta las metas que no tenían fuente publicada (rechazo 1.4.1 de Apple).
+# Metas diarias que puede fijar el tratante, con su columna en Supabase y el
+# rango clínico aceptado, más el múltiplo en que se prescribe. Fuera de rango
+# o fuera del múltiplo el portal no deja guardar: frena el dedazo (796 g de
+# carbohidratos en vez de 196) y la falsa precisión (2501 mg de sodio, que
+# nadie indica). Los rangos son anchos a propósito para no estorbar una
+# indicación atípica. Decisión de Camilo, 2026-09-19.
 METAS_TRATANTE = {
-    "sodio_mg": ("metas_sodio_mg", 10000),
-    "potasio_mg": ("metas_potasio_mg", 10000),
-    "fosforo_mg": ("metas_fosforo_mg", 5000),
-    "carbohidratos_g": ("metas_carbohidratos_g", 800),
-    "calorias_kcal": ("metas_calorias_kcal", 6000),
-    "liquidos_ml": ("metas_liquidos_ml", 5000),
+    "sodio_mg": {"columna": "metas_sodio_mg", "minimo": 500, "maximo": 4000, "paso": 100, "nombre": "el sodio", "unidad": "mg/día"},
+    "potasio_mg": {"columna": "metas_potasio_mg", "minimo": 800, "maximo": 4000, "paso": 100, "nombre": "el potasio", "unidad": "mg/día"},
+    "fosforo_mg": {"columna": "metas_fosforo_mg", "minimo": 400, "maximo": 2000, "paso": 100, "nombre": "el fósforo", "unidad": "mg/día"},
+    "carbohidratos_g": {"columna": "metas_carbohidratos_g", "minimo": 50, "maximo": 400, "paso": 5, "nombre": "los carbohidratos", "unidad": "g/día"},
+    "calorias_kcal": {"columna": "metas_calorias_kcal", "minimo": 800, "maximo": 4000, "paso": 50, "nombre": "las calorías", "unidad": "kcal/día"},
+    "liquidos_ml": {"columna": "metas_liquidos_ml", "minimo": 300, "maximo": 3000, "paso": 100, "nombre": "los líquidos", "unidad": "ml/día"},
 }
 
 
 def _metas_de(paciente):
     """Las metas del paciente con los nombres que usa la app, no los de la
     base. Una meta sin fijar vale None."""
-    return {nombre: paciente.get(col) for nombre, (col, _) in METAS_TRATANTE.items()}
+    return {nombre: paciente.get(cfg["columna"]) for nombre, cfg in METAS_TRATANTE.items()}
 
 
 def _validar_metas(body):
     """Devuelve (columnas, error). Solo se tocan las metas que vengan en el
     body: lo que no viene se deja como está, y un null explícito la borra."""
     columnas = {}
-    for nombre, (col, maximo) in METAS_TRATANTE.items():
+    for nombre, cfg in METAS_TRATANTE.items():
         if nombre not in body:
             continue
         valor = body[nombre]
         if valor is None or valor == "":
-            columnas[col] = None
+            columnas[cfg["columna"]] = None
             continue
         if isinstance(valor, bool) or not isinstance(valor, (int, float)):
-            return None, f"{nombre} debe ser un número o null"
-        if valor <= 0 or valor > maximo:
-            return None, f"{nombre} debe estar entre 1 y {maximo}"
-        columnas[col] = valor
+            return None, f"{nombre} debe ser un número o dejarse vacío"
+        if valor < cfg["minimo"] or valor > cfg["maximo"]:
+            return None, (
+                f"La meta para {cfg['nombre']} debe estar entre {cfg['minimo']} y "
+                f"{cfg['maximo']} {cfg['unidad']}."
+            )
+        if valor % cfg["paso"] != 0:
+            return None, (
+                f"La meta para {cfg['nombre']} se fija en múltiplos de "
+                f"{cfg['paso']} {cfg['unidad']}."
+            )
+        columnas[cfg["columna"]] = valor
     if not columnas:
         return None, "No se envió ninguna meta"
     return columnas, None

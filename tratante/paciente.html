@@ -32,27 +32,33 @@
         </p>
         <div class="campo">
           <label for="meta-sodio">Sodio (mg/día)</label>
-          <input type="number" id="meta-sodio" min="1" max="10000" step="50" placeholder="Sin fijar">
+          <input type="number" id="meta-sodio" min="500" max="4000" step="100" placeholder="Sin fijar">
+          <small class="hint-msg">Entre 500 y 4000 mg/día, en múltiplos de 100</small>
         </div>
         <div class="campo">
           <label for="meta-potasio">Potasio (mg/día)</label>
-          <input type="number" id="meta-potasio" min="1" max="10000" step="50" placeholder="Sin fijar">
+          <input type="number" id="meta-potasio" min="800" max="4000" step="100" placeholder="Sin fijar">
+          <small class="hint-msg">Entre 800 y 4000 mg/día, en múltiplos de 100</small>
         </div>
         <div class="campo">
           <label for="meta-fosforo">Fósforo (mg/día)</label>
-          <input type="number" id="meta-fosforo" min="1" max="5000" step="50" placeholder="Sin fijar">
+          <input type="number" id="meta-fosforo" min="400" max="2000" step="100" placeholder="Sin fijar">
+          <small class="hint-msg">Entre 400 y 2000 mg/día, en múltiplos de 100</small>
         </div>
         <div class="campo">
           <label for="meta-carbohidratos">Carbohidratos (g/día)</label>
-          <input type="number" id="meta-carbohidratos" min="1" max="800" step="5" placeholder="Sin fijar">
+          <input type="number" id="meta-carbohidratos" min="50" max="400" step="5" placeholder="Sin fijar">
+          <small class="hint-msg">Entre 50 y 400 g/día, en múltiplos de 5</small>
         </div>
         <div class="campo">
           <label for="meta-calorias">Calorías (kcal/día)</label>
-          <input type="number" id="meta-calorias" min="1" max="6000" step="50" placeholder="Sin fijar">
+          <input type="number" id="meta-calorias" min="800" max="4000" step="50" placeholder="Sin fijar">
+          <small class="hint-msg">Entre 800 y 4000 kcal/día, en múltiplos de 50</small>
         </div>
         <div class="campo">
           <label for="meta-liquidos">Líquidos (ml/día)</label>
-          <input type="number" id="meta-liquidos" min="1" max="5000" step="50" placeholder="Sin fijar">
+          <input type="number" id="meta-liquidos" min="300" max="3000" step="100" placeholder="Sin fijar">
+          <small class="hint-msg">Entre 300 y 3000 ml/día, en múltiplos de 100</small>
         </div>
         <button type="submit" class="btn btn-primary" id="metas-btn">Guardar metas</button>
         <p class="error-msg" id="metas-error"></p>
@@ -107,13 +113,16 @@
 
     // Nombre de la meta en la API -> input del formulario. Agregar una meta
     // nueva es sumar una fila acá y su campo en el HTML de arriba.
+    // Mismos rangos que valida server.py (METAS_TRATANTE). Fuera de rango no
+    // se guarda: atajan un dedazo, no reemplazan el criterio clínico, por eso
+    // son anchos.
     const CAMPOS_META = {
-      sodio_mg: () => els.metaSodio,
-      potasio_mg: () => els.metaPotasio,
-      fosforo_mg: () => els.metaFosforo,
-      carbohidratos_g: () => els.metaCarbohidratos,
-      calorias_kcal: () => els.metaCalorias,
-      liquidos_ml: () => els.metaLiquidos,
+      sodio_mg: { paso: 100, campo: () => els.metaSodio, minimo: 500, maximo: 4000, nombre: "el sodio", unidad: "mg/día" },
+      potasio_mg: { paso: 100, campo: () => els.metaPotasio, minimo: 800, maximo: 4000, nombre: "el potasio", unidad: "mg/día" },
+      fosforo_mg: { paso: 100, campo: () => els.metaFosforo, minimo: 400, maximo: 2000, nombre: "el fósforo", unidad: "mg/día" },
+      carbohidratos_g: { paso: 5, campo: () => els.metaCarbohidratos, minimo: 50, maximo: 400, nombre: "los carbohidratos", unidad: "g/día" },
+      calorias_kcal: { paso: 50, campo: () => els.metaCalorias, minimo: 800, maximo: 4000, nombre: "las calorías", unidad: "kcal/día" },
+      liquidos_ml: { paso: 100, campo: () => els.metaLiquidos, minimo: 300, maximo: 3000, nombre: "los líquidos", unidad: "ml/día" },
     };
 
     const pacienteId = new URLSearchParams(location.search).get("id");
@@ -146,8 +155,8 @@
         els.pacienteCodigo.textContent = `Código ${vinculoActual.codigo_cliente}`;
 
         const metas = await getMetasPaciente(pacienteId);
-        for (const [nombre, campo] of Object.entries(CAMPOS_META)) {
-          campo().value = metas[nombre] ?? "";
+        for (const [nombre, cfg] of Object.entries(CAMPOS_META)) {
+          cfg.campo().value = metas[nombre] ?? "";
         }
         els.metasActualizado.textContent = metas.actualizado_at
           ? `Último ajuste: ${formatFecha(metas.actualizado_at)}`
@@ -202,9 +211,24 @@
       els.metasBtn.disabled = true;
       try {
         const metas = {};
-        for (const [nombre, campo] of Object.entries(CAMPOS_META)) {
-          const valor = campo().value;
-          metas[nombre] = valor === "" ? null : Number(valor);
+        for (const [nombre, cfg] of Object.entries(CAMPOS_META)) {
+          const crudo = cfg.campo().value.trim();
+          if (crudo === "") {
+            metas[nombre] = null;
+            continue;
+          }
+          const valor = Number(crudo);
+          if (!Number.isFinite(valor) || valor < cfg.minimo || valor > cfg.maximo) {
+            throw new Error(
+              `La meta para ${cfg.nombre} debe estar entre ${cfg.minimo} y ${cfg.maximo} ${cfg.unidad}.`
+            );
+          }
+          if (valor % cfg.paso !== 0) {
+            throw new Error(
+              `La meta para ${cfg.nombre} se fija en múltiplos de ${cfg.paso} ${cfg.unidad}.`
+            );
+          }
+          metas[nombre] = valor;
         }
         await guardarMetasPaciente(pacienteId, metas);
         els.metasHint.textContent = "Metas guardadas.";
