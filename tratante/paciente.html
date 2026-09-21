@@ -410,15 +410,18 @@
 
     async function cargarCatalogoExamenes() {
       try {
-        const { examenes, fuente } = await getCatalogoExamenes();
+        const { examenes, fuentes } = await getCatalogoExamenes();
         els.catalogoExamenes.innerHTML = examenes.map((e) => `
           <label class="check">
             <input type="checkbox" value="${escapeHtml(e.id)}" name="examen">
             <span>${escapeHtml(e.etiqueta)}</span>
           </label>`).join("");
-        els.fuenteExamenes.innerHTML = `Lista basada en los exámenes de seguimiento que nombra
-          ${escapeHtml(fuente.cita)} <a href="${escapeHtml(fuente.url)}" target="_blank" rel="noopener">Ver guía</a>.
-          Qué pedir lo decides tú.`;
+        // Cada guía con lo que respalda; la cita completa queda en el title
+        // del enlace para quien quiera auditarla sin salir del portal.
+        const listaFuentes = fuentes.map((f) => `${escapeHtml(f.cubre)}:
+          <a href="${escapeHtml(f.url)}" target="_blank" rel="noopener"
+             title="${escapeHtml(f.cita)}">${escapeHtml(f.nombre_corto)}</a>`).join(" · ");
+        els.fuenteExamenes.innerHTML = `Fuentes — ${listaFuentes}. Qué pedir lo decides tú.`;
       } catch (err) {
         els.catalogoExamenes.innerHTML = `<p class="lista-vacia">No se pudo cargar la lista de exámenes: ${escapeHtml(err.message)}</p>`;
       }

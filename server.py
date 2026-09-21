@@ -2005,37 +2005,70 @@ def handle_get_foto_paciente(handler, id):
 # encuadre tiene que quedar visible en las dos puntas (portal y app), no solo
 # en este comentario.
 #
-# El catálogo son NOMBRES de exámenes de seguimiento habitual en ERC, no
-# umbrales ni indicaciones: KidneyChef no decide qué pedir, solo ahorra
-# tipeo. Quien elige es el tratante, y siempre puede escribir en el campo
-# libre. La lista sigue los exámenes que KDIGO 2024 nombra para el
-# seguimiento de ERC; la cita se muestra en el portal.
-EXAMENES_FUENTE = {
-    "cita": (
-        "Kidney Disease: Improving Global Outcomes (KDIGO) CKD Work Group. "
-        "KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management "
-        "of Chronic Kidney Disease. Kidney Int. 2024;105(4S):S117-S314."
-    ),
-    "url": "https://kdigo.org/guidelines/ckd-evaluation-and-management/",
+# El catálogo son NOMBRES de exámenes de seguimiento habitual en ERC y
+# diálisis, no umbrales ni indicaciones: KidneyChef no decide qué pedir, solo
+# ahorra tipeo. Quien elige es el médico tratante, y siempre puede escribir en
+# el campo libre.
+#
+# `fuente` marca solo lo que se verificó contra el texto de una guía (Kt/V,
+# nPCR, albúmina). El resto lleva None a propósito: son exámenes de uso
+# habitual que KDIGO 2024 enmarca como guía general, pero no se revisó que
+# esa guía nombre cada uno — y atribuírselo sin revisarlo sería inventar la
+# procedencia. Hemoglobina/hematocrito, hemograma y nPCR los pidió Camilo
+# (2026-09-21), los dos primeros por separado para poder pedir uno u otro.
+EXAMENES_FUENTES = {
+    "kdigo_2024": {
+        "nombre_corto": "KDIGO 2024",
+        "cubre": "guía general de seguimiento de la ERC",
+        "cita": (
+            "Kidney Disease: Improving Global Outcomes (KDIGO) CKD Work Group. "
+            "KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management "
+            "of Chronic Kidney Disease. Kidney Int. 2024;105(4S):S117-S314. "
+            "doi:10.1016/j.kint.2023.10.018"
+        ),
+        "url": "https://kdigo.org/guidelines/ckd-evaluation-and-management/",
+    },
+    "kdoqi_hd_2015": {
+        "nombre_corto": "KDOQI 2015",
+        "cubre": "Kt/V",
+        "cita": (
+            "National Kidney Foundation. KDOQI Clinical Practice Guideline for "
+            "Hemodialysis Adequacy: 2015 Update. Am J Kidney Dis. 2015;66(5):884-930. "
+            "doi:10.1053/j.ajkd.2015.07.015"
+        ),
+        "url": "https://pubmed.ncbi.nlm.nih.gov/26498416/",
+    },
+    "kdoqi_nutricion_2020": {
+        "nombre_corto": "KDOQI 2020",
+        "cubre": "nPCR y albúmina sérica",
+        "cita": (
+            "Ikizler TA, Burrowes JD, Byham-Gray LD, et al. KDOQI Clinical Practice "
+            "Guideline for Nutrition in CKD: 2020 Update. Am J Kidney Dis. "
+            "2020;76(3 Suppl 1):S1-S107. doi:10.1053/j.ajkd.2020.05.006"
+        ),
+        "url": "https://pubmed.ncbi.nlm.nih.gov/32829751/",
+    },
 }
 
 EXAMENES_CATALOGO = [
-    {"id": "creatinina_vfg", "etiqueta": "Creatinina sérica y VFG estimada"},
-    {"id": "rac_orina", "etiqueta": "Razón albúmina/creatinina en orina (RAC)"},
-    {"id": "potasio_serico", "etiqueta": "Potasio sérico"},
-    {"id": "sodio_serico", "etiqueta": "Sodio sérico"},
-    {"id": "fosforo_serico", "etiqueta": "Fósforo sérico"},
-    {"id": "calcio_serico", "etiqueta": "Calcio sérico"},
-    {"id": "pth", "etiqueta": "Hormona paratiroidea (PTH)"},
-    {"id": "vitamina_d", "etiqueta": "Vitamina D (25-OH)"},
-    {"id": "bicarbonato", "etiqueta": "Bicarbonato sérico"},
-    {"id": "urea_bun", "etiqueta": "Nitrógeno ureico (BUN)"},
-    {"id": "albumina_serica", "etiqueta": "Albúmina sérica"},
-    {"id": "hemograma", "etiqueta": "Hemograma (hemoglobina)"},
-    {"id": "ferritina_tsat", "etiqueta": "Ferritina y saturación de transferrina"},
-    {"id": "hba1c", "etiqueta": "Hemoglobina glicosilada (HbA1c)"},
-    {"id": "perfil_lipidico", "etiqueta": "Perfil lipídico"},
-    {"id": "kt_v", "etiqueta": "Kt/V (adecuación de diálisis)"},
+    {"id": "creatinina_vfg", "etiqueta": "Creatinina sérica y VFG estimada", "fuente": None},
+    {"id": "rac_orina", "etiqueta": "Razón albúmina/creatinina en orina (RAC)", "fuente": None},
+    {"id": "potasio_serico", "etiqueta": "Potasio sérico", "fuente": None},
+    {"id": "sodio_serico", "etiqueta": "Sodio sérico", "fuente": None},
+    {"id": "fosforo_serico", "etiqueta": "Fósforo sérico", "fuente": None},
+    {"id": "calcio_serico", "etiqueta": "Calcio sérico", "fuente": None},
+    {"id": "pth", "etiqueta": "Hormona paratiroidea (PTH)", "fuente": None},
+    {"id": "vitamina_d", "etiqueta": "Vitamina D (25-OH)", "fuente": None},
+    {"id": "bicarbonato", "etiqueta": "Bicarbonato sérico", "fuente": None},
+    {"id": "urea_bun", "etiqueta": "Nitrógeno ureico (BUN)", "fuente": None},
+    {"id": "albumina_serica", "etiqueta": "Albúmina sérica", "fuente": "kdoqi_nutricion_2020"},
+    {"id": "npcr", "etiqueta": "nPCR (marcador de ingesta proteica)", "fuente": "kdoqi_nutricion_2020"},
+    {"id": "hemograma", "etiqueta": "Hemograma", "fuente": None},
+    {"id": "hemoglobina_hematocrito", "etiqueta": "Hemoglobina / hematocrito", "fuente": None},
+    {"id": "ferritina_tsat", "etiqueta": "Ferritina y saturación de transferrina", "fuente": None},
+    {"id": "hba1c", "etiqueta": "Hemoglobina glicosilada (HbA1c)", "fuente": None},
+    {"id": "perfil_lipidico", "etiqueta": "Perfil lipídico", "fuente": None},
+    {"id": "kt_v", "etiqueta": "Kt/V (adecuación de diálisis)", "fuente": "kdoqi_hd_2015"},
 ]
 
 EXAMENES_POR_ID = {e["id"]: e for e in EXAMENES_CATALOGO}
@@ -2056,7 +2089,10 @@ def handle_get_catalogo_examenes(handler):
         return
     if not _exige_medico(handler, user):
         return
-    handler._send_json(200, {"examenes": EXAMENES_CATALOGO, "fuente": EXAMENES_FUENTE})
+    handler._send_json(200, {
+        "examenes": EXAMENES_CATALOGO,
+        "fuentes": [{"id": k, **v} for k, v in EXAMENES_FUENTES.items()],
+    })
 
 
 def _validar_indicacion(body):
@@ -2074,7 +2110,8 @@ def _validar_indicacion(body):
         vistos.add(examen_id)
         # Se guarda una copia de la etiqueta, no solo el id: la indicación
         # tiene que leerse igual dentro de un año aunque el catálogo cambie.
-        seleccionados.append(dict(EXAMENES_POR_ID[examen_id]))
+        examen = EXAMENES_POR_ID[examen_id]
+        seleccionados.append({"id": examen["id"], "etiqueta": examen["etiqueta"]})
 
     otros = (body.get("otros") or "").strip()
     if len(otros) > INDICACION_OTROS_MAX:
