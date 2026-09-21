@@ -93,7 +93,7 @@
     <div class="dialog-body">
       <form id="form-vincular">
         <div class="campo">
-          <label for="vincular-codigo">Código de cliente</label>
+          <label for="vincular-codigo">Código del paciente</label>
           <input type="text" id="vincular-codigo" required placeholder="Ej: LS9AHULR"
                  style="text-transform:uppercase" autocomplete="off" maxlength="8">
           <small class="campo-ayuda">
@@ -268,7 +268,7 @@
       const activos = vinculos.filter((v) => v.estado === "activo");
       els.listaActivos.innerHTML = activos.length
         ? `<div class="lista">${activos.map(filaActivo).join("")}</div>`
-        : estadoVacio("Todavía no tienes pacientes", "Vincula uno con su código de cliente para empezar a seguirlo.");
+        : estadoVacio("Todavía no tienes pacientes", "Vincula uno con su código de paciente para empezar a seguirlo.");
 
       els.resumenPacientes.textContent = activos.length === 1
         ? "1 paciente con vínculo activo"

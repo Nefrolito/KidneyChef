@@ -1464,7 +1464,7 @@ def handle_crear_paciente(handler):
                 continue  # código ya existía, reintenta con uno nuevo
             raise
     if paciente is None:
-        handler._send_json(500, {"error": "No se pudo generar un código de cliente único"})
+        handler._send_json(500, {"error": "No se pudo generar un código de paciente único"})
         return
     handler._send_json(201, {"codigo_cliente": paciente["codigo_cliente"], "device_secret": secret})
 
@@ -1648,7 +1648,7 @@ def handle_crear_vinculo(handler):
     codigo = (body.get("codigo_cliente") or "").strip().upper()
     alias = (body.get("alias") or "").strip()
     if not codigo:
-        handler._send_json(400, {"error": "Falta el código de cliente"})
+        handler._send_json(400, {"error": "Falta el código del paciente"})
         return
     paciente = supabase_client.get_paciente_por_codigo(codigo)
     if not paciente:
