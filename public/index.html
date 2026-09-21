@@ -286,10 +286,18 @@
 
     <section class="card tratante-card" data-tab="tratante">
       <h2>Equipo tratante</h2>
-      <p class="clinical-note">
+      <p class="clinical-note" id="tratante-intro">
         Vincula tu celular con tu nefrólogo(a) o nutricionista para que ajuste
         tus metas de potasio y fósforo a distancia. No ve ningún dato tuyo
         hasta que tú aceptas la solicitud de vínculo, acá mismo.
+      </p>
+      <!-- Solo cuando bajó de Platinum teniendo tratante: el vínculo queda en
+           pausa, no se corta (ver modoTratante() en app.js). -->
+      <p class="clinical-note tratante-congelado-aviso" id="tratante-congelado-aviso" hidden>
+        Tu plan actual no incluye el equipo tratante, así que tu vínculo quedó
+        en pausa: lo que registras ya no se envía a tu equipo. Las últimas metas
+        que te fijaron siguen aplicándose. Puedes revocar el vínculo cuando
+        quieras, o volver a Platinum para retomarlo donde quedó.
       </p>
 
       <label class="clinical-check clinical-check-ancho">

@@ -45,6 +45,12 @@ const REVENUECAT_API_KEY_ANDROID = "";
 const NIVELES_SUSCRIPCION = ["diamond", "platinum", "gold"];
 const RANGO_NIVEL = { gold: 1, platinum: 2, diamond: 3 };
 
+// Pestañas que exigen un nivel; las que no aparecen acá son de todos. Se
+// restringe la pestaña completa porque todo lo que vive en ella es de ese
+// nivel para arriba (y lo de Diamond que hay adentro se restringe aparte).
+// Tratante tiene su propia regla, con estado en pausa: ver modoTratante().
+const NIVEL_MINIMO_TAB = { refrigerador: "platinum", supermercado: "platinum" };
+
 // Copy y precios de referencia para el selector de niveles del paywall — se
 // muestran mientras no haya una oferta real de RevenueCat cargada (hoy
 // siempre, porque las API keys de arriba están vacías). Los precios deben
@@ -54,10 +60,8 @@ const NIVELES_INFO = {
     nombre: "Gold",
     precioMensualClp: 5990,
     precioAnualClp: 49990,
-    // El Plan Clínico (vínculo con el tratante) NO se ofrece acá mientras
-    // MOSTRAR_TAB_TRATANTE sea false: vive entero en esa pestaña, y vender una
-    // función que el usuario no puede abrir es motivo de rechazo en la App
-    // Store. Cuando la pestaña vuelva, vuelve también este bullet.
+    // Gold no incluye el equipo tratante: es de Platinum para arriba (ver
+    // NIVEL_MINIMO_TRATANTE y featuresDeNivel()).
     features: [
       "Semáforo de sodio, potasio, fósforo y carbohidratos",
       "Así va tu día: metas diarias, registro por foto e historial",
@@ -214,16 +218,15 @@ async function sincronizarSuscripcionRevenueCat() {
     // paciente reinicie la app cuando el nivel acaba de cambiar.
     renderRobotSelector();
     renderRevisarReceta();
+    renderTabsPorNivel();
   } catch (e) {
     console.warn("No se pudo sincronizar el estado de suscripción de RevenueCat", e);
   }
 }
 
 // true si el nivel de suscripción activo (o el trial, que da acceso
-// completo) alcanza el mínimo pedido. Todavía no hay ninguna feature en la
-// app que llame a esto — hoy el paywall sigue siendo por-app, no por-tier —
-// pero es la comparación de rangos que va a necesitar cada feature exclusiva
-// de Platinum/Diamond (refrigerador, Súper, Cookidoo) cuando se gatee.
+// completo) alcanza el mínimo pedido. La usan las funciones de Diamond
+// (modo robot, revisar receta) y la pestaña Tratante (Platinum).
 function nivelSuficiente(minimo) {
   const { enTrial, bloqueado } = estadoSuscripcion();
   if (enTrial && !bloqueado) return true;
@@ -643,7 +646,7 @@ function renderPaywallNiveles() {
           ${id === "platinum" ? '<span class="paywall-nivel-badge">Recomendado</span>' : ""}
           <span class="paywall-nivel-nombre">${info.nombre}</span>
           <span class="paywall-nivel-precio">$${precio.toLocaleString("es-CL")}<small>${sufijo}</small></span>
-          <ul class="paywall-nivel-features">${info.features.map((f) => `<li>${escapeHtml(f)}</li>`).join("")}</ul>
+          <ul class="paywall-nivel-features">${featuresDeNivel(id).map((f) => `<li>${escapeHtml(f)}</li>`).join("")}</ul>
         </button>
       `;
     })
@@ -1177,6 +1180,84 @@ function renderPlanUpsell() {
 // Ponerlo en true es todo lo que hace falta para volver a probar la pestaña.
 const MOSTRAR_TAB_TRATANTE = false;
 
+// El equipo tratante es de Platinum para arriba: Gold no lo trae. Decisión
+// de Camilo (2026-09-21). Durante el mes de prueba se ve igual, porque el
+// trial da acceso completo (ver nivelSuficiente()).
+const NIVEL_MINIMO_TRATANTE = "platinum";
+
+// Vínculos activos o pendientes según la última consulta al servidor (ver
+// refrescarVinculos). Decide si alguien sin Platinum ve la pestaña en pausa.
+let vinculosAbiertos = 0;
+
+// Tres estados:
+// - "completo": Platinum, Diamond o mes de prueba.
+// - "congelado": bajó de nivel teniendo un tratante. Decisión de Camilo
+//   (2026-09-21): el vínculo queda en pausa en vez de cortarse. No se envía
+//   su consumo ni fotos nuevas; las últimas metas del tratante siguen
+//   aplicándose, porque volver de golpe a los límites genéricos sería
+//   clínicamente peor; y la pestaña sigue visible, reducida, para que pueda
+//   revocar: retirar el consentimiento (Ley 20.584) no puede quedar detrás
+//   de un pago. Si vuelve a Platinum, retoma donde quedó.
+// - "oculto": la pestaña está apagada, o no tiene nivel ni tratante.
+function modoTratante() {
+  if (!MOSTRAR_TAB_TRATANTE) return "oculto";
+  if (nivelSuficiente(NIVEL_MINIMO_TRATANTE)) return "completo";
+  return vinculosAbiertos > 0 ? "congelado" : "oculto";
+}
+
+function renderTabTratante() {
+  const modo = modoTratante();
+  const congelado = modo === "congelado";
+  els.tabTratanteBtn.hidden = modo === "oculto";
+  // En pausa no se ofrece empezar nada nuevo: ni activar el plan, ni el
+  // código para vincular a otro tratante.
+  els.tratanteIntro.hidden = congelado;
+  els.tratanteCongeladoAviso.hidden = !congelado;
+  els.activarPlanClinico.closest("label").hidden = congelado;
+  els.codigoClienteBloque.hidden = congelado || !ensurePerfil().vinculacion.codigoCliente;
+  renderFotoPaciente();
+  // Si la persona está justo en esta pestaña cuando deja de corresponderle,
+  // vuelve a Hoy.
+  if (modo === "oculto" && els.tabTratanteBtn.getAttribute("aria-selected") === "true") irATab("hoy");
+  renderBarraPestanas();
+}
+
+// Con una sola pestaña visible (Gold sin equipo tratante) la barra no lleva
+// a ningún lado y se ve rota: se esconde y se devuelve el espacio que
+// reservaba abajo. Se llama al final de renderTabTratante(), que es lo último
+// que cambia la cantidad de pestañas visibles.
+function renderBarraPestanas() {
+  const visibles = [...els.tabBar.querySelectorAll(".tab-btn")].filter((b) => !b.hidden).length;
+  els.tabBar.hidden = visibles <= 1;
+  document.body.classList.toggle("sin-tab-bar", visibles <= 1);
+}
+
+// Oculta las pestañas que el nivel no incluye y, si la abierta dejó de
+// corresponder, vuelve a Hoy. Se llama al iniciar y cada vez que RevenueCat
+// informa otro nivel.
+function renderTabsPorNivel() {
+  for (const tab of Object.keys(NIVEL_MINIMO_TAB)) {
+    const btn = els.tabBar.querySelector(`[data-tab-target="${tab}"]`);
+    if (btn) btn.hidden = !tabPermitida(tab);
+  }
+  renderTabTratante();
+  const activa = els.tabBar.querySelector('.tab-btn[aria-selected="true"]');
+  if (activa && !tabPermitida(activa.dataset.tabTarget)) irATab("hoy");
+}
+
+// El renglón del paywall se agrega al dibujar y no en NIVELES_INFO porque
+// esa tabla está más arriba en el archivo que MOSTRAR_TAB_TRATANTE, y usar
+// la constante antes de declararla rompería la carga de la app. Mientras la
+// pestaña siga apagada no se ofrece: vender una función que el usuario no
+// puede abrir es motivo de rechazo en la App Store.
+const FEATURE_TRATANTE = "Equipo tratante: vincúlate con tu nefrólogo(a) o nutricionista para que ajuste tus metas a distancia";
+
+function featuresDeNivel(id) {
+  const base = NIVELES_INFO[id].features;
+  // Solo en Platinum: Diamond ya dice "Todo lo de Platinum".
+  return MOSTRAR_TAB_TRATANTE && id === NIVEL_MINIMO_TRATANTE ? [...base, FEATURE_TRATANTE] : base;
+}
+
 // Sin infraestructura de push, se refresca por polling mientras la app está
 // abierta — así una solicitud de vínculo nueva aparece sin que el paciente
 // tenga que cerrar y volver a abrir la app.
@@ -1196,7 +1277,7 @@ function renderVinculacion() {
   const perfil = ensurePerfil();
   els.activarPlanClinico.checked = perfil.planId === "clinico";
   const codigo = perfil.vinculacion && perfil.vinculacion.codigoCliente;
-  els.codigoClienteBloque.hidden = !codigo;
+  els.codigoClienteBloque.hidden = !codigo || modoTratante() === "congelado";
   els.codigoClienteValor.textContent = codigo || "—";
   renderQrVinculo(codigo);
 }
@@ -1277,7 +1358,8 @@ async function refrescarVinculos() {
     els.vinculosPendientes.innerHTML = "";
     els.vinculosActivos.innerHTML = "";
     hayVinculoActivo = false;
-    renderFotoPaciente();
+    vinculosAbiertos = 0;
+    renderTabTratante();
     if (els.indicacionesBloque) els.indicacionesBloque.hidden = true;
     return;
   }
@@ -1291,6 +1373,8 @@ async function refrescarVinculos() {
     // La foto solo se ofrece con un vínculo activo: el backend la rechaza
     // sin él, y no tiene sentido pedirla si nadie va a verla.
     hayVinculoActivo = vinculos.some((v) => v.estado === "activo");
+    vinculosAbiertos = vinculos.filter((v) => v.estado === "activo" || v.estado === "pendiente").length;
+    const puedeAceptar = modoTratante() === "completo";
 
     els.vinculosPendientes.innerHTML = vinculos
       .filter((v) => v.estado === "pendiente")
@@ -1301,7 +1385,7 @@ async function refrescarVinculos() {
             <small>${escapeHtml(tipoTratanteLabel(v.tratante_tipo))} quiere vincularse contigo</small>
           </div>
           <div class="vinculo-item-acciones">
-            <button class="btn btn-primary" data-vinculo-aceptar="${v.id}">Aceptar</button>
+            ${puedeAceptar ? `<button class="btn btn-primary" data-vinculo-aceptar="${v.id}">Aceptar</button>` : ""}
             <button class="btn btn-ghost" data-vinculo-rechazar="${v.id}">Rechazar</button>
           </div>
         </div>`)
@@ -1324,6 +1408,7 @@ async function refrescarVinculos() {
     wireVinculoBotones();
     await refrescarFotoPaciente();
     await refrescarIndicaciones();
+    renderTabTratante();
   } catch {
     // sin conexión: se reintenta en el próximo refresco
   }
@@ -1342,6 +1427,10 @@ function wireVinculoBotones() {
 }
 
 async function actualizarVinculo(id, estado) {
+  if (estado === "activo" && modoTratante() !== "completo") {
+    setStatus("Tu plan actual no incluye vincularte con un equipo tratante.", true);
+    return;
+  }
   try {
     const res = await fetch(`${API_BASE}/api/pacientes/me/vinculos/${id}`, {
       method: "PATCH",
@@ -1450,7 +1539,11 @@ async function comprimirFotoPaciente(file) {
 
 function renderFotoPaciente() {
   if (!els.fotoPacienteBloque) return;
-  els.fotoPacienteBloque.hidden = !hayVinculoActivo;
+  // En pausa solo se puede quitar la foto que ya estaba (retirar el permiso
+  // no puede depender del pago), no subir una nueva.
+  const congelado = modoTratante() === "congelado";
+  els.fotoPacienteBloque.hidden = !hayVinculoActivo || (congelado && !fotoPacienteActual);
+  els.fotoPacienteElegir.hidden = congelado;
   els.fotoPacienteVista.innerHTML = fotoPacienteActual
     ? `<img src="${fotoPacienteActual}" alt="">`
     : ICONO_FOTO_VACIA;
@@ -1486,6 +1579,10 @@ async function refrescarFotoPaciente() {
 
 async function subirFotoPaciente(file) {
   if (!file) return;
+  if (!nivelSuficiente(NIVEL_MINIMO_TRATANTE)) {
+    estadoFoto("Tu plan actual no incluye compartir fotos con tu equipo tratante.", true);
+    return;
+  }
   if (!els.fotoConsentimiento.checked) {
     estadoFoto("Marca la autorización antes de subir la foto.", true);
     return;
@@ -1738,6 +1835,8 @@ const els = {
   onboardingClinico: document.getElementById("onboarding-clinico"),
   onboardingOmitirBtn: document.getElementById("onboarding-omitir-btn"),
   tabTratanteBtn: document.getElementById("tab-tratante-btn"),
+  tratanteIntro: document.getElementById("tratante-intro"),
+  tratanteCongeladoAviso: document.getElementById("tratante-congelado-aviso"),
   activarPlanClinico: document.getElementById("activar-plan-clinico"),
   codigoClienteBloque: document.getElementById("codigo-cliente-bloque"),
   codigoClienteValor: document.getElementById("codigo-cliente-valor"),
@@ -1857,7 +1956,7 @@ async function init() {
   renderPerfilOverlay();
   renderSuscripcion();
   initRevenueCat();
-  els.tabTratanteBtn.hidden = !MOSTRAR_TAB_TRATANTE;
+  renderTabsPorNivel();
   initTabs();
   renderRecetasGuardadas();
   renderRobotSelector();
@@ -2007,6 +2106,9 @@ function initTabs() {
 }
 
 function irATab(tab) {
+  // Venga de donde venga el salto (la barra, el puente a la receta, un cambio
+  // de nivel), nadie cae en una pestaña que su nivel no incluye.
+  if (!tabPermitida(tab)) tab = "hoy";
   document.querySelectorAll("[data-tab]").forEach((el) => {
     el.classList.toggle("tab-inactive", el.dataset.tab !== tab);
   });
@@ -2014,6 +2116,12 @@ function irATab(tab) {
     btn.setAttribute("aria-selected", String(btn.dataset.tabTarget === tab));
   });
   localStorage.setItem(TAB_STORAGE_KEY, tab);
+}
+
+function tabPermitida(tab) {
+  if (tab === "tratante") return modoTratante() !== "oculto";
+  const minimo = NIVEL_MINIMO_TAB[tab];
+  return !minimo || nivelSuficiente(minimo);
 }
 
 // Rota cada tres horas en vez de una vez al día: alguien que abre la app en
@@ -2219,6 +2327,9 @@ function renderResults() {
 // que ya reconocimos para que no tenga que fotografiar todo de nuevo.
 function puenteALaReceta() {
   if (!lastAnalysis.some((i) => i.match)) return "";
+  // Las recetas son de Platinum: a Gold no se le ofrece un botón que lleva a
+  // una pestaña que su nivel no incluye.
+  if (!tabPermitida("refrigerador")) return "";
   return `
     <div class="puente-receta">
       <p>¿Quieres cocinar algo que te acomode mejor con lo que te queda del día?</p>
@@ -4816,6 +4927,9 @@ function saveToHistory(idx) {
 async function sincronizarConsumoHoy() {
   const perfil = ensurePerfil();
   if (!perfil.vinculacion.codigoCliente) return;
+  // Con el vínculo en pausa (bajó de Platinum) no se envía nada: ver
+  // modoTratante().
+  if (!nivelSuficiente(NIVEL_MINIMO_TRATANTE)) return;
   const totals = totalesNutrientesHoy();
   const fecha = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
   try {

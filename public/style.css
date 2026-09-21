@@ -919,6 +919,15 @@ h1, h2, h3 {
 .vinculo-item-acciones .btn { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
 .metas-sincronizadas-fila { margin: 0 0 0.3rem; font-size: 0.9rem; }
 
+/* Vínculo en pausa por bajar de nivel */
+.tratante-congelado-aviso {
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+  background: var(--amarillo-bg, #fff6e5);
+  border: 1px solid var(--amarillo-border, #f3dba8);
+  color: var(--text);
+}
+
 /* Foto que el paciente comparte con su equipo tratante */
 .foto-paciente-fila { display: flex; align-items: center; gap: 0.9rem; margin: 0.6rem 0; }
 .foto-paciente-vista {
@@ -1534,6 +1543,9 @@ h1, h2, h3 {
 .paywall-nivel-features li::before { content: "✓"; position: absolute; left: 0; color: var(--verde); font-weight: 800; }
 
 /* --- Navegación por pestañas --- */
+/* Sin barra (una sola pestaña visible): el contenedor deja de reservar el
+   espacio de abajo que era para ella. */
+body.sin-tab-bar .container { padding-bottom: calc(1.25rem + env(safe-area-inset-bottom)); }
 .tab-bar {
   position: fixed;
   left: 0;
