@@ -63,3 +63,39 @@ async function iniciarSesion(email, password) {
   guardarSesion(data);
   return data;
 }
+
+// El access_token de Supabase vence a la hora. Sin renovarlo, el portal
+// echaba al tratante cada hora y, si estaba llenando las metas, perdía lo
+// escrito. La sesión trae un refresh_token justamente para esto.
+//
+// Una sola renovación a la vez: el dashboard dispara varias llamadas en
+// paralelo (una foto por paciente) y todas pueden recibir 401 juntas.
+// Supabase trata el refresh_token como de un solo uso, así que si cada una
+// lo gastara por su cuenta, la sesión podría quedar revocada.
+let renovacionEnCurso = null;
+
+function renovarSesion() {
+  if (!renovacionEnCurso) {
+    renovacionEnCurso = pedirRenovacion().finally(() => {
+      renovacionEnCurso = null;
+    });
+  }
+  return renovacionEnCurso;
+}
+
+async function pedirRenovacion() {
+  const sesion = obtenerSesion();
+  if (!sesion || !sesion.refresh_token) return false;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
+      body: JSON.stringify({ refresh_token: sesion.refresh_token }),
+    });
+    if (!res.ok) return false;
+    guardarSesion(await res.json());
+    return true;
+  } catch {
+    return false;
+  }
+}

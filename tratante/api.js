@@ -2,7 +2,7 @@
 // negocio en Python: perfil de tratante, vínculos, metas y consumo del
 // paciente. El login/signup en sí vive en auth.js, hablando directo con
 // Supabase Auth.
-async function apiTratante(path, options = {}) {
+async function apiTratante(path, options = {}, esReintento = false) {
   const token = tokenActual();
   if (!token) {
     location.href = "login.html";
@@ -17,6 +17,20 @@ async function apiTratante(path, options = {}) {
     },
   });
   if (res.status === 401) {
+    // Lo normal es que haya vencido el token de la hora: se renueva y se
+    // reintenta UNA vez. Recién si eso falla (sesión revocada, contraseña
+    // cambiada) se manda al tratante al login.
+    //
+    // Si el token guardado ya no es el que usó esta llamada, otra llamada
+    // paralela ya renovó la sesión: basta con reintentar. Sin este chequeo,
+    // los 401 que llegan después de terminada una renovación pedían otra
+    // cada uno (se midió: 4 renovaciones para 5 llamadas en paralelo).
+    if (!esReintento) {
+      const yaRenovada = tokenActual() !== token;
+      if (yaRenovada || (await renovarSesion())) {
+        return apiTratante(path, options, true);
+      }
+    }
     cerrarSesion();
     location.href = "login.html";
     throw new Error("Sesión expirada");
