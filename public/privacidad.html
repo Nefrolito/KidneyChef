@@ -44,7 +44,7 @@
 <body>
 <div class="wrap">
   <h1>Política de Privacidad de KidneyChef</h1>
-  <p class="fecha">Última actualización: 24 de agosto de 2026</p>
+  <p class="fecha">Última actualización: 22 de septiembre de 2026</p>
 
   <h2>Qué es KidneyChef</h2>
   <p>
@@ -71,15 +71,38 @@
     </li>
     <li>
       <strong>Datos clínicos, solo si activas el vínculo con tu tratante</strong>
-      (nefrólogo/a o nutricionista): un código de cliente, tus metas diarias de potasio y
-      fósforo (mg) que te asigna tu tratante, y tu registro de consumo diario. Estos datos
-      se sincronizan con nuestra base de datos (Supabase) para que tu tratante pueda
-      verlos y ajustarlos — sin activar este vínculo, nada de esto sale de tu dispositivo.
+      (nefrólogo/a, médico/a nutriólogo/a o nutricionista): un código del paciente, las
+      metas diarias que te fija tu tratante (sodio, potasio, fósforo, carbohidratos,
+      calorías y líquidos) y el total diario de potasio y fósforo que registras. Estos
+      datos se sincronizan con nuestra base de datos (Supabase) para que tu tratante
+      pueda verlos y ajustarlos. El consumo solo se envía mientras tengas un vínculo
+      aceptado por ti; sin vínculo, en el servidor solo queda tu código del paciente, sin datos de salud. KidneyChef no te
+      pide tu nombre ni tu RUT para el vínculo; tu tratante puede anotar un nombre o
+      apodo para reconocerte en su lista, que solo ve él o ella.
     </li>
     <li>
-      <strong>Datos de la cuenta del tratante</strong> (si eres nefrólogo/a o
-      nutricionista): nombre, correo y contraseña (guardada de forma cifrada, nunca en
-      texto plano), y la lista de pacientes vinculados a tu cuenta.
+      <strong>Tu foto, solo si decides compartirla con tu tratante.</strong> Si tienes un
+      vínculo activo, puedes subir una foto tuya para que tu equipo tratante te reconozca.
+      La app la recorta y la reduce (512 × 512 píxeles) antes de enviarla; se guarda en
+      nuestra base de datos (Supabase) junto con la fecha en que diste tu consentimiento,
+      y solo la ven los tratantes con los que tienes un vínculo activo. No se usa para
+      reconocimiento facial ni se envía a la IA. Puedes quitarla cuando quieras
+      desmarcando el consentimiento en la app, y se borra sola si cierras tu último
+      vínculo activo.
+    </li>
+    <li>
+      <strong>Indicaciones de exámenes de control.</strong> Si tu tratante es médico/a
+      (nefrólogo/a o nutriólogo/a), puede enviarte desde su portal una indicación con los
+      exámenes de control que te sugiere, una fecha sugerida y una nota. Se guarda en
+      nuestra base de datos (Supabase) junto con si ya la viste o la marcaste como hecha,
+      y la ven solo tú y ese tratante. No es una orden médica y KidneyChef no recibe ni
+      guarda los resultados de tus exámenes.
+    </li>
+    <li>
+      <strong>Datos de la cuenta del tratante</strong> (si eres nefrólogo/a, médico/a
+      nutriólogo/a o nutricionista): nombre, correo, profesión y contraseña (guardada de
+      forma cifrada, nunca en texto plano), la lista de pacientes vinculados a tu cuenta
+      con el nombre o apodo que les pongas, y las indicaciones de exámenes que envíes.
     </li>
     <li>
       <strong>Datos de suscripción y pago.</strong> La compra se procesa por RevenueCat y
@@ -91,14 +114,17 @@
   <h2>Con quién compartimos datos</h2>
   <ul>
     <li><strong>Anthropic</strong> (API de Claude) — para el reconocimiento de alimentos por foto, según sus propias políticas de privacidad.</li>
-    <li><strong>Supabase</strong> — almacenamiento de los datos clínicos y de vínculo paciente-tratante, solo si activas el Plan Clínico.</li>
+    <li><strong>Supabase</strong> — almacenamiento de los datos clínicos, la foto, las indicaciones de exámenes y el vínculo paciente-tratante, solo si tienes un vínculo con tu tratante.</li>
+    <li><strong>Tu equipo tratante</strong> — ve tus metas, tu consumo diario, tu foto (si la compartiste) y las indicaciones que te envió, solo mientras el vínculo esté activo. Puedes revocarlo desde la app o escribiéndonos, y desde ese momento deja de ver tus datos.</li>
     <li><strong>RevenueCat, Apple y Google</strong> — gestión de la suscripción y el pago.</li>
   </ul>
   <p>No vendemos tus datos ni los compartimos con terceros con fines publicitarios.</p>
 
   <h2>Tus derechos</h2>
   <p>
-    Puedes pedir acceder, corregir o eliminar tus datos clínicos sincronizados
+    Puedes quitar tu foto o revocar el vínculo con tu tratante directamente desde la app.
+    También puedes pedir acceder, corregir
+    o eliminar tus datos clínicos sincronizados (metas, consumo, foto e indicaciones)
     escribiendo a <a href="mailto:contacto@kidneychef.com">contacto@kidneychef.com</a>. Los datos
     guardados solo en tu dispositivo (historial, calculadora del día) se eliminan
     borrando la app o sus datos desde los ajustes de tu teléfono.
