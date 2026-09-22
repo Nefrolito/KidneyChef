@@ -662,6 +662,26 @@ function estadoSuscripcion() {
 // planes" (consulta, se cierra con la X).
 let paywallModoConsulta = false;
 
+// Sin nivel, el paywall tapa toda la app, pero revocar el vínculo o quitar la
+// foto no puede quedar detrás de un pago (Ley 20.584). Con esto el paywall se
+// aparta y deja ver solo la pestaña Tratante en pausa, sin barra de pestañas,
+// hasta que la persona vuelve a los planes o ya no le queda vínculo abierto.
+let gestionTratanteSinPlan = false;
+
+function abrirGestionTratanteSinPlan() {
+  gestionTratanteSinPlan = true;
+  renderSuscripcion();
+  irATab("tratante");
+  renderTabTratante();
+}
+
+function volverAPlanes() {
+  gestionTratanteSinPlan = false;
+  irATab("hoy");
+  renderTabTratante();
+  renderSuscripcion();
+}
+
 function abrirPaywallConsulta() {
   paywallModoConsulta = true;
   renderSuscripcion();
@@ -738,9 +758,10 @@ function renderAvisoDialisis() {
 function renderSuscripcion() {
   const estado = estadoSuscripcion();
   const { bloqueado } = estado;
-  const mostrar = bloqueado || paywallModoConsulta;
+  const mostrar = (bloqueado && !gestionTratanteSinPlan) || paywallModoConsulta;
 
   els.paywallOverlay.hidden = !mostrar;
+  els.paywallTratanteBtn.hidden = !(bloqueado && modoTratante() === "congelado");
   // Sin nivel activo no hay X: la app queda bloqueada hasta que haya
   // suscripción. En modo consulta sí se puede salir.
   els.paywallCerrarBtn.hidden = bloqueado;
@@ -1365,6 +1386,13 @@ function renderTabTratante() {
   els.activarPlanClinico.closest("label").hidden = congelado;
   els.codigoClienteBloque.hidden = congelado || !ensurePerfil().vinculacion.codigoCliente;
   renderFotoPaciente();
+  els.tratanteVolverPlanes.hidden = !gestionTratanteSinPlan;
+  // Revocó su último vínculo (o volvió a tener nivel): ya no hay nada que
+  // gestionar desde aquí, así que vuelve el paywall o la app normal.
+  if (gestionTratanteSinPlan && (modo !== "congelado" || !estadoSuscripcion().bloqueado)) {
+    volverAPlanes();
+    return;
+  }
   // Si la persona está justo en esta pestaña cuando deja de corresponderle,
   // vuelve a Hoy.
   if (modo === "oculto" && els.tabTratanteBtn.getAttribute("aria-selected") === "true") irATab("hoy");
@@ -1377,8 +1405,9 @@ function renderTabTratante() {
 // que cambia la cantidad de pestañas visibles.
 function renderBarraPestanas() {
   const visibles = [...els.tabBar.querySelectorAll(".tab-btn")].filter((b) => !b.hidden).length;
-  els.tabBar.hidden = visibles <= 1;
-  document.body.classList.toggle("sin-tab-bar", visibles <= 1);
+  const sinBarra = visibles <= 1 || gestionTratanteSinPlan;
+  els.tabBar.hidden = sinBarra;
+  document.body.classList.toggle("sin-tab-bar", sinBarra);
 }
 
 // Oculta las pestañas que el nivel no incluye y, si la abierta dejó de
@@ -1968,6 +1997,8 @@ const els = {
   paywallBajada: document.getElementById("paywall-bajada"),
   suscripcionEstado: document.getElementById("suscripcion-estado"),
   paywallDetallePrecio: document.getElementById("paywall-detalle-precio"),
+  paywallTratanteBtn: document.getElementById("paywall-tratante-btn"),
+  tratanteVolverPlanes: document.getElementById("tratante-volver-planes"),
   verPlanesBtn: document.getElementById("ver-planes-btn"),
   paywallMsg: document.getElementById("paywall-msg"),
   terminosOverlay: document.getElementById("terminos-overlay"),
@@ -2172,6 +2203,8 @@ async function init() {
   els.paywallSuscribirBtn.addEventListener("click", comprarSuscripcion);
   els.paywallRestaurarBtn.addEventListener("click", restaurarCompras);
   els.verPlanesBtn.addEventListener("click", abrirPaywallConsulta);
+  els.paywallTratanteBtn.addEventListener("click", abrirGestionTratanteSinPlan);
+  els.tratanteVolverPlanes.querySelector("button").addEventListener("click", volverAPlanes);
   els.paywallCerrarBtn.addEventListener("click", cerrarPaywallConsulta);
   els.paywallPeriodoToggle.addEventListener("click", (e) => {
     const btn = e.target.closest(".paywall-periodo-btn");
@@ -2258,6 +2291,7 @@ function irATab(tab) {
   // Venga de donde venga el salto (la barra, el puente a la receta, un cambio
   // de nivel), nadie cae en una pestaña que su nivel no incluye.
   if (!tabPermitida(tab)) tab = "hoy";
+  if (gestionTratanteSinPlan) tab = "tratante";
   document.querySelectorAll("[data-tab]").forEach((el) => {
     el.classList.toggle("tab-inactive", el.dataset.tab !== tab);
   });

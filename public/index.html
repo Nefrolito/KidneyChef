@@ -299,6 +299,9 @@
         que te fijaron siguen aplicándose. Puedes revocar el vínculo cuando
         quieras, o volver a Platinum para retomarlo donde quedó.
       </p>
+      <p id="tratante-volver-planes" hidden>
+        <button type="button" id="tratante-volver-planes-btn" class="btn btn-secondary" style="width:100%;">Volver a los planes</button>
+      </p>
 
       <label class="clinical-check clinical-check-ancho">
         <input type="checkbox" id="activar-plan-clinico">
@@ -560,6 +563,9 @@
       <button id="paywall-suscribir-btn" class="btn btn-primary paywall-btn">Suscribirme</button>
       <p class="paywall-detalle-precio" id="paywall-detalle-precio" hidden></p>
       <button type="button" id="paywall-restaurar-btn" class="paywall-restaurar">Restaurar compras</button>
+      <!-- Revocar el vínculo o quitar la foto no puede quedar detrás de un
+           pago: sin nivel, esto abre solo la pestaña Tratante reducida. -->
+      <button type="button" id="paywall-tratante-btn" class="paywall-restaurar" hidden>Revocar mi vínculo o quitar mi foto</button>
       <p class="paywall-msg" id="paywall-msg" hidden></p>
 
       <!-- Apple exige las tres cosas de acá abajo en la propia pantalla de
