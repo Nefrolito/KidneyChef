@@ -31,8 +31,8 @@ const API_BASE = esAppNativa() ? "https://kidneychef-api.onrender.com" : "";
 // grupo de suscripciones de cada tienda, crear ahí los 3 entitlements de
 // abajo, y completar las dos API keys públicas de RevenueCat (una por
 // plataforma — son públicas, igual que APP_KEY o las keys de Supabase en
-// tratante/config.js). Mientras estén vacías, initRevenueCat() no hace nada
-// y la app sigue funcionando solo con el trial local ya implementado.
+// tratante/config.js). Con la de la plataforma vacía, initRevenueCat() no
+// hace nada y la app usa el contador local de prueba, como la demo web.
 const REVENUECAT_API_KEY_IOS = "appl_CqmSDZNWUZxeKLOQgWQGsaITuRr";
 const REVENUECAT_API_KEY_ANDROID = "";
 
@@ -51,10 +51,9 @@ const RANGO_NIVEL = { gold: 1, platinum: 2, diamond: 3 };
 // Tratante tiene su propia regla, con estado en pausa: ver modoTratante().
 const NIVEL_MINIMO_TAB = { refrigerador: "platinum", supermercado: "platinum" };
 
-// Copy y precios de referencia para el selector de niveles del paywall — se
-// muestran mientras no haya una oferta real de RevenueCat cargada (hoy
-// siempre, porque las API keys de arriba están vacías). Los precios deben
-// coincidir con los configurados en App Store Connect / Google Play.
+// Copy y precios de referencia para el selector de niveles del paywall. Los
+// precios se usan solo si los productos de la tienda no alcanzan a cargar (y
+// en la demo web); deben coincidir con los de App Store Connect / Google Play.
 const NIVELES_INFO = {
   gold: {
     nombre: "Gold",
@@ -95,31 +94,115 @@ const NIVELES_INFO = {
   },
 };
 
-async function initRevenueCat() {
-  if (!esAppNativa()) return;
+// Lo que se sabe de la tienda en esta sesión de la app nativa. `listo` pasa a
+// true cuando RevenueCat respondió (o falló) por primera vez: antes de eso no
+// se muestra el paywall, para no mostrárselo un instante a quien sí paga.
+const tienda = {
+  listo: false,
+  error: false,
+  appUserId: null,
+  productos: {}, // id de producto → StoreProduct (precio y prueba reales)
+  elegibleParaPrueba: {}, // id de producto → true si la tienda le da la prueba gratis
+};
+
+// Clave pública de RevenueCat de esta plataforma, o "" en el navegador. Con
+// clave, el nivel y la prueba salen de la tienda; sin clave (la demo web) se
+// usa el contador local de TRIAL_DIAS.
+function apiKeyRevenueCat() {
+  if (!esAppNativa()) return "";
   const platform = window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : null;
-  const apiKey = platform === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
+  return platform === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
+}
+
+async function initRevenueCat() {
+  const apiKey = apiKeyRevenueCat();
   if (!apiKey) return;
+  const Purchases = window.Capacitor.Plugins.Purchases;
   try {
-    const Purchases = window.Capacitor.Plugins.Purchases;
     await Purchases.configure({ apiKey });
-    await sincronizarSuscripcionRevenueCat();
+    // ID anónimo de esta instalación. Viaja al servidor en cada llamada
+    // (X-RevenueCat-Id) para que compruebe el nivel por su cuenta.
+    ({ appUserID: tienda.appUserId } = await Purchases.getAppUserID());
+    // Renovaciones, cancelaciones que vencen o compras hechas en otro equipo
+    // llegan solas, sin que el paciente tenga que reabrir la app.
+    await Purchases.addCustomerInfoUpdateListener(aplicarCustomerInfo);
   } catch (e) {
     console.warn("No se pudo inicializar RevenueCat", e);
+    tienda.listo = true;
+    tienda.error = true;
+    renderSuscripcion();
+    return;
   }
+  await Promise.all([sincronizarSuscripcionRevenueCat(), cargarProductosTienda()]);
+}
+
+// Precios y prueba gratis tal como los tiene la tienda, para mostrar en el
+// paywall lo que de verdad se va a cobrar. Si no cargan, el paywall usa los
+// precios de referencia de NIVELES_INFO y no promete ninguna prueba.
+async function cargarProductosTienda() {
+  try {
+    const Purchases = window.Capacitor.Plugins.Purchases;
+    const { current } = await Purchases.getOfferings();
+    for (const pkg of current?.availablePackages || []) {
+      if (pkg.product?.identifier) tienda.productos[pkg.product.identifier] = pkg.product;
+    }
+    const ids = Object.keys(tienda.productos);
+    if (ids.length) {
+      // Apple da la prueba una sola vez por grupo de suscripciones: quien ya
+      // la usó no puede ver "1 mes gratis", porque se le cobraría al tiro.
+      const eleg = await Purchases.checkTrialOrIntroductoryPriceEligibility({ productIdentifiers: ids });
+      for (const id of ids) {
+        tienda.elegibleParaPrueba[id] = eleg?.[id]?.status === 2; // INTRO_ELIGIBILITY_STATUS_ELIGIBLE
+      }
+    }
+  } catch (e) {
+    console.warn("No se pudieron cargar los productos de la tienda", e);
+  }
+  renderSuscripcion();
 }
 
 // Nivel y periodo elegidos en el selector del paywall — ver renderPaywallNiveles().
 let paywallNivelSeleccionado = "platinum";
 let paywallPeriodoSeleccionado = "mensual"; // "mensual" | "anual"
 
-// Product ID real en App Store Connect / Google Play para el nivel+periodo
-// elegidos (com.kidneychef.app.<nivel> mensual, .<nivel>.annual anual).
+// Product ID real en App Store Connect / Google Play (com.kidneychef.app.<nivel>
+// mensual, .<nivel>.annual anual).
+function productIdPara(nivel, periodo) {
+  return `com.kidneychef.app.${periodo === "anual" ? `${nivel}.annual` : nivel}`;
+}
+
 function productIdSeleccionado() {
-  const sufijo = paywallPeriodoSeleccionado === "anual"
-    ? `${paywallNivelSeleccionado}.annual`
-    : paywallNivelSeleccionado;
-  return `com.kidneychef.app.${sufijo}`;
+  return productIdPara(paywallNivelSeleccionado, paywallPeriodoSeleccionado);
+}
+
+// "$7.990/mes": el precio de la tienda si cargó, si no el de referencia.
+function precioDeProducto(productId) {
+  const anual = productId.endsWith(".annual");
+  const nivel = productId.replace("com.kidneychef.app.", "").replace(".annual", "");
+  const info = NIVELES_INFO[nivel];
+  const referencia = info ? `$${(anual ? info.precioAnualClp : info.precioMensualClp).toLocaleString("es-CL")}` : "";
+  return `${tienda.productos[productId]?.priceString || referencia}${anual ? "/año" : "/mes"}`;
+}
+
+const UNIDADES_PERIODO = {
+  DAY: ["día", "días"],
+  WEEK: ["semana", "semanas"],
+  MONTH: ["mes", "meses"],
+  YEAR: ["año", "años"],
+};
+
+// "1 mes" si este producto trae prueba gratis y esta cuenta todavía puede
+// usarla; null en cualquier otro caso (incluido cuando no se sabe).
+function pruebaGratisDe(productId) {
+  const intro = tienda.productos[productId]?.introPrice;
+  if (!tienda.elegibleParaPrueba[productId] || !intro || intro.price !== 0) return null;
+  const n = intro.periodNumberOfUnits || 1;
+  const [uno, varios] = UNIDADES_PERIODO[intro.periodUnit] || UNIDADES_PERIODO.MONTH;
+  return `${n} ${n === 1 ? uno : varios}`;
+}
+
+function fechaLarga(iso) {
+  return new Date(iso).toLocaleDateString("es-CL", { day: "numeric", month: "long" });
 }
 
 // Dispara la compra real a través de RevenueCat.
@@ -130,10 +213,8 @@ function productIdSeleccionado() {
 // "estará disponible muy pronto", que para App Review es una compra rota y para
 // el paciente es un botón que no hace nada.
 async function comprarSuscripcion() {
-  const platform = esAppNativa() && window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : null;
-  const apiKey = platform === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
   els.paywallMsg.hidden = false;
-  if (!apiKey) {
+  if (!apiKeyRevenueCat()) {
     els.paywallMsg.textContent = "Las suscripciones se compran desde la app de iPhone o Android, no desde el navegador.";
     return;
   }
@@ -151,11 +232,14 @@ async function comprarSuscripcion() {
       els.paywallMsg.textContent = "Ese plan no está disponible en la tienda en este momento. No se te cobró nada. Prueba con otro plan o inténtalo más tarde.";
       return;
     }
-    await Purchases.purchasePackage({ aPackage: paquete });
+    const conPrueba = pruebaGratisDe(idProducto);
+    const { customerInfo } = await Purchases.purchasePackage({ aPackage: paquete });
     // Si se compró desde "Ver planes", el paywall ya cumplió su función.
     paywallModoConsulta = false;
-    await sincronizarSuscripcionRevenueCat();
-    els.paywallMsg.textContent = "¡Listo! Tu suscripción quedó activa.";
+    aplicarCustomerInfo(customerInfo);
+    els.paywallMsg.textContent = conPrueba
+      ? `¡Listo! Empezó tu prueba gratis de ${conPrueba}.`
+      : "¡Listo! Tu suscripción quedó activa.";
   } catch (e) {
     // Que el paciente cierre la hoja de compra de Apple no es un error: ya sabe
     // lo que hizo, y mostrarle una alarma sería confundirlo.
@@ -176,18 +260,16 @@ async function comprarSuscripcion() {
 // recupere su suscripción sin volver a pagar. Sin este botón el binario se
 // rechaza, aunque la compra funcione perfecto.
 async function restaurarCompras() {
-  const platform = esAppNativa() && window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : null;
-  const apiKey = platform === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
   els.paywallMsg.hidden = false;
-  if (!apiKey) {
+  if (!apiKeyRevenueCat()) {
     els.paywallMsg.textContent = "Las compras se restauran desde la app de iPhone o Android, no desde el navegador.";
     return;
   }
   els.paywallMsg.textContent = "Buscando tus compras anteriores…";
   try {
     const Purchases = window.Capacitor.Plugins.Purchases;
-    await Purchases.restorePurchases();
-    await sincronizarSuscripcionRevenueCat();
+    const { customerInfo } = await Purchases.restorePurchases();
+    aplicarCustomerInfo(customerInfo);
     const nivel = ensurePerfil().suscripcion.nivel;
     els.paywallMsg.textContent = nivel
       ? `Listo: restauramos tu suscripción ${NIVELES_INFO[nivel].nombre}.`
@@ -198,41 +280,68 @@ async function restaurarCompras() {
   }
 }
 
-// Refleja en perfil.suscripcion.nivel el entitlement real de RevenueCat (el
-// más alto entre los activos, o null si no hay ninguno). Se guarda en
-// localStorage (no solo en memoria) para que el paywall pueda evaluarse en
-// el siguiente arranque sin depender de que la llamada a RevenueCat ya haya
-// vuelto.
+// Refleja en perfil.suscripcion lo que dice RevenueCat: el nivel más alto
+// entre los activos (o null), y si está en la prueba gratis, hasta cuándo y si
+// se va a renovar. Se guarda en localStorage para que el siguiente arranque
+// no dependa de que RevenueCat ya haya respondido. La prueba gratis de la
+// tienda activa el entitlement del nivel elegido, así que quien prueba Gold
+// ve Gold, igual que el servidor.
+function aplicarCustomerInfo(customerInfo) {
+  const activos = customerInfo?.entitlements?.active || {};
+  const nivel = NIVELES_SUSCRIPCION.find((id) => Boolean(activos[id])) || null;
+  const ent = nivel ? activos[nivel] : null;
+  const perfil = ensurePerfil();
+  perfil.suscripcion = {
+    nivel,
+    enPrueba: ent?.periodType === "TRIAL",
+    vence: ent?.expirationDate || null,
+    seRenueva: ent ? ent.willRenew !== false : false,
+    producto: ent?.productIdentifier || null,
+  };
+  guardarPerfil(perfil);
+  tienda.listo = true;
+  tienda.error = false;
+  renderSuscripcion();
+  renderPlan();
+  // Las funciones de cada nivel tienen que aparecer (o desaparecer) sin que el
+  // paciente reinicie la app cuando el nivel acaba de cambiar.
+  renderRobotSelector();
+  renderRevisarReceta();
+  renderTabsPorNivel();
+}
+
 async function sincronizarSuscripcionRevenueCat() {
   try {
     const Purchases = window.Capacitor.Plugins.Purchases;
     const { customerInfo } = await Purchases.getCustomerInfo();
-    const activos = customerInfo?.entitlements?.active || {};
-    const nivel = NIVELES_SUSCRIPCION.find((id) => Boolean(activos[id])) || null;
-    const perfil = ensurePerfil();
-    perfil.suscripcion.nivel = nivel;
-    guardarPerfil(perfil);
-    renderSuscripcion();
-    renderPlan();
-    // Las funciones de Diamond tienen que aparecer (o desaparecer) sin que el
-    // paciente reinicie la app cuando el nivel acaba de cambiar.
-    renderRobotSelector();
-    renderRevisarReceta();
-    renderTabsPorNivel();
+    aplicarCustomerInfo(customerInfo);
   } catch (e) {
+    // Sin conexión con la tienda se sigue con el último nivel guardado; quien
+    // no tenía ninguno ve el paywall con el aviso de que no hubo conexión.
     console.warn("No se pudo sincronizar el estado de suscripción de RevenueCat", e);
+    tienda.listo = true;
+    tienda.error = true;
+    renderSuscripcion();
   }
 }
 
-// true si el nivel de suscripción activo (o el trial, que da acceso
-// completo) alcanza el mínimo pedido. La usan las funciones de Diamond
-// (modo robot, revisar receta) y la pestaña Tratante (Platinum).
+// true si el nivel activo alcanza el mínimo pedido. En la app nativa la
+// prueba gratis ya viene como nivel (el que eligió el paciente); solo la
+// demo web, sin compras, abre todo durante su mes de prueba local.
 function nivelSuficiente(minimo) {
-  const { enTrial, bloqueado } = estadoSuscripcion();
-  if (enTrial && !bloqueado) return true;
+  const estado = estadoSuscripcion();
+  if (!estado.conTienda && estado.enTrial) return true;
   const nivel = ensurePerfil().suscripcion.nivel;
   const rango = nivel ? RANGO_NIVEL[nivel] : 0;
   return rango >= RANGO_NIVEL[minimo];
+}
+
+// Headers de toda llamada al backend: la clave de app y, en la app nativa,
+// el ID de RevenueCat con el que el servidor comprueba el nivel.
+function headersApi(extra = {}) {
+  const h = { "X-App-Key": APP_KEY, ...extra };
+  if (tienda.appUserId) h["X-RevenueCat-Id"] = tienda.appUserId;
+  return h;
 }
 
 // Clave compartida con el backend, enviada en cada análisis. No es un secreto:
@@ -405,7 +514,7 @@ function guardarDatosPersonales() {
 // Subir TERMINOS_VERSION cuando cambie el contenido de terminos.html o
 // privacidad.html de forma relevante vuelve a pedir la aceptación a todos,
 // incluidos quienes ya la habían dado para una versión anterior.
-const TERMINOS_VERSION = "1.0";
+const TERMINOS_VERSION = "1.1";
 
 function terminosAceptados() {
   return ensurePerfil().terminos.version === TERMINOS_VERSION;
@@ -522,28 +631,35 @@ function confirmarDatosClinicos() {
   irATab("hoy");
 }
 
-// Suscripción: toda la app es gratis por TRIAL_DIAS desde la primera vez que
-// se abre (perfil.creadoEn), y de ahí en adelante requiere perfil.suscripcion.nivel
-// (hoy siempre null — se completa cuando se conecte el SDK de compras real).
-// 3 niveles con precio fijo (Gold/Platinum/Diamond, ver NIVELES_INFO) en vez
-// de un SKU único cuyo precio sube con el tiempo.
+// Suscripción. En la app nativa todo sale de la tienda: la prueba gratis es
+// una oferta introductoria de la App Store (1 mes en los 6 productos) y sin
+// nivel activo la app queda tras el paywall desde que se abre. Antes la prueba
+// era un contador local desde perfil.creadoEn, y reinstalar regalaba otro mes.
+// La demo web no tiene compras, así que conserva ese contador local de
+// TRIAL_DIAS (y el corte global DEMO_HASTA del servidor).
 const TRIAL_DIAS = 30;
 
 function estadoSuscripcion() {
   const perfil = ensurePerfil();
+  if (apiKeyRevenueCat()) {
+    return {
+      conTienda: true,
+      enTrial: false,
+      bloqueado: tienda.listo && !perfil.suscripcion.nivel,
+    };
+  }
   const diasTranscurridos = Math.floor(
     (Date.now() - new Date(perfil.creadoEn).getTime()) / 86400000
   );
   const diasRestantes = Math.max(0, TRIAL_DIAS - diasTranscurridos);
   const enTrial = diasRestantes > 0;
   const bloqueado = !enTrial && !perfil.suscripcion.nivel;
-  return { diasRestantes, enTrial, bloqueado };
+  return { conTienda: false, diasRestantes, enTrial, bloqueado };
 }
 
-// El paywall se abre por dos motivos distintos: porque se acabó el mes de
-// prueba (bloqueante, sin salida hasta suscribirse) o porque el paciente tocó
-// "Ver planes" (consulta, se cierra con la X). Antes solo existía el primero, y
-// eso dejaba los 6 productos inalcanzables durante los primeros 30 días.
+// El paywall se abre por dos motivos distintos: porque no hay nivel activo
+// (bloqueante, sin salida hasta suscribirse) o porque el paciente tocó "Ver
+// planes" (consulta, se cierra con la X).
 let paywallModoConsulta = false;
 
 function abrirPaywallConsulta() {
@@ -558,13 +674,28 @@ function cerrarPaywallConsulta() {
 
 // Estado en palabras para la tarjeta "Tu suscripción" de la pestaña Hoy.
 function textoEstadoSuscripcion() {
-  const { diasRestantes, enTrial } = estadoSuscripcion();
-  const nivel = ensurePerfil().suscripcion.nivel;
-  if (nivel) return `Tienes el nivel ${NIVELES_INFO[nivel].nombre} activo.`;
-  if (enTrial) {
-    return diasRestantes === 1
+  const estado = estadoSuscripcion();
+  const s = ensurePerfil().suscripcion;
+  if (s.nivel) {
+    const nombre = NIVELES_INFO[s.nivel].nombre;
+    if (estado.conTienda && s.vence) {
+      const fecha = fechaLarga(s.vence);
+      if (s.enPrueba) {
+        return s.seRenueva
+          ? `Estás en la prueba gratis de ${nombre} hasta el ${fecha}. Después se cobra ${precioDeProducto(s.producto || productIdPara(s.nivel, "mensual"))}, salvo que la canceles antes.`
+          : `Estás en la prueba gratis de ${nombre} hasta el ${fecha}. La cancelaste, así que no se te va a cobrar.`;
+      }
+      if (!s.seRenueva) return `Tienes ${nombre} hasta el ${fecha}. La cancelaste, así que no se va a renovar.`;
+    }
+    return `Tienes el nivel ${nombre} activo.`;
+  }
+  if (estado.conTienda) {
+    return tienda.listo ? "No tienes una suscripción activa." : "Revisando tu suscripción…";
+  }
+  if (estado.enTrial) {
+    return estado.diasRestantes === 1
       ? "Te queda 1 día de prueba gratis."
-      : `Te quedan ${diasRestantes} días de prueba gratis.`;
+      : `Te quedan ${estado.diasRestantes} días de prueba gratis.`;
   }
   return "Tu mes de prueba terminó.";
 }
@@ -605,30 +736,43 @@ function renderAvisoDialisis() {
 }
 
 function renderSuscripcion() {
-  const { bloqueado } = estadoSuscripcion();
+  const estado = estadoSuscripcion();
+  const { bloqueado } = estado;
   const mostrar = bloqueado || paywallModoConsulta;
 
   els.paywallOverlay.hidden = !mostrar;
-  // Con el trial vencido no hay X: la app queda bloqueada hasta que haya
+  // Sin nivel activo no hay X: la app queda bloqueada hasta que haya
   // suscripción. En modo consulta sí se puede salir.
   els.paywallCerrarBtn.hidden = bloqueado;
-  els.paywallTitulo.textContent = bloqueado
-    ? "Tu mes de prueba terminó"
-    : "Los planes de KidneyChef";
-  els.paywallBajada.textContent = bloqueado
-    ? "Elige el nivel de KidneyChef que se ajuste a lo que necesitas."
-    : "Puedes suscribirte cuando quieras: tu mes de prueba sigue corriendo igual.";
+  if (estado.conTienda) {
+    const prueba = pruebaGratisDe(productIdSeleccionado());
+    els.paywallTitulo.textContent = bloqueado ? "Elige tu nivel de KidneyChef" : "Los planes de KidneyChef";
+    els.paywallBajada.textContent = bloqueado && tienda.error
+      ? "No pudimos conectar con la tienda. Revisa tu conexión; si ya tienes una suscripción, toca Restaurar compras."
+      : ensurePerfil().suscripcion.nivel
+        ? "Puedes cambiar de nivel cuando quieras; la tienda ajusta el cobro."
+        : prueba
+          ? `Cada nivel parte con ${prueba} gratis. Si la cancelas antes de que termine, no se te cobra nada.`
+          : "Elige el nivel de KidneyChef que se ajuste a lo que necesitas.";
+  } else {
+    els.paywallTitulo.textContent = bloqueado ? "Tu mes de prueba terminó" : "Los planes de KidneyChef";
+    els.paywallBajada.textContent = bloqueado
+      ? "Elige el nivel de KidneyChef que se ajuste a lo que necesitas."
+      : "Puedes suscribirte cuando quieras: tu mes de prueba sigue corriendo igual.";
+  }
   if (mostrar) renderPaywallNiveles();
 
   els.suscripcionEstado.textContent = textoEstadoSuscripcion();
 
-  // Los días de prueba los arma renderBanner(), que además rota el consejo.
+  // El consejo del día se esconde tras el paywall; lo decide renderBanner().
   renderBanner();
 }
 
 // Dibuja el toggle mensual/anual y las 3 tarjetas de nivel del paywall según
 // paywallNivelSeleccionado / paywallPeriodoSeleccionado, y actualiza el botón
-// de suscribirse con el nivel y precio elegidos.
+// de suscribirse con el nivel y precio elegidos. Apple exige que el monto que
+// se va a cobrar sea el precio más visible, también cuando hay prueba gratis:
+// por eso el precio grande de la tarjeta no cambia y la prueba va en el botón.
 function renderPaywallNiveles() {
   els.paywallPeriodoToggle.querySelectorAll(".paywall-periodo-btn").forEach((btn) => {
     const activo = btn.dataset.periodo === paywallPeriodoSeleccionado;
@@ -638,25 +782,30 @@ function renderPaywallNiveles() {
 
   els.paywallNiveles.innerHTML = Object.entries(NIVELES_INFO)
     .map(([id, info]) => {
-      const precio = paywallPeriodoSeleccionado === "anual" ? info.precioAnualClp : info.precioMensualClp;
-      const sufijo = paywallPeriodoSeleccionado === "anual" ? "/año" : "/mes";
+      const [monto, sufijo] = precioDeProducto(productIdPara(id, paywallPeriodoSeleccionado)).split("/");
       const seleccionado = id === paywallNivelSeleccionado;
       return `
         <button type="button" class="paywall-nivel${seleccionado ? " seleccionado" : ""}" data-nivel="${id}" aria-pressed="${seleccionado}">
           ${id === "platinum" ? '<span class="paywall-nivel-badge">Recomendado</span>' : ""}
           <span class="paywall-nivel-nombre">${info.nombre}</span>
-          <span class="paywall-nivel-precio">$${precio.toLocaleString("es-CL")}<small>${sufijo}</small></span>
+          <span class="paywall-nivel-precio">${escapeHtml(monto)}<small>/${sufijo}</small></span>
           <ul class="paywall-nivel-features">${featuresDeNivel(id).map((f) => `<li>${escapeHtml(f)}</li>`).join("")}</ul>
         </button>
       `;
     })
     .join("");
 
-  const infoSeleccionado = NIVELES_INFO[paywallNivelSeleccionado];
-  const precioSeleccionado = paywallPeriodoSeleccionado === "anual" ? infoSeleccionado.precioAnualClp : infoSeleccionado.precioMensualClp;
-  const sufijoBtn = paywallPeriodoSeleccionado === "anual" ? "/año" : "/mes";
-  els.paywallSuscribirBtn.textContent =
-    `Suscribirme a ${infoSeleccionado.nombre} — $${precioSeleccionado.toLocaleString("es-CL")} CLP ${sufijoBtn}`;
+  const idProducto = productIdSeleccionado();
+  const nombre = NIVELES_INFO[paywallNivelSeleccionado].nombre;
+  const precio = precioDeProducto(idProducto);
+  const prueba = ensurePerfil().suscripcion.nivel ? null : pruebaGratisDe(idProducto);
+  els.paywallSuscribirBtn.textContent = prueba
+    ? `Probar ${nombre} ${prueba} gratis`
+    : `Suscribirme a ${nombre} — ${precio}`;
+  els.paywallDetallePrecio.hidden = !prueba;
+  els.paywallDetallePrecio.textContent = prueba
+    ? `${prueba} gratis, después ${precio}. Se renueva sola hasta que la canceles.`
+    : "";
 }
 
 function datosClinicosPorDefecto() {
@@ -981,9 +1130,9 @@ function clasificar(nutriente, valorPorcion, densidad100g, por100g = false) {
 // sin relación con lo que el usuario efectivamente paga.
 function renderPlan() {
   const { enTrial, bloqueado } = estadoSuscripcion();
-  const nivel = ensurePerfil().suscripcion.nivel;
+  const { nivel, enPrueba } = ensurePerfil().suscripcion;
   const nombreNivel = nivel
-    ? NIVELES_INFO[nivel].nombre
+    ? `${NIVELES_INFO[nivel].nombre}${enPrueba ? " (prueba)" : ""}`
     : enTrial && !bloqueado
       ? "Prueba gratis"
       : "Sin suscripción";
@@ -1266,11 +1415,10 @@ const VINCULOS_POLL_MS = 60000;
 function authHeadersPaciente() {
   const perfil = ensurePerfil();
   const v = perfil.vinculacion || {};
-  return {
-    "X-App-Key": APP_KEY,
+  return headersApi({
     "X-Codigo-Cliente": v.codigoCliente || "",
     "X-Device-Secret": v.deviceSecret || "",
-  };
+  });
 }
 
 function renderVinculacion() {
@@ -1325,7 +1473,7 @@ async function activarPlanClinico() {
     try {
       const res = await fetch(`${API_BASE}/api/pacientes`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+        headers: headersApi({ "Content-Type": "application/json" }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo activar el Plan Clínico");
@@ -1819,6 +1967,7 @@ const els = {
   paywallTitulo: document.getElementById("paywall-titulo"),
   paywallBajada: document.getElementById("paywall-bajada"),
   suscripcionEstado: document.getElementById("suscripcion-estado"),
+  paywallDetallePrecio: document.getElementById("paywall-detalle-precio"),
   verPlanesBtn: document.getElementById("ver-planes-btn"),
   paywallMsg: document.getElementById("paywall-msg"),
   terminosOverlay: document.getElementById("terminos-overlay"),
@@ -2190,7 +2339,7 @@ async function analyzeImage() {
   try {
     const res = await fetch(`${API_BASE}/api/analyze`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      headers: headersApi({ "Content-Type": "application/json" }),
       body: JSON.stringify({ image: currentImageDataUrl }),
     });
     const data = await res.json();
@@ -2748,7 +2897,7 @@ async function identificarIngredientesRefrigerador() {
       refrigeradorImagenes.map((imagen) =>
         fetch(`${API_BASE}/api/identificar-ingredientes`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+          headers: headersApi({ "Content-Type": "application/json" }),
           body: JSON.stringify({ image: imagen }),
         })
           .then(async (res) => {
@@ -3334,7 +3483,7 @@ async function analizarMiDia() {
   try {
     const res = await fetch(`${API_BASE}/api/analisis-dia`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      headers: headersApi({ "Content-Type": "application/json" }),
       body: JSON.stringify({
         alimentos: alimentos.map((a) => ({ nombre: a.nombre, gramos: a.porcionG })),
         totales,
@@ -3676,7 +3825,7 @@ async function identificarProductoSuper() {
   try {
     const res = await fetch(`${API_BASE}/api/identificar-ingredientes`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      headers: headersApi({ "Content-Type": "application/json" }),
       body: JSON.stringify({ image: superFotoImagenDataUrl }),
     });
     const data = await res.json();
@@ -3981,7 +4130,7 @@ async function pedirLecturaReceta(payload) {
   try {
     const res = await fetch(`${API_BASE}/api/leer-receta`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      headers: headersApi({ "Content-Type": "application/json" }),
       body: JSON.stringify(payload),
     });
     const data = await res.json();
@@ -4354,7 +4503,7 @@ async function generarRecetaIA() {
   try {
     const res = await fetch(`${API_BASE}/api/generar-receta`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-App-Key": APP_KEY },
+      headers: headersApi({ "Content-Type": "application/json" }),
       body: JSON.stringify({
         ingredientes,
         presupuesto: presupuestoRestanteHoy(),
