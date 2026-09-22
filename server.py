@@ -48,6 +48,7 @@ load_dotenv()
 # importa DESPUÉS de load_dotenv() por la misma razón de arriba — si se
 # importara antes (ej. en el bloque de imports), leería el entorno vacío.
 import supabase_client  # noqa: E402
+import revenuecat_client  # noqa: E402
 
 PUBLIC_DIR = ROOT / "public"
 TRATANTE_DIR = ROOT / "tratante"
@@ -144,6 +145,70 @@ PAGINA_DEMO_TERMINADA = """<!DOCTYPE html>
   </div>
 </body>
 </html>"""
+
+# --- Nivel de suscripción del lado del servidor -------------------------
+# Hoy los niveles (Gold/Platinum/Diamond) solo los aplica la app. La app 1.2
+# manda su ID de RevenueCat en X-RevenueCat-Id y el servidor puede
+# comprobarlo; las versiones 1.0 y 1.1 no lo mandan, así que exigirlo antes
+# de que casi todos actualicen rechazaría también a quienes pagan.
+#   observar (por defecto): consulta el nivel y registra en el log qué
+#     rechazaría, sin rechazar nada ni demorar la respuesta.
+#   apagado: ni consulta ni registra.
+# Nunca se exige nivel para revocar o rechazar un vínculo, quitar la foto ni
+# leer datos propios (el consentimiento no va detrás de un pago), ni en los
+# endpoints del portal (el tratante no paga).
+NIVEL_MODO = os.environ.get("NIVEL_MODO", "observar").strip().lower()
+HEADER_REVENUECAT_ID = "X-RevenueCat-Id"
+
+
+def _origen(handler):
+    # Distingue la app nativa (Capacitor) de la app web de prueba, que no
+    # tiene compras y nunca va a mandar un ID.
+    origen = handler.headers.get("Origin", "")
+    if origen.startswith("capacitor://") or origen.startswith("https://localhost"):
+        return "app"
+    return "web" if origen else "sin-origen"
+
+
+def _decidir_nivel(app_user_id, minimo):
+    """(pasaría, detalle) para el log del modo observar."""
+    if not app_user_id:
+        return False, "sin-id"
+    if not revenuecat_client.id_valido(app_user_id):
+        return False, "id-invalido"
+    if not revenuecat_client.configurado():
+        return False, "sin-clave-revenuecat"
+    try:
+        nivel = revenuecat_client.nivel_de(app_user_id)
+    except revenuecat_client.RevenueCatError as e:
+        # En modo exigir, una caída de RevenueCat tendría que dejar pasar.
+        return True, f"error-revenuecat ({e})"
+    if revenuecat_client.alcanza(nivel, minimo):
+        return True, f"tiene={nivel}"
+    return False, f"tiene={nivel or 'ninguno'}"
+
+
+def observar_nivel(handler, minimo):
+    """Registra si esta petición pasaría con el nivel exigido. No responde
+    nada ni frena la petición: la consulta a RevenueCat va en otro hilo."""
+    if NIVEL_MODO != "observar":
+        return
+    app_user_id = handler.headers.get(HEADER_REVENUECAT_ID, "").strip()
+    ruta = handler.path.split("?", 1)[0]
+    origen = _origen(handler)
+    # Solo el final del ID: alcanza para seguir a una instalación en el log.
+    corto = app_user_id[-6:] if app_user_id else "-"
+
+    def tarea():
+        pasaria, detalle = _decidir_nivel(app_user_id, minimo)
+        print(
+            f"[nivel] {'pasaria' if pasaria else 'rechazaria'} ruta={ruta} "
+            f"exige={minimo} {detalle} origen={origen} id=…{corto}",
+            flush=True,
+        )
+
+    threading.Thread(target=tarea, daemon=True).start()
+
 
 # Tope de tamaño del body. Las fotos llegan como data URL en base64; 8 MB da
 # holgura para una foto de celular y evita que alguien mande payloads enormes.
@@ -1083,6 +1148,8 @@ def handle_analyze(handler):
             handler._send_json(401, {"error": "Acceso no autorizado a la API."})
             return
 
+    observar_nivel(handler, "gold")
+
     try:
         length = int(handler.headers.get("Content-Length", 0))
     except ValueError:
@@ -1143,6 +1210,8 @@ def handle_identificar_ingredientes(handler):
             print(f"[auth] rechazado ip={handler._client_ip()}", flush=True)
             handler._send_json(401, {"error": "Acceso no autorizado a la API."})
             return
+
+    observar_nivel(handler, "platinum")
 
     try:
         length = int(handler.headers.get("Content-Length", 0))
@@ -1299,6 +1368,8 @@ def handle_analisis_dia(handler):
             handler._send_json(401, {"error": "Acceso no autorizado a la API."})
             return
 
+    observar_nivel(handler, "gold")
+
     body = _leer_body_json(handler)
     if body is None:
         return
@@ -1345,6 +1416,7 @@ def handle_generar_receta(handler):
     situacion_clinica = body.get("situacion_clinica") if isinstance(body.get("situacion_clinica"), dict) else None
     riesgo_hiperkalemia = bool(body.get("riesgo_hiperkalemia"))
     robot_id = body.get("robot") if isinstance(body.get("robot"), str) else None
+    observar_nivel(handler, "diamond" if robot_id else "platinum")
 
     ip = handler._client_ip()
     permitido, retry_after, motivo = RATE_LIMITER.check(ip)
@@ -1381,6 +1453,8 @@ def handle_leer_receta(handler):
             print(f"[auth] rechazado ip={handler._client_ip()}", flush=True)
             handler._send_json(401, {"error": "Acceso no autorizado a la API."})
             return
+
+    observar_nivel(handler, "diamond")
 
     body = _leer_body_json(handler)
     if body is None:
@@ -1450,6 +1524,8 @@ def handle_crear_paciente(handler):
         if not hmac.compare_digest(provided, APP_KEY):
             handler._send_json(401, {"error": "Acceso no autorizado a la API."})
             return
+
+    observar_nivel(handler, "platinum")
 
     secret = generar_device_secret()
     secret_hash = hash_device_secret(secret)
@@ -1530,6 +1606,8 @@ def handle_actualizar_vinculo_paciente(handler, id):
     if body is None:
         return
     nuevo_estado = body.get("estado")
+    if nuevo_estado == "activo":
+        observar_nivel(handler, "platinum")
     vinculo = supabase_client.get_vinculo_por_id(id)
     if not vinculo or vinculo["paciente_id"] != paciente["id"]:
         handler._send_json(404, {"error": "Vínculo no encontrado"})
@@ -1838,6 +1916,7 @@ def handle_upsert_consumo(handler, fecha):
     if not paciente:
         handler._send_json(401, {"error": "Credenciales de dispositivo inválidas"})
         return
+    observar_nivel(handler, "platinum")
     if not supabase_client.find_vinculo_activo(paciente["id"]):
         handler._send_json(403, {
             "error": "No hay un vínculo activo con ningún tratante; el consumo no se sincroniza."
@@ -1931,6 +2010,7 @@ def handle_put_foto_paciente(handler):
     if not paciente:
         handler._send_json(401, {"error": "Credenciales de dispositivo inválidas"})
         return
+    observar_nivel(handler, "platinum")
     if not supabase_client.find_vinculo_activo(paciente["id"]):
         handler._send_json(403, {
             "error": "No hay un vínculo activo con ningún tratante; la foto no se guarda."
@@ -2328,7 +2408,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
         self.send_header(
             "Access-Control-Allow-Headers",
-            "Content-Type, X-App-Key, X-Device-Secret, X-Codigo-Cliente, Authorization",
+            "Content-Type, X-App-Key, X-Device-Secret, X-Codigo-Cliente, Authorization, X-RevenueCat-Id",
         )
 
     def _send_json(self, status, obj, extra_headers=None):

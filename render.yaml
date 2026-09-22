@@ -16,6 +16,13 @@ services:
         sync: false
       - key: SUPABASE_ANON_KEY
         sync: false
+      # Clave secreta de RevenueCat (sk_...), para comprobar el nivel de
+      # suscripción en el servidor. Se pega a mano en el panel de Render.
+      - key: REVENUECAT_SECRET_KEY
+        sync: false
+      # observar: solo registra en el log qué rechazaría (ver server.py).
+      - key: NIVEL_MODO
+        value: observar
       # Último día en que se puede abrir la app web compartida por fuera de
       # la App Store (hora de Chile). Vacío = sin vencimiento. Cambiar la
       # fecha acá y volver a desplegar, o editarla en el panel de Render.
