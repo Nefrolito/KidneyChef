@@ -1467,7 +1467,9 @@ h1, h2, h3 {
 .paywall-card h2 { margin: 0 0 0.6rem; font-size: 1.15rem; color: var(--brand-dark); }
 .paywall-card p { margin: 0 0 0.75rem; font-size: 0.9rem; color: var(--text); line-height: 1.5; }
 .paywall-btn { width: 100%; margin-top: 0.9rem; }
-.about-version { margin: 0.2rem 0 0; font-size: 0.78rem; color: var(--muted); }
+/* El margen inferior compensa el -0.6rem de .about-privacidad, que si no
+   sube los enlaces encima de esta línea. */
+.about-version { margin: 0.4rem 0 0.9rem; font-size: 0.78rem; color: var(--muted); }
 .paywall-detalle-precio { margin: 0.5rem 0 0; font-size: 0.85rem; color: var(--text); text-align: center; }
 .paywall-detalle-precio[hidden] { display: none; }
 .paywall-restaurar {
