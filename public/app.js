@@ -516,6 +516,12 @@ function guardarDatosPersonales() {
 // incluidos quienes ya la habían dado para una versión anterior.
 const TERMINOS_VERSION = "1.1";
 
+// Versión que muestra "Acerca de KidneyChef". Sirve para saber, con la app
+// instalada, si es la compilada ahora o la de la tienda. Hay que subirla a
+// mano junto con MARKETING_VERSION/CURRENT_PROJECT_VERSION en Xcode (no se
+// lee del bundle: eso exigiría el plugin @capacitor/app, que no está).
+const APP_VERSION = "1.2 (8)";
+
 function terminosAceptados() {
   return ensurePerfil().terminos.version === TERMINOS_VERSION;
 }
@@ -1159,6 +1165,7 @@ function renderPlan() {
       : "Sin suscripción";
   els.planBadge.textContent = nombreNivel;
   els.aboutPlan.textContent = `Tu plan actual: ${nombreNivel}.`;
+  els.aboutVersion.textContent = `KidneyChef ${APP_VERSION}${esAppNativa() ? "" : " · web"}`;
 }
 
 function renderDatosClinicos() {
@@ -1956,6 +1963,7 @@ const els = {
   aboutClose: document.getElementById("about-close"),
   planBadge: document.getElementById("plan-badge"),
   aboutPlan: document.getElementById("about-plan"),
+  aboutVersion: document.getElementById("about-version"),
   etapaSello: document.getElementById("etapa-sello"),
   etapaCirculoSuperior: document.getElementById("etapa-circulo-superior"),
   etapaCirculoValor: document.getElementById("etapa-circulo-valor"),
