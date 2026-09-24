@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /Users/camiloulloa/dieta-renal && python3 scripts/chequeo_salud.py --json)",
+      "Bash(cd /Users/camiloulloa/dieta-renal && python3 scripts/chequeo_salud.py)",
+      "Bash(cd /Users/camiloulloa/dieta-renal)",
+      "Bash(python3 /Users/camiloulloa/dieta-renal/scripts/chequeo_salud.py --json)",
+      "Bash(python3 /Users/camiloulloa/dieta-renal/scripts/chequeo_salud.py)",
+      "Bash(python3 scripts/chequeo_salud.py *)",
+      "Bash(python3 scripts/chequeo_salud.py --json)",
+      "Bash(python3 scripts/chequeo_salud.py)"
+    ]
+  }
+}
