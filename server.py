@@ -401,6 +401,48 @@ def fallo_ia(handler, e, accion, mensaje):
     handler._send_json(502, {"error": mensaje})
 
 
+# Fallas pasajeras de la API de Claude: sobrecarga del servicio, tope de
+# velocidad, un 500 suelto, un corte de red. Se reintentan solas con espera
+# creciente, así un tropiezo de segundos no llega al paciente como error. Un
+# 401 o un 400 NO se reintentan: esos no se arreglan esperando.
+ANTHROPIC_REINTENTOS = int(os.environ.get("ANTHROPIC_REINTENTOS", 2))
+ANTHROPIC_CODIGOS_REINTENTABLES = {408, 409, 429, 500, 502, 503, 504, 529}
+ANTHROPIC_ESPERA_MAX = 10
+
+
+def llamar_anthropic(body, api_key, timeout=60, que="la IA"):
+    """POST a la API de Claude con reintentos. Devuelve el payload parseado."""
+    espera = 1.0
+    for intento in range(ANTHROPIC_REINTENTOS + 1):
+        ultimo = intento == ANTHROPIC_REINTENTOS
+        req = urllib.request.Request(ANTHROPIC_URL, data=body, method="POST", headers={
+            "x-api-key": api_key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        })
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode("utf-8", errors="replace")
+            if ultimo or e.code not in ANTHROPIC_CODIGOS_REINTENTABLES:
+                raise RuntimeError(f"Error de la API de Claude ({e.code}): {detail}") from e
+            motivo = str(e.code)
+            # Si la API dice cuánto esperar, se le hace caso (con tope, para no
+            # dejar al paciente mirando la pantalla un minuto).
+            try:
+                espera = min(float(e.headers.get("retry-after", espera)), ANTHROPIC_ESPERA_MAX)
+            except (TypeError, ValueError):
+                pass
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, OSError) as e:
+            if ultimo:
+                raise RuntimeError(f"No se pudo hablar con la API de Claude: {e}") from e
+            motivo = type(e).__name__
+        print(f"[ia] reintento {intento + 1} de {ANTHROPIC_REINTENTOS} en {que}: {motivo}", flush=True)
+        time.sleep(espera)
+        espera = min(espera * 2, ANTHROPIC_ESPERA_MAX)
+
+
 def _verificar_no_truncado(payload, que):
     """Corta con un error claro si el modelo se quedó sin max_tokens.
 
@@ -451,18 +493,7 @@ def _call_claude_vision_con_prompt(data_url, prompt):
         }],
     }).encode("utf-8")
 
-    req = urllib.request.Request(ANTHROPIC_URL, data=body, method="POST", headers={
-        "x-api-key": api_key,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-    })
-
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        detail = e.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Error de la API de Claude ({e.code}): {detail}") from e
+    payload = llamar_anthropic(body, api_key, 60, "identificación de alimentos")
 
     _verificar_no_truncado(payload, "identificación de alimentos")
 
@@ -599,17 +630,8 @@ def call_claude_leer_receta(imagen=None, texto=None):
         "messages": [{"role": "user", "content": contenido}],
     }).encode("utf-8")
 
-    req = urllib.request.Request(ANTHROPIC_URL, data=body, method="POST", headers={
-        "x-api-key": api_key,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-    })
-    try:
-        with urllib.request.urlopen(req, timeout=90) as resp:
-            datos = _parsear_respuesta_receta(json.loads(resp.read().decode("utf-8")))
-    except urllib.error.HTTPError as e:
-        detail = e.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Error de la API de Claude ({e.code}): {detail}") from e
+    datos = _parsear_respuesta_receta(
+        llamar_anthropic(body, api_key, 90, "lectura de receta"))
 
     # El nombre que da el modelo se resuelve acá contra nutrientes.json: al
     # cliente le llega el id exacto o null, no un nombre suelto que tendría que
@@ -882,18 +904,7 @@ def _intentar_llamada_receta(prompt, api_key):
         "messages": [{"role": "user", "content": prompt}],
     }).encode("utf-8")
 
-    req = urllib.request.Request(ANTHROPIC_URL, data=body, method="POST", headers={
-        "x-api-key": api_key,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-    })
-
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        detail = e.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Error de la API de Claude ({e.code}): {detail}") from e
+    payload = llamar_anthropic(body, api_key, 60, "generación de la receta")
 
     _verificar_no_truncado(payload, "generación de la receta")
 
@@ -1353,17 +1364,7 @@ def call_claude_analisis_dia(datos):
         "messages": [{"role": "user", "content": _build_prompt_analisis_dia(datos)}],
     }).encode("utf-8")
 
-    req = urllib.request.Request(ANTHROPIC_URL, data=body, method="POST", headers={
-        "x-api-key": api_key,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-    })
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        detail = e.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Error de la API de Claude ({e.code}): {detail}") from e
+    payload = llamar_anthropic(body, api_key, 60, "análisis del día")
 
     _verificar_no_truncado(payload, "análisis del día")
     texto = "".join(
