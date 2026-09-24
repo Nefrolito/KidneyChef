@@ -2364,11 +2364,28 @@ def handle_actualizar_indicacion_paciente(handler, id):
     handler._send_json(200, {"indicacion": _indicacion_publica(actualizada or fila)})
 
 
+def handle_version(handler):
+    """GET /api/version — qué commit está corriendo ahora mismo.
+
+    Existe porque después de un despliegue no había forma de saber, desde
+    afuera, si el servidor ya tomó el código nuevo o seguía con el viejo:
+    había que entrar al panel de Render a mirarlo. Render define
+    RENDER_GIT_COMMIT solo; en local no existe y se responde "local"."""
+    commit = os.environ.get("RENDER_GIT_COMMIT", "")
+    handler._send_json(200, {
+        "commit": commit[:7] if commit else "local",
+        "commit_completo": commit,
+        "modo_nivel": NIVEL_MODO,
+        "demo_hasta": DEMO_HASTA or None,
+    })
+
+
 # Router mínimo: cada ruta es (método HTTP, regex del path, función que recibe
 # el Handler y los grupos nombrados del regex como kwargs). Las fases
 # siguientes (metas, consumo) solo agregan tuplas acá — no tocan
 # do_GET/do_POST/do_PATCH/do_DELETE, que quedan como despachadores genéricos.
 ROUTES = [
+    ("GET", re.compile(r"^/api/version$"), handle_version),
     ("POST", re.compile(r"^/api/analyze$"), handle_analyze),
     ("POST", re.compile(r"^/api/identificar-ingredientes$"), handle_identificar_ingredientes),
     ("POST", re.compile(r"^/api/generar-receta$"), handle_generar_receta),

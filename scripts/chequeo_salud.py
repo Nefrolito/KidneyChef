@@ -113,6 +113,26 @@ def revisar_ia():
                  "Revisa los logs de Render.")
 
 
+def revisar_commit():
+    """Avisa si producción quedó corriendo un commit distinto al de GitHub,
+    que es lo que pasa cuando un despliegue falla y nadie se da cuenta."""
+    status, cuerpo, _ = pedir(f"{BASE}/api/version", timeout=30)
+    if status != 200:
+        return aviso("Versión desplegada", f"/api/version respondió {status}",
+                     "Si es 404, producción todavía corre una versión anterior a este chequeo.")
+    try:
+        desplegado = json.loads(cuerpo).get("commit", "")
+    except json.JSONDecodeError:
+        return aviso("Versión desplegada", "respuesta ilegible", "")
+    local = os.popen("cd %s && git rev-parse origin/main 2>/dev/null" % RAIZ).read().strip()[:7]
+    if not local:
+        return ok("Versión desplegada", f"commit {desplegado}")
+    if desplegado == local:
+        return ok("Versión desplegada", f"commit {desplegado}, al día con GitHub")
+    return aviso("Versión desplegada", f"corre {desplegado} y GitHub va en {local}",
+                 "Puede ser un despliegue en curso o uno que falló: revisa Deploys en Render.")
+
+
 def revisar_portal():
     status, _, _ = pedir(f"{BASE}/tratante/")
     if status == 200:
@@ -181,7 +201,7 @@ def main():
 
     cargar_env()
 
-    resultados = [revisar_web(), revisar_ia(), revisar_portal(),
+    resultados = [revisar_web(), revisar_ia(), revisar_commit(), revisar_portal(),
                   revisar_revenuecat(), revisar_demo()]
     hay_falla = any(r["estado"] == "falla" for r in resultados)
 
