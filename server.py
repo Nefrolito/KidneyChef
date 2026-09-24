@@ -210,6 +210,13 @@ def observar_nivel(handler, minimo):
     threading.Thread(target=tarea, daemon=True).start()
 
 
+REINTENTO = "Inténtalo de nuevo en unos minutos."
+MSG_IA_ANALYZE = f"No pudimos analizar la foto en este momento. {REINTENTO}"
+MSG_IA_INGREDIENTES = f"No pudimos identificar los ingredientes en este momento. {REINTENTO}"
+MSG_IA_RECETA = f"No pudimos generar la receta en este momento. {REINTENTO}"
+MSG_IA_LEER_RECETA = f"No pudimos leer esta receta en este momento. {REINTENTO}"
+MSG_IA_ANALISIS_DIA = f"No pudimos preparar el resumen de tu día en este momento. {REINTENTO}"
+
 # Tope de tamaño del body. Las fotos llegan como data URL en base64; 8 MB da
 # holgura para una foto de celular y evita que alguien mande payloads enormes.
 MAX_BODY_BYTES = int(os.environ.get("MAX_BODY_BYTES", 8 * 1024 * 1024))
@@ -383,6 +390,15 @@ def format_espera(segundos):
         return f"{minutos} minuto{'s' if minutos != 1 else ''}"
     horas = minutos // 60
     return f"{horas} hora{'s' if horas != 1 else ''}"
+
+
+# Lo que ve el paciente cuando falla una llamada a la IA. El detalle técnico
+# (401 de Anthropic, JSON truncado, timeout) va al log del servidor y NUNCA a
+# la pantalla: el 2026-09-24 la clave de Anthropic venció y los usuarios
+# vieron el JSON crudo del error dentro de la app.
+def fallo_ia(handler, e, accion, mensaje):
+    print(f"[ia] fallo en {accion}: {type(e).__name__}: {e}", flush=True)
+    handler._send_json(502, {"error": mensaje})
 
 
 def _verificar_no_truncado(payload, que):
@@ -1193,10 +1209,10 @@ def handle_analyze(handler):
 
         items = call_claude_vision(image)
         handler._send_json(200, {"items": items})
-    except RuntimeError as e:
-        handler._send_json(500, {"error": str(e)})
+    except ValueError as e:
+        handler._send_json(400, {"error": str(e)})
     except Exception as e:
-        handler._send_json(500, {"error": f"Error inesperado: {e}"})
+        fallo_ia(handler, e, "analyze", MSG_IA_ANALYZE)
 
 
 def handle_identificar_ingredientes(handler):
@@ -1252,10 +1268,10 @@ def handle_identificar_ingredientes(handler):
 
         items = call_claude_vision_ingredientes(image)
         handler._send_json(200, {"items": items})
-    except RuntimeError as e:
-        handler._send_json(500, {"error": str(e)})
+    except ValueError as e:
+        handler._send_json(400, {"error": str(e)})
     except Exception as e:
-        handler._send_json(500, {"error": f"Error inesperado: {e}"})
+        fallo_ia(handler, e, "identificar-ingredientes", MSG_IA_INGREDIENTES)
 
 
 def _build_prompt_analisis_dia(datos):
@@ -1386,7 +1402,7 @@ def handle_analisis_dia(handler):
     try:
         comentario = call_claude_analisis_dia(body)
     except Exception as e:
-        handler._send_json(502, {"error": str(e)})
+        fallo_ia(handler, e, "analisis-dia", MSG_IA_ANALISIS_DIA)
         return
     handler._send_json(200, {"comentario": comentario})
 
@@ -1437,10 +1453,8 @@ def handle_generar_receta(handler):
         handler._send_json(200, receta)
     except ValueError as e:
         handler._send_json(400, {"error": str(e)})
-    except RuntimeError as e:
-        handler._send_json(500, {"error": str(e)})
     except Exception as e:
-        handler._send_json(500, {"error": f"Error inesperado: {e}"})
+        fallo_ia(handler, e, "generar-receta", MSG_IA_RECETA)
 
 
 def handle_leer_receta(handler):
@@ -1483,10 +1497,8 @@ def handle_leer_receta(handler):
         handler._send_json(200, call_claude_leer_receta(imagen, texto))
     except ValueError as e:
         handler._send_json(400, {"error": str(e)})
-    except RuntimeError as e:
-        handler._send_json(500, {"error": str(e)})
     except Exception as e:
-        handler._send_json(500, {"error": f"Error inesperado: {e}"})
+        fallo_ia(handler, e, "leer-receta", MSG_IA_LEER_RECETA)
 
 
 def _leer_body_json(handler):
@@ -2461,10 +2473,13 @@ class Handler(BaseHTTPRequestHandler):
             if match:
                 try:
                     handler_fn(self, **match.groupdict())
-                except supabase_client.SupabaseError as e:
-                    self._send_json(500, {"error": str(e)})
                 except Exception as e:
-                    self._send_json(500, {"error": f"Error inesperado: {e}"})
+                    # El detalle (incluido el de Supabase) va al log, no a la
+                    # pantalla del paciente.
+                    print(f"[error] {method} {path}: {type(e).__name__}: {e}", flush=True)
+                    self._send_json(500, {
+                        "error": "Algo falló de nuestro lado. Inténtalo de nuevo en unos minutos."
+                    })
                 return True
         return False
 
