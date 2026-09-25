@@ -3247,7 +3247,12 @@ function itemsPreciables() {
     flat.push(item);
     if (item.cortes) flat.push(...item.cortes);
   }
-  return flat;
+  // Las categorías que quedaron sin precio propio al abrirse en cortes (hoy
+  // cerdo, pollo y merluza): el precio vive en cada corte. Hoy no se pueden
+  // marcar, pero quien las marcó ANTES de que se abrieran tiene ese id
+  // guardado en su teléfono, y sumarlo reventaba la app entera al abrirla
+  // (cadenaMasBarata leía precios.jumbo de un item sin precios).
+  return flat.filter((item) => item && item.precios);
 }
 
 // Los 3 nutrientes por separado (potasio, fósforo, sodio), no solo el peor —
