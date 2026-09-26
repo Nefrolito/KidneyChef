@@ -3,7 +3,8 @@
 
 Revisa lo que de verdad usa un paciente y lo que, cuando se cae, no avisa
 solo: la app web, la IA (con una llamada real a Anthropic), el portal del
-tratante, la clave de RevenueCat y la fecha de término de la demo.
+tratante, la base de datos (Supabase), la clave de RevenueCat y la fecha de
+término de la demo.
 
 Nació del 2026-09-24, cuando la clave de Anthropic venció y nadie se enteró
 hasta que Camilo abrió la app y vio el error.
@@ -142,6 +143,30 @@ def revisar_portal():
                  "puede ser Supabase pausado por inactividad.")
 
 
+def revisar_supabase():
+    """Hace que producción consulte Supabase y, de paso, lo mantiene despierto:
+    el plan gratuito pausa el proyecto tras unos 7 días sin actividad, y
+    mientras la pestaña del tratante esté oculta nadie más lo toca.
+
+    Se pide un paciente que no existe: el servidor tiene que buscarlo en la
+    tabla `pacientes` para responder 401. Si Supabase no contesta, el
+    servidor responde 500."""
+    status, _, _ = pedir(f"{BASE}/api/pacientes/me", headers={
+        "X-App-Key": app_key(),
+        "X-Codigo-Cliente": "CHEQUEO-SALUD",
+        "X-Device-Secret": "chequeo",
+    }, timeout=30)
+    if status == 401:
+        return ok("Base de datos (Supabase)", "responde; consulta hecha, el proyecto sigue activo")
+    if status == 500:
+        return falla("Base de datos (Supabase)", "el servidor no pudo consultarla",
+                     "Probablemente Supabase se pausó por inactividad: entra a "
+                     "supabase.com/dashboard y pulsa Restore en el proyecto. Si no, "
+                     "mira los logs de Render y busca [error].")
+    return aviso("Base de datos (Supabase)", f"respuesta inesperada ({status})",
+                 "Revisa los logs de Render.")
+
+
 def revisar_revenuecat():
     clave = os.environ.get("REVENUECAT_SECRET_KEY", "")
     if not clave:
@@ -202,7 +227,7 @@ def main():
     cargar_env()
 
     resultados = [revisar_web(), revisar_ia(), revisar_commit(), revisar_portal(),
-                  revisar_revenuecat(), revisar_demo()]
+                  revisar_supabase(), revisar_revenuecat(), revisar_demo()]
     hay_falla = any(r["estado"] == "falla" for r in resultados)
 
     if args.json:
