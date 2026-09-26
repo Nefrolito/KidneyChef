@@ -153,12 +153,35 @@ PAGINA_DEMO_TERMINADA = """<!DOCTYPE html>
 # de que casi todos actualicen rechazaría también a quienes pagan.
 #   observar (por defecto): consulta el nivel y registra en el log qué
 #     rechazaría, sin rechazar nada ni demorar la respuesta.
+#   exigir: consulta el nivel antes de atender y responde 403 si no alcanza.
+#     Si RevenueCat falla o falta su clave, deja pasar: una caída ajena no
+#     puede dejar sin servicio a quien paga. Se enciende con NIVEL_MODO=exigir
+#     en Render cuando los logs [nivel] ya casi no muestren sin-id desde la app.
 #   apagado: ni consulta ni registra.
 # Nunca se exige nivel para revocar o rechazar un vínculo, quitar la foto ni
 # leer datos propios (el consentimiento no va detrás de un pago), ni en los
 # endpoints del portal (el tratante no paga).
+NIVEL_MODOS = {"observar", "exigir", "apagado"}
 NIVEL_MODO = os.environ.get("NIVEL_MODO", "observar").strip().lower()
+if NIVEL_MODO not in NIVEL_MODOS:
+    # Un valor mal escrito no puede ni rechazar a todos ni apagar el registro
+    # sin que nadie lo note: se vuelve a observar y se avisa.
+    print(f"NIVEL_MODO inválido ({NIVEL_MODO!r}), se usa 'observar'", flush=True)
+    NIVEL_MODO = "observar"
 HEADER_REVENUECAT_ID = "X-RevenueCat-Id"
+
+NOMBRE_NIVEL = {"gold": "Gold", "platinum": "Platinum", "diamond": "Diamond"}
+MSG_NIVEL_SIN_ID = (
+    "Esta versión de KidneyChef ya no es compatible. "
+    "Actualízala desde la App Store para seguir usándola."
+)
+
+
+def _msg_nivel_insuficiente(minimo):
+    return (
+        f"Esta función es parte del plan {NOMBRE_NIVEL[minimo]}. "
+        "Puedes cambiar de plan desde «Ver planes» en la app."
+    )
 
 
 def _origen(handler):
@@ -181,33 +204,50 @@ def _decidir_nivel(app_user_id, minimo):
     try:
         nivel = revenuecat_client.nivel_de(app_user_id)
     except revenuecat_client.RevenueCatError as e:
-        # En modo exigir, una caída de RevenueCat tendría que dejar pasar.
+        # En modo exigir, una caída de RevenueCat tiene que dejar pasar.
         return True, f"error-revenuecat ({e})"
     if revenuecat_client.alcanza(nivel, minimo):
         return True, f"tiene={nivel}"
     return False, f"tiene={nivel or 'ninguno'}"
 
 
-def observar_nivel(handler, minimo):
-    """Registra si esta petición pasaría con el nivel exigido. No responde
-    nada ni frena la petición: la consulta a RevenueCat va en otro hilo."""
-    if NIVEL_MODO != "observar":
-        return
+def exigir_nivel(handler, minimo):
+    """True si la petición puede seguir. En modo exigir, si no alcanza el
+    nivel ya respondió 403 y devuelve False; en observar y apagado siempre
+    devuelve True (observar registra en otro hilo, sin demorar)."""
+    if NIVEL_MODO == "apagado":
+        return True
     app_user_id = handler.headers.get(HEADER_REVENUECAT_ID, "").strip()
     ruta = handler.path.split("?", 1)[0]
     origen = _origen(handler)
     # Solo el final del ID: alcanza para seguir a una instalación en el log.
     corto = app_user_id[-6:] if app_user_id else "-"
 
-    def tarea():
-        pasaria, detalle = _decidir_nivel(app_user_id, minimo)
+    def registrar(verbo, detalle):
         print(
-            f"[nivel] {'pasaria' if pasaria else 'rechazaria'} ruta={ruta} "
-            f"exige={minimo} {detalle} origen={origen} id=…{corto}",
+            f"[nivel] {verbo} ruta={ruta} exige={minimo} {detalle} "
+            f"origen={origen} id=…{corto}",
             flush=True,
         )
 
-    threading.Thread(target=tarea, daemon=True).start()
+    if NIVEL_MODO == "observar":
+        def tarea():
+            pasaria, detalle = _decidir_nivel(app_user_id, minimo)
+            registrar("pasaria" if pasaria else "rechazaria", detalle)
+
+        threading.Thread(target=tarea, daemon=True).start()
+        return True
+
+    if app_user_id and not revenuecat_client.configurado():
+        registrar("paso", "sin-clave-revenuecat")
+        return True
+    paso, detalle = _decidir_nivel(app_user_id, minimo)
+    registrar("paso" if paso else "rechazado", detalle)
+    if paso:
+        return True
+    mensaje = MSG_NIVEL_SIN_ID if not app_user_id else _msg_nivel_insuficiente(minimo)
+    handler._send_json(403, {"error": mensaje, "nivel_requerido": minimo})
+    return False
 
 
 REINTENTO = "Inténtalo de nuevo en unos minutos."
@@ -1175,7 +1215,8 @@ def handle_analyze(handler):
             handler._send_json(401, {"error": "Acceso no autorizado a la API."})
             return
 
-    observar_nivel(handler, "gold")
+    if not exigir_nivel(handler, "gold"):
+        return
 
     try:
         length = int(handler.headers.get("Content-Length", 0))
@@ -1238,7 +1279,8 @@ def handle_identificar_ingredientes(handler):
             handler._send_json(401, {"error": "Acceso no autorizado a la API."})
             return
 
-    observar_nivel(handler, "platinum")
+    if not exigir_nivel(handler, "platinum"):
+        return
 
     try:
         length = int(handler.headers.get("Content-Length", 0))
@@ -1385,7 +1427,8 @@ def handle_analisis_dia(handler):
             handler._send_json(401, {"error": "Acceso no autorizado a la API."})
             return
 
-    observar_nivel(handler, "gold")
+    if not exigir_nivel(handler, "gold"):
+        return
 
     body = _leer_body_json(handler)
     if body is None:
@@ -1433,7 +1476,8 @@ def handle_generar_receta(handler):
     situacion_clinica = body.get("situacion_clinica") if isinstance(body.get("situacion_clinica"), dict) else None
     riesgo_hiperkalemia = bool(body.get("riesgo_hiperkalemia"))
     robot_id = body.get("robot") if isinstance(body.get("robot"), str) else None
-    observar_nivel(handler, "diamond" if robot_id else "platinum")
+    if not exigir_nivel(handler, "diamond" if robot_id else "platinum"):
+        return
 
     ip = handler._client_ip()
     permitido, retry_after, motivo = RATE_LIMITER.check(ip)
@@ -1469,7 +1513,8 @@ def handle_leer_receta(handler):
             handler._send_json(401, {"error": "Acceso no autorizado a la API."})
             return
 
-    observar_nivel(handler, "diamond")
+    if not exigir_nivel(handler, "diamond"):
+        return
 
     body = _leer_body_json(handler)
     if body is None:
@@ -1538,7 +1583,8 @@ def handle_crear_paciente(handler):
             handler._send_json(401, {"error": "Acceso no autorizado a la API."})
             return
 
-    observar_nivel(handler, "platinum")
+    if not exigir_nivel(handler, "platinum"):
+        return
 
     secret = generar_device_secret()
     secret_hash = hash_device_secret(secret)
@@ -1620,7 +1666,8 @@ def handle_actualizar_vinculo_paciente(handler, id):
         return
     nuevo_estado = body.get("estado")
     if nuevo_estado == "activo":
-        observar_nivel(handler, "platinum")
+        if not exigir_nivel(handler, "platinum"):
+            return
     vinculo = supabase_client.get_vinculo_por_id(id)
     if not vinculo or vinculo["paciente_id"] != paciente["id"]:
         handler._send_json(404, {"error": "Vínculo no encontrado"})
@@ -1929,7 +1976,8 @@ def handle_upsert_consumo(handler, fecha):
     if not paciente:
         handler._send_json(401, {"error": "Credenciales de dispositivo inválidas"})
         return
-    observar_nivel(handler, "platinum")
+    if not exigir_nivel(handler, "platinum"):
+        return
     if not supabase_client.find_vinculo_activo(paciente["id"]):
         handler._send_json(403, {
             "error": "No hay un vínculo activo con ningún tratante; el consumo no se sincroniza."
@@ -2023,7 +2071,8 @@ def handle_put_foto_paciente(handler):
     if not paciente:
         handler._send_json(401, {"error": "Credenciales de dispositivo inválidas"})
         return
-    observar_nivel(handler, "platinum")
+    if not exigir_nivel(handler, "platinum"):
+        return
     if not supabase_client.find_vinculo_activo(paciente["id"]):
         handler._send_json(403, {
             "error": "No hay un vínculo activo con ningún tratante; la foto no se guarda."

@@ -21,6 +21,7 @@ services:
       - key: REVENUECAT_SECRET_KEY
         sync: false
       # observar: solo registra en el log qué rechazaría (ver server.py).
+      # exigir: responde 403 a quien no tiene el nivel. apagado: nada.
       - key: NIVEL_MODO
         value: observar
       # Último día en que se puede abrir la app web compartida por fuera de
