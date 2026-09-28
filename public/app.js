@@ -114,6 +114,19 @@ function apiKeyRevenueCat() {
   return platform === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
 }
 
+function esAndroid() {
+  return esAppNativa() && window.Capacitor.getPlatform?.() === "android";
+}
+
+// Google Play identifica cada plan como "suscripción:plan base"
+// ("com.kidneychef.app.gold:mensual"); Apple, solo por el producto. En Play
+// cada nivel y periodo es una suscripción aparte con los mismos ids que en
+// App Store Connect, así que basta quitar el plan base para que el resto del
+// código use un solo id en las dos tiendas.
+function idProductoTienda(identifier) {
+  return (identifier || "").split(":")[0];
+}
+
 async function initRevenueCat() {
   const apiKey = apiKeyRevenueCat();
   if (!apiKey) return;
@@ -144,10 +157,17 @@ async function cargarProductosTienda() {
     const Purchases = window.Capacitor.Plugins.Purchases;
     const { current } = await Purchases.getOfferings();
     for (const pkg of current?.availablePackages || []) {
-      if (pkg.product?.identifier) tienda.productos[pkg.product.identifier] = pkg.product;
+      if (pkg.product?.identifier) tienda.productos[idProductoTienda(pkg.product.identifier)] = pkg.product;
     }
     const ids = Object.keys(tienda.productos);
-    if (ids.length) {
+    if (esAndroid()) {
+      // Play no responde la consulta de elegibilidad (siempre UNKNOWN): en
+      // cambio, solo entrega las ofertas que esta cuenta todavía puede usar,
+      // y RevenueCat deja la de prueba gratis como opción por defecto.
+      for (const id of ids) {
+        tienda.elegibleParaPrueba[id] = Boolean(tienda.productos[id].defaultOption?.freePhase);
+      }
+    } else if (ids.length) {
       // Apple da la prueba una sola vez por grupo de suscripciones: quien ya
       // la usó no puede ver "1 mes gratis", porque se le cobraría al tiro.
       const eleg = await Purchases.checkTrialOrIntroductoryPriceEligibility({ productIdentifiers: ids });
@@ -194,7 +214,15 @@ const UNIDADES_PERIODO = {
 // "1 mes" si este producto trae prueba gratis y esta cuenta todavía puede
 // usarla; null en cualquier otro caso (incluido cuando no se sabe).
 function pruebaGratisDe(productId) {
-  const intro = tienda.productos[productId]?.introPrice;
+  const producto = tienda.productos[productId];
+  const fase = producto?.defaultOption?.freePhase;
+  if (fase) {
+    if (!tienda.elegibleParaPrueba[productId]) return null;
+    const n = fase.billingPeriod?.value || 1;
+    const [uno, varios] = UNIDADES_PERIODO[fase.billingPeriod?.unit] || UNIDADES_PERIODO.MONTH;
+    return `${n} ${n === 1 ? uno : varios}`;
+  }
+  const intro = producto?.introPrice;
   if (!tienda.elegibleParaPrueba[productId] || !intro || intro.price !== 0) return null;
   const n = intro.periodNumberOfUnits || 1;
   const [uno, varios] = UNIDADES_PERIODO[intro.periodUnit] || UNIDADES_PERIODO.MONTH;
@@ -225,7 +253,7 @@ async function comprarSuscripcion() {
     const Purchases = window.Capacitor.Plugins.Purchases;
     const { current } = await Purchases.getOfferings();
     const idProducto = productIdSeleccionado();
-    const paquete = current?.availablePackages?.find((pkg) => pkg.product?.identifier === idProducto);
+    const paquete = current?.availablePackages?.find((pkg) => idProductoTienda(pkg.product?.identifier) === idProducto);
     if (!paquete) {
       // Falta configurar el producto en RevenueCat o todavía no lo aprueba la
       // tienda. No es culpa del paciente y no se le cobró nada.
@@ -296,7 +324,7 @@ function aplicarCustomerInfo(customerInfo) {
     enPrueba: ent?.periodType === "TRIAL",
     vence: ent?.expirationDate || null,
     seRenueva: ent ? ent.willRenew !== false : false,
-    producto: ent?.productIdentifier || null,
+    producto: ent?.productIdentifier ? idProductoTienda(ent.productIdentifier) : null,
   };
   guardarPerfil(perfil);
   tienda.listo = true;
