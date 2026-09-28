@@ -1,8 +1,9 @@
 # Android: cómo construir y publicar KidneyChef
 
 El proyecto Android es el mismo Capacitor que la app de iOS: el código vive en
-`public/` y acá solo se empaqueta. Al 2026-09-17 la app está publicada en la
-App Store y **no** en Google Play.
+`public/` y acá solo se empaqueta. Al 2026-09-28 la app está publicada en la
+App Store y **no** en Google Play. El Android va en la misma versión que iOS:
+1.2, `versionCode` 8 (el mismo número del build de Xcode).
 
 ## 1. Requisitos locales
 
@@ -51,21 +52,59 @@ Para subir una versión nueva hay que aumentar `versionCode` en
 
 ## 4. Lo que falta antes de publicar
 
-1. **Cuenta de Google Play Developer**: pago único de 25 USD y verificación de
-   identidad.
-2. **Prueba cerrada obligatoria**: una cuenta personal creada después del
-   13-11-2023 necesita 12 testers inscritos 14 días seguidos antes de pedir
-   acceso a producción. Cuentas de organización están exentas.
-3. **Suscripciones**: crearlas en Play Console con los mismos identificadores
-   que en RevenueCat, agregar la app Android en RevenueCat y poner su clave
-   pública en `REVENUECAT_API_KEY_ANDROID` (`public/app.js`), hoy vacía. Sin
-   eso el paywall no puede cobrar en Android.
-4. **Formularios de Play Console**: seguridad de los datos, clasificación de
-   contenido, público objetivo y la **declaración de apps de salud**.
-5. **Ficha**: para una app de salud que no es dispositivo médico, la
-   descripción debe decirlo y recordar consultar a un profesional.
+1. **Cuenta de Google Play Developer de organización** (a nombre de la SpA):
+   pago único de 25 USD, número D-U-N-S de la empresa y verificación de la
+   organización. Las cuentas de organización no tienen que pasar la prueba
+   cerrada de 12 testers durante 14 días que se exige a las personales. La razón social,
+   el RUT y la dirección tienen que coincidir con el SII y con el D-U-N-S.
+2. **Llave de subida y `keystore.properties`** (sección 2).
+3. **Suscripciones en Play Console** (Monetizar → Suscripciones). Seis
+   suscripciones con **los mismos ids que en App Store Connect**, cada una con
+   un solo plan base:
 
-## 5. Borrador de la ficha
+   | Suscripción (id) | Plan base | Precio |
+   |---|---|---|
+   | `com.kidneychef.app.gold` | `mensual`, renovación mensual | $5.990 |
+   | `com.kidneychef.app.gold.annual` | `anual`, renovación anual | $49.990 |
+   | `com.kidneychef.app.platinum` | `mensual` | $7.990 |
+   | `com.kidneychef.app.platinum.annual` | `anual` | $69.990 |
+   | `com.kidneychef.app.diamond` | `mensual` | $9.990 |
+   | `com.kidneychef.app.diamond.annual` | `anual` | $89.990 |
+
+   En cada una, una **oferta de prueba gratis de 1 mes** con elegibilidad
+   "Adquisición de clientes nuevos → nunca tuvo ninguna suscripción" (lo mismo
+   que en Apple, donde la prueba se da una vez por grupo). Play entrega como id
+   `suscripción:plan base`; la app le quita el plan base (`idProductoTienda()`
+   en `public/app.js`), así que el código es el mismo para las dos tiendas.
+4. **RevenueCat**: agregar la app Android (`com.kidneychef.app`), subir la
+   credencial de la cuenta de servicio de Google (Play Console → Configuración →
+   Acceso a la API; los permisos pueden demorar hasta 36 h en activarse),
+   importar los seis productos y colgarlos de los mismos entitlements `gold`,
+   `platinum` y `diamond`, y de la misma offering. Después, poner la clave pública
+   `goog_...` en `REVENUECAT_API_KEY_ANDROID` (`public/app.js`), que hoy está
+   vacía. Sin ella la app de Android usa el contador local de 30 días de la
+   demo web y no puede cobrar. El servidor consulta RevenueCat sin importar la
+   tienda, así que no hay que cambiarlo.
+5. **Países: solo Chile**, igual que en la App Store (restricción legal).
+6. **Formularios de Play Console**: seguridad de los datos (sección 6),
+   clasificación de contenido (IARC: sin violencia ni contenido sensible),
+   público objetivo mayores de 18, sin anuncios, y la **declaración de apps de
+   salud** (sección 7).
+7. **Probar en un teléfono Android real** con una prueba interna antes de
+   producción: cámara, paywall con precios de Play y compra con una cuenta de
+   prueba de licencias.
+
+## 5. Ficha de Play Store (español, Latinoamérica)
+
+Los gráficos están en `~/Desktop/ficha-google-play-kidneychef/`, fuera del repo:
+`icono-512.png`, `grafico-destacado-1024x500.png` y cinco capturas de
+1080×2160. Son las de iPhone de 6,9" con márgenes laterales del color del
+borde, porque Play no acepta una proporción mayor que 2:1. La app es la misma
+vista web, así que en Android se ve igual.
+
+**Nombre (máx. 30):** KidneyChef
+
+**Categoría:** Medicina
 
 **Descripción corta (máx. 80 caracteres)**
 
@@ -80,8 +119,8 @@ Para subir una versión nueva hay que aumentar `versionCode` en
 > • Registro del día con tus metas de potasio, fósforo, sodio, carbohidratos y
 >   calorías, y del agua y el peso si estás en diálisis.
 > • Recetas con lo que tienes en el refrigerador, ajustadas a tu situación.
-> • Lista de supermercado con precios de referencia de cadenas chilenas.
-> • Tu nefrólogo(a) o nutricionista puede fijarte metas propias desde su portal.
+> • Lista de supermercado con cortes reales y precios de referencia de cadenas
+>   chilenas.
 > • Datos nutricionales de USDA FoodData Central, y criterios de la National
 >   Kidney Foundation, KDIGO y KDOQI, todos citados dentro de la app.
 >
@@ -90,21 +129,49 @@ Para subir una versión nueva hay que aumentar `versionCode` en
 > siempre a tu equipo de nefrología y nutrición antes de cambiar tu dieta o tu
 > tratamiento.
 >
-> Suscripción con un mes de prueba. Se renueva sola y se cancela desde Google
-> Play cuando quieras.
+> Tres planes (Gold, Platinum y Diamond), mensuales o anuales, con un mes de
+> prueba gratis. La suscripción se renueva sola y se cancela cuando quieras
+> desde Google Play.
 
-**Enlaces obligatorios**
+(Se sacó la línea del portal del tratante: esa pestaña está oculta en la 1.2 y
+Google rechaza fichas que describen funciones que la app no tiene. Volverá con
+la 1.3.)
+
+**Enlaces**
 
 - Privacidad: https://kidneychef-api.onrender.com/privacidad.html
 - Términos: https://kidneychef-api.onrender.com/terminos.html
 - Soporte: https://kidneychef-api.onrender.com/soporte.html
+- Correo de contacto: soporte.kidneychef@gmail.com
 
-## 6. Seguridad de los datos (borrador de respuestas)
+## 6. Seguridad de los datos (respuestas para Play Console)
 
-- Las fotos de comida se envían al backend solo para analizarlas y no se
-  guardan.
-- El historial, el perfil clínico y las metas viven en el teléfono
-  (`localStorage`).
-- Solo si el paciente activa el vínculo con un tratante se suben al servidor su
-  código de cliente y el total diario de potasio y fósforo.
-- No hay cuentas de usuario para el paciente ni publicidad.
+Revisado contra el código de la 1.2 el 2026-09-28. Todo viaja por HTTPS
+("encriptados en tránsito": sí). El paciente no tiene cuenta, así que no hay
+URL de borrado de cuenta; su historial se borra al desinstalar.
+
+| Tipo de dato (Play) | ¿Se recopila? | Detalle |
+|---|---|---|
+| Fotos | Sí, **procesamiento efímero** | Fotos del plato, del refrigerador y de recetas: el backend las pasa a la IA (Anthropic) para analizarlas y no las guarda. Obligatorio para la función. |
+| Información de salud | Sí, **procesamiento efímero** | Con "Analizar mi día" y las recetas se envían la etapa renal, las metas y lo que comió, sin nombre, para que la IA comente. No se guardan. Opcional. |
+| Historial de compras | Sí | RevenueCat recibe las compras de Google Play para dar el nivel. Funcionalidad de la app. |
+| ID del dispositivo u otros | Sí | ID anónimo de RevenueCat, que va al servidor en cada llamada (`X-RevenueCat-Id`) para comprobar el nivel. Funcionalidad de la app. No es el ID de publicidad. |
+| Dirección IP | Solo en registros del servidor | Para el límite de uso y el diagnóstico (`[rate-limit]`, `[auth]`). |
+
+Compartir con terceros: **no**. Anthropic y RevenueCat procesan los datos por
+cuenta de KidneyChef, y Google no cuenta eso como "compartir". El nombre, la
+fecha de nacimiento (solo para calcular la edad y el eGFR), el historial, el
+perfil clínico y las metas quedan en el teléfono (`localStorage`) y no se
+declaran. El vínculo
+con el tratante (Supabase) está apagado en la 1.2; al encenderlo en la 1.3 hay
+que agregar "nombre", "información de salud: almacenada" y la URL de borrado.
+
+## 7. Declaración de apps de salud
+
+- Funciones: **nutrición y control de peso** (dieta renal) y **gestión de
+  enfermedades** (enfermedad renal crónica).
+- No es dispositivo médico, no está regulada como tal y no pretende
+  diagnosticar ni tratar. El descargo va en la descripción larga y dentro de
+  la app (Acerca de y cada análisis).
+- Fuentes citadas dentro de la app: `fuentes.html`
+  (https://kidneychef-api.onrender.com/fuentes.html).
