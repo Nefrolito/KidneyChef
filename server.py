@@ -146,6 +146,94 @@ PAGINA_DEMO_TERMINADA = """<!DOCTYPE html>
 </body>
 </html>"""
 
+# --- Invitaciones a la app web -------------------------------------------
+# Links personales que Camilo le pasa a un paciente para probar la app en el
+# navegador, cada uno con su propio vencimiento (7 días por defecto, ver
+# scripts/crear_invitacion.py). El link lleva el vencimiento firmado con
+# HMAC-SHA256 y una clave que solo vive en Render y en el .env: no se puede
+# fabricar uno, ni alargar uno existente, sin esa clave. Cambiar la clave
+# anula de golpe todas las invitaciones emitidas.
+# Al abrir /i/<token> el servidor deja el token en una cookie HttpOnly y
+# redirige a la app; desde ahí la app web y sus llamadas de IA exigen esa
+# cookie vigente. La app nativa (otro origen) y el portal del tratante no la
+# necesitan. Vacía = no se exige invitación (como en local).
+INVITACION_SECRETO = os.environ.get("INVITACION_SECRETO", "").strip()
+COOKIE_INVITACION = "kc_invitacion"
+
+
+def _b64url(datos):
+    return base64.urlsafe_b64encode(datos).rstrip(b"=").decode("ascii")
+
+
+def _b64url_decode(texto):
+    return base64.urlsafe_b64decode(texto + "=" * (-len(texto) % 4))
+
+
+def firmar_invitacion(vence_ts, secreto=None):
+    """Token = vencimiento (unix) + 8 bytes al azar, firmado. El azar hace que
+    dos invitaciones del mismo día no sean iguales."""
+    clave = (secreto or INVITACION_SECRETO).encode("utf-8")
+    cuerpo = int(vence_ts).to_bytes(8, "big") + secrets.token_bytes(8)
+    firma = hmac.new(clave, cuerpo, hashlib.sha256).digest()
+    return _b64url(cuerpo) + "." + _b64url(firma)
+
+
+def vencimiento_invitacion(token):
+    """Devuelve el vencimiento (unix) si el token es auténtico y sigue vigente;
+    None si no."""
+    if not INVITACION_SECRETO or not token or len(token) > 100:
+        return None
+    try:
+        parte_cuerpo, parte_firma = token.split(".", 1)
+        cuerpo = _b64url_decode(parte_cuerpo)
+        firma = _b64url_decode(parte_firma)
+    except (ValueError, base64.binascii.Error):
+        return None
+    if len(cuerpo) != 16:
+        return None
+    esperada = hmac.new(INVITACION_SECRETO.encode("utf-8"), cuerpo, hashlib.sha256).digest()
+    if not hmac.compare_digest(firma, esperada):
+        return None
+    vence = int.from_bytes(cuerpo[:8], "big")
+    return vence if time.time() < vence else None
+
+
+PAGINA_SIN_INVITACION = """<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KidneyChef</title>
+<style>
+  body {{ margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: #f4f8fa; color: #17262c; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }}
+  .caja {{ max-width: 420px; margin: 1.5rem; padding: 2rem 1.75rem; background: #fff; border: 1px solid #dfe7eb;
+    border-radius: 16px; line-height: 1.6; }}
+  h1 {{ color: #0b5a70; font-size: 1.35rem; margin: 0 0 0.9rem; }}
+  p {{ margin: 0 0 1rem; font-size: 0.95rem; }}
+  a {{ color: #0e7490; }}
+  .nota {{ color: #5b7280; font-size: 0.85rem; margin: 0; }}
+  @media (prefers-color-scheme: dark) {{
+    body {{ background: #0b1418; color: #e8f1f4; }}
+    .caja {{ background: #101c22; border-color: #223038; }}
+    h1 {{ color: #7fd3e6; }}
+    .nota {{ color: #93a5ae; }}
+  }}
+</style>
+</head>
+<body>
+  <div class="caja">
+    <h1>{titulo}</h1>
+    <p>La versión de KidneyChef en el navegador se abre con una invitación personal,
+      que dura unos días. Pídele una nueva a tu equipo tratante.</p>
+    <p>La app completa está en la App Store:
+      <a href="{tienda}">descargar KidneyChef</a>.</p>
+    <p class="nota">¿Dudas? Escríbenos desde la página de
+      <a href="/soporte.html">soporte</a>.</p>
+  </div>
+</body>
+</html>"""
+
 # --- Nivel de suscripción del lado del servidor -------------------------
 # Hoy los niveles (Gold/Platinum/Diamond) solo los aplica la app. La app 1.2
 # manda su ID de RevenueCat en X-RevenueCat-Id y el servidor puede
@@ -2524,6 +2612,12 @@ class Handler(BaseHTTPRequestHandler):
                 "error": "La versión de prueba en el navegador terminó. La app completa está en la App Store."
             })
             return True
+        if (self.path.split("?", 1)[0] in DEMO_RUTAS_IA
+                and self._desde_app_web() and not self._invitacion_vigente()):
+            self._send_json(403, {
+                "error": "Tu invitación para probar KidneyChef venció. Pide una nueva a tu equipo tratante."
+            })
+            return True
         """Busca en ROUTES una entrada que matchee método+path. Devuelve True
         si encontró una (el handler ya respondió, incluso si fue con un 500),
         False si ninguna matcheó (el llamador decide qué hacer — 404, o caer a
@@ -2580,14 +2674,68 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(cuerpo)
 
+    def _desde_app_web(self):
+        # La app web llama con fetch al mismo origen, y el navegador manda
+        # Origin en los POST. La app nativa llega desde capacitor://localhost
+        # o https://localhost, y el portal del tratante no usa estas rutas.
+        if not INVITACION_SECRETO:
+            return False
+        origen = urllib.parse.urlparse(self.headers.get("Origin", "")).netloc
+        return bool(origen) and origen == self.headers.get("Host", "")
+
+    def _invitacion_vigente(self):
+        for trozo in self.headers.get("Cookie", "").split(";"):
+            nombre, _, valor = trozo.strip().partition("=")
+            if nombre == COOKIE_INVITACION and vencimiento_invitacion(valor):
+                return True
+        return False
+
+    def _servir_html(self, status, html, extra_headers=None):
+        cuerpo = html.encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(cuerpo)))
+        self.send_header("Cache-Control", "no-store")
+        for name, value in (extra_headers or {}).items():
+            self.send_header(name, value)
+        self.end_headers()
+        self.wfile.write(cuerpo)
+
+    def _abrir_invitacion(self, token):
+        vence = vencimiento_invitacion(token)
+        if not vence:
+            print(f"[invitacion] inválida o vencida ip={self._client_ip()}", flush=True)
+            self._servir_html(403, PAGINA_SIN_INVITACION.format(
+                titulo="Esta invitación ya no sirve", tienda=APP_STORE_URL))
+            return
+        segura = "; Secure" if self.headers.get("X-Forwarded-Proto") == "https" else ""
+        self.send_response(303)
+        self.send_header(
+            "Set-Cookie",
+            f"{COOKIE_INVITACION}={token}; Max-Age={int(vence - time.time())}; "
+            f"Path=/; HttpOnly; SameSite=Lax{segura}",
+        )
+        self.send_header("Location", "/")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def do_GET(self):
         if self._dispatch("GET"):
             return
         path = self.path.split("?", 1)[0]
+        if path.startswith("/i/"):
+            self._abrir_invitacion(path[len("/i/"):])
+            return
         # Solo se corta la entrada a la app web. Las páginas legales y el
         # portal del tratante siguen sirviéndose.
         if path in ("/", "/index.html") and demo_vencida():
             self._servir_demo_terminada()
+            return
+        if (path in ("/", "/index.html") and INVITACION_SECRETO
+                and not self._invitacion_vigente()):
+            self._servir_html(403, PAGINA_SIN_INVITACION.format(
+                titulo="Necesitas una invitación", tienda=APP_STORE_URL))
             return
         # El portal del tratante es una segunda raíz estática, separada de
         # public/ (que es la app del paciente) — mismo estilo sin build ni
