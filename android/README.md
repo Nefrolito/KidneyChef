@@ -22,16 +22,16 @@ mandarle los bundles. Guárdala fuera del repositorio y no la pierdas: sin ella
 no se puede publicar una actualización.
 
 ```bash
-"$JAVA_HOME/bin/keytool" -genkeypair -v -keystore ~/Documents/kidneychef-upload.jks -alias kidneychef -keyalg RSA -keysize 2048 -validity 10000
+"$JAVA_HOME/bin/keytool" -genkeypair -v -keystore ~/kidneychef-upload.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 Te va a pedir una contraseña y tus datos. Después crea
 `android/keystore.properties` (git lo ignora) con:
 
 ```properties
-storeFile=/Users/camiloulloa/Documents/kidneychef-upload.jks
+storeFile=/Users/camiloulloa/kidneychef-upload.jks
 storePassword=la-que-pusiste
-keyAlias=kidneychef
+keyAlias=upload
 keyPassword=la-que-pusiste
 ```
 

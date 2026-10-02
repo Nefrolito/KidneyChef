@@ -34,7 +34,7 @@ const API_BASE = esAppNativa() ? "https://kidneychef-api.onrender.com" : "";
 // tratante/config.js). Con la de la plataforma vacía, initRevenueCat() no
 // hace nada y la app usa el contador local de prueba, como la demo web.
 const REVENUECAT_API_KEY_IOS = "appl_CqmSDZNWUZxeKLOQgWQGsaITuRr";
-const REVENUECAT_API_KEY_ANDROID = "";
+const REVENUECAT_API_KEY_ANDROID = "goog_WBODrkqlCQXMhjsLCJBFNtwbwic";
 
 // De mayor a menor nivel — deben coincidir con los entitlements creados en
 // RevenueCat. Cada producto otorga solo su propio entitlement (no son
