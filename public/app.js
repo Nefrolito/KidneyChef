@@ -119,12 +119,15 @@ function esAndroid() {
 }
 
 // Google Play identifica cada plan como "suscripción:plan base"
-// ("com.kidneychef.app.gold:mensual"); Apple, solo por el producto. En Play
-// cada nivel y periodo es una suscripción aparte con los mismos ids que en
-// App Store Connect, así que basta quitar el plan base para que el resto del
-// código use un solo id en las dos tiendas.
-function idProductoTienda(identifier) {
-  return (identifier || "").split(":")[0];
+// ("com.kidneychef.app.gold:anual"); Apple, solo por el producto. En Play
+// cada nivel es una suscripción (mismo id que el mensual de App Store
+// Connect) con dos planes base, "mensual" y "anual", así que el plan anual se
+// traduce al id anual de Apple (".annual") para que el resto del código use un
+// solo id en las dos tiendas. En los entitlements de Android el plan base
+// viene aparte (productPlanIdentifier).
+function idProductoTienda(identifier, planBase) {
+  const [id, plan = planBase] = (identifier || "").split(":");
+  return plan === "anual" && !id.endsWith(".annual") ? `${id}.annual` : id;
 }
 
 async function initRevenueCat() {
@@ -324,7 +327,7 @@ function aplicarCustomerInfo(customerInfo) {
     enPrueba: ent?.periodType === "TRIAL",
     vence: ent?.expirationDate || null,
     seRenueva: ent ? ent.willRenew !== false : false,
-    producto: ent?.productIdentifier ? idProductoTienda(ent.productIdentifier) : null,
+    producto: ent?.productIdentifier ? idProductoTienda(ent.productIdentifier, ent.productPlanIdentifier) : null,
   };
   guardarPerfil(perfil);
   tienda.listo = true;

@@ -58,28 +58,29 @@ Para subir una versión nueva hay que aumentar `versionCode` en
    cerrada de 12 testers durante 14 días que se exige a las personales. La razón social,
    el RUT y la dirección tienen que coincidir con el SII y con el D-U-N-S.
 2. **Llave de subida y `keystore.properties`** (sección 2).
-3. **Suscripciones en Play Console** (Monetizar → Suscripciones). Seis
-   suscripciones con **los mismos ids que en App Store Connect**, cada una con
-   un solo plan base:
+3. **Suscripciones en Play Console** (Monetizar → Suscripciones). Tres
+   suscripciones, una por nivel, con **el mismo id que el mensual de App Store
+   Connect** y dos planes base cada una:
 
-   | Suscripción (id) | Plan base | Precio |
-   |---|---|---|
-   | `com.kidneychef.app.gold` | `mensual`, renovación mensual | $5.990 |
-   | `com.kidneychef.app.gold.annual` | `anual`, renovación anual | $49.990 |
-   | `com.kidneychef.app.platinum` | `mensual` | $7.990 |
-   | `com.kidneychef.app.platinum.annual` | `anual` | $69.990 |
-   | `com.kidneychef.app.diamond` | `mensual` | $9.990 |
-   | `com.kidneychef.app.diamond.annual` | `anual` | $89.990 |
+   | Suscripción (id) | Plan base | Precio | Producto en RevenueCat |
+   |---|---|---|---|
+   | `com.kidneychef.app.gold` | `mensual`, renovación mensual | $5.990 | `com.kidneychef.app.gold:mensual` |
+   | | `anual`, renovación anual | $49.990 | `com.kidneychef.app.gold:anual` |
+   | `com.kidneychef.app.platinum` | `mensual` | $7.990 | `com.kidneychef.app.platinum:mensual` |
+   | | `anual` | $69.990 | `com.kidneychef.app.platinum:anual` |
+   | `com.kidneychef.app.diamond` | `mensual` | $9.990 | `com.kidneychef.app.diamond:mensual` |
+   | | `anual` | $89.990 | `com.kidneychef.app.diamond:anual` |
 
-   En cada una, una **oferta de prueba gratis de 1 mes** con elegibilidad
+   En cada plan base, una **oferta de prueba gratis de 1 mes** con elegibilidad
    "Adquisición de clientes nuevos → nunca tuvo ninguna suscripción" (lo mismo
    que en Apple, donde la prueba se da una vez por grupo). Play entrega como id
-   `suscripción:plan base`; la app le quita el plan base (`idProductoTienda()`
-   en `public/app.js`), así que el código es el mismo para las dos tiendas.
+   `suscripción:plan base`; la app lo traduce al id de Apple (`:anual` pasa a
+   `.annual`, `idProductoTienda()` en `public/app.js`), así que el código es el
+   mismo para las dos tiendas.
 4. **RevenueCat**: agregar la app Android (`com.kidneychef.app`), subir la
    credencial de la cuenta de servicio de Google (Play Console → Configuración →
    Acceso a la API; los permisos pueden demorar hasta 36 h en activarse),
-   importar los seis productos y colgarlos de los mismos entitlements `gold`,
+   importar los seis productos (o crearlos a mano con los ids de la tabla) y colgarlos de los mismos entitlements `gold`,
    `platinum` y `diamond`, y de la misma offering. Después, poner la clave pública
    `goog_...` en `REVENUECAT_API_KEY_ANDROID` (`public/app.js`), que hoy está
    vacía. Sin ella la app de Android usa el contador local de 30 días de la
